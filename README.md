@@ -1,7 +1,4 @@
-Sup Kir.
-I'll just keep track of my hacks and stuff here. 
+Fixes:
 
-Should be fun!
-
-26/06:
+26/06 - MLSTRM:
 Fixed parallelogram for M-slice pieces in IE; -msperspective -> -ms-perspective
