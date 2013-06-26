@@ -1,0 +1,1229 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+<meta content="utf-8" http-equiv="encoding">
+<html>
+<head><title>kSim</title>
+<style>
+body{color:#777;font-family:arial;font-size:15px;font-weight:200;}img{border:0px;}
+.fl{position:absolute;border:1px solid #000;width:50px;height:50px; text-align:center;font-size:20px;cursor:pointer;cursor:hand;}
+.u{height:35px;-webkit-transform:rotate(25deg)skew(-45deg);-moz-transform:rotate(25deg)skew(-45deg);-o-transform:rotate(25deg)skew(-45deg);-ms-transform:rotate(25deg)skew(-45deg)}
+.f{height:45px;-webkit-transform:rotate(90deg)skew(-26deg);-moz-transform:rotate(90deg)skew(-26deg);-o-transform:rotate(90deg)skew(-26deg);-ms-transform:rotate(90deg)skew(-26deg)}
+.r{height:47px;-webkit-transform:rotate(158deg)skew(-22deg);-moz-transform:rotate(159deg)skew(-22deg);-o-transform:rotate(158deg)skew(-22deg);-ms-transform:rotate(158deg)skew(-22deg)}
+.b{background-color:#ededed;color:#777;font-family:arial;font-size:15px;font-weight:700;padding:6px 24px}
+.l{cursor:pointer;cursor:hand;float:left;font-weight:700;margin-right:5px;color:#00F}
+.fli{float:left;cursor:pointer;cursor:hand;width:20px;height:20px;margin-right:5px;border:2px solid #000;text-align:center;font-weight:700}
+</style>
+</head>
+<body>
+<div id="wrapper" style="border:0px solid black;position:relative;margin-top:72px;margin-left:80px;width:0px;float:left;">
+<script>
+/*
+ksim - thom barlow
+acube - josef jelinek & lucas garron
+timing - joey gouly
+visualcube - conrad rider
+ideas & testing - justin jaffray
+
+&alg - algorithm input
+&keys - keyboard map
+&nokeys - disable keys
+&colours - face colours (all six need to be specified for visualcube images to work)
+&solve - scramble,solve ,,,=splits
+&alt - alternative layout
+&macro - name,alg,name,alg
+&rfu - rfu only view
+&align - left,right,swap,centre
+
+TODO:
+show key layout
+local storage saving
+meepmode - 19:55 <Meep> i get much better times when i halve their width: http://dl.dropboxusercontent.com/u/10477021/cube/qcube.htm
+custom solver - read jaap's pruning guide
+viscube arrows
+*/
+function $(id){return document.getElementById(id);}
+
+function getParams(sname) {
+  var params = location.search.substr(location.search.indexOf("?")+1);
+  var sval = "";  params = params.split("&");
+  for (var i=0; i<params.length; i++)
+  { temp = params[i].split("="); if ( [temp[0]] == sname ) { if (temp.length == 1) { sval = sname;} else {sval = temp[1];} } }
+  return unescape(sval);
+}
+var _align = getParams("align");
+var _alg = getParams("alg");
+var _alt = getParams("alt");
+var _kds = getParams("nokeys");
+var _keys = getParams("keys");
+var _colours = getParams("colours");
+var _solve = getParams("solve");
+var _macro = getParams("macro");
+var start_time, end_time, solve_time, cubestate = 0;
+var remap=0, kdsv=0;
+var macros=[];
+var times = [];
+var scrambles=[[0,1,4,5],[0,1,8,9],[0,1,2,3,6,7],[0,1,8,9,2,3],[0,1,4,5,2,3,22,23]];
+var ckeys="URMFLBDEyxzrl";
+var qkeys=[74,70,73,75,999,998,72,71,68,69,87,79,83,76,997,996,59,65,89,78,80,81,85,77,86,82];
+var kkeys=[74,70,73,75,72,71,78,86,68,69,87,79,83,76,82,85,59,65,89,84,80,81,56,188,67,51];
+var keys = kkeys;
+var browser = 0;
+if (navigator.userAgent.indexOf("Chrome")!=-1 || navigator.userAgent.indexOf("Safari")!=-1) { browser = 1; }
+else if (navigator.userAgent.indexOf("MSIE")!=-1) { browser = 1; }
+var clr = ["#FFFFFF","#00FF00","#FF0000","#F0FF00","#0000DD","#FFAA00","#C0C0C0"];
+if (_colours != "" && _colours != "colours") {
+	_colours = _colours.split(',');
+	for(i=0;i<_colours.length;i++) { clr[i] = _colours[i]; }
+}
+var rfu='';if (getParams("rfu") == "rfu"){rfu = 'display:none;';}
+var aname = ["UF","UR","UB","UL","DF","DR","DB","DL","FR","FL","BR","BL","UFR","URB","UBL","ULF","DRF","DFL","DLB","DBR"];
+var astate = [["u4","f4"],["u4","r4"],["u4","b4"],["u4","l4"],["d4","f4"],["d4","r4"],["d4","b4"],["d4","l4"],["f4","r4"],["f4","l4"],["b4","r4"],["b4","l4"],["u4","f4","r4"],["u4","r4","b4"],["u4","b4","l4"],["u4","l4","f4"],["d4","r4","f4"],["d4","f4","l4"],["d4","l4","b4"],["d4","b4","r4"]];
+var kstate = [["u7","f1"],["u5","r1"],["u1","b7"],["u3","l7"],["d1","f7"],["d5","r7"],["d7","b1"],["d3","l1"],["f5","r3"],["f3","l3"],["b5","r5"],["b3","l5"],["u8","f2","r0"],["u2","r2","b8"],["u0","b6","l8"],["u6","l6","f0"],["d2","r6","f8"],["d0","f6","l0"],["d6","l2","b0"],["d8","b2","r8"]];
+var u=[2,202,26,253,50,304,22,149,46,200,70,252,42,96,66,148,90,200];
+var f=[76,70,100,122,124,174,132,70,156,122,180,174,188,70,212,122,237,174];
+var r=[125,226,106,278,85,330,182,226,162,278,142,330,238,226,218,278,198,330];
+var oops=[2,5,8,1,4,7,0,3,6];
+function writeisoview() {
+	$('wrapper').innerHTML = '';
+	for (var i=0;i<9;i++){
+		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="u'+i+'" class="u fl" style="top:'+u[i*2]+'px;left:'+u[(i*2)+1]+'px;background-color:'+clr[0]+';"></div>';
+		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="f'+i+'" class="f fl" style="top:'+f[i*2]+'px;left:'+f[(i*2)+1]+'px;background-color:'+clr[1]+';"></div>';
+		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="r'+i+'" class="r fl" style="top:'+r[i*2]+'px;left:'+r[(i*2)+1]+'px;background-color:'+clr[2]+';"></div>';
+		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="d'+i+'" class="f fl d" style="top:'+((f[i*2])+170)+'px;left:'+f[(i*2)+1]+'px;background-color:'+clr[3]+';'+rfu+'"></div>';
+		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="b'+i+'" class="u fl" style="top:'+(u[i*2]-60)+'px;left:'+(u[(i*2)+1]+158)+'px;background-color:'+clr[4]+';'+rfu+'"></div>';
+		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="l'+oops[i]+'" class="u fl" style="top:'+(u[i*2]-73)+'px;left:'+(u[(i*2)+1]-154)+'px;background-color:'+clr[5]+';'+rfu+'"></div>';
+	}
+}
+function writeheiseview() {	
+	$('wrapper').innerHTML = '';
+	
+	/* U */
+	$('wrapper').innerHTML += '<div style="top:2px;left:52px;width:60px;height:32px;margin: 0 auto;position: absolute;-webkit-perspective: 60px;-moz-perspective: 60px;-o-perspective: 60px;-ms-perspective: 60px;-webkit-transform: skew(-10deg); -moz-transform: skew(-10deg); -o-transform: skew(-10deg); -ms-transform: skew(-10deg);z-index:1"><div class="fl" onClick="selectfacelet(this)" id="u0" style="-webkit-transform: rotateX( 8deg );-moz-transform: rotateX( 8deg ); -o-transform: rotateX( 8deg ); -ms-transform: rotateX( 8deg );width: 100%;height: 100%;position: absolute;background-color:'+clr[0]+';border:2px solid black;"></div></div>';
+	$('wrapper').innerHTML += '<div style="top:2px;left:129px;width: 57px;height: 32px;margin: 0 auto;position: absolute;-webkit-perspective: 60px;-moz-perspective: 60px;-o-perspective: 60px;-msperspective: 60px;z-index:1"><div class="fl" onClick="selectfacelet(this)" id="u1" style="-webkit-transform: rotateX( 8deg );-moz-transform: rotateX( 8deg ); -o-transform: rotateX( 8deg );transform: rotateX( 8deg );width: 100%;height: 100%;position: absolute;background-color:'+clr[0]+';border:2px solid black;"></div></div>';
+	$('wrapper').innerHTML += '<div style="top:2px;left:201px;width:60px;height:32px;margin: 0 auto;position: absolute;-webkit-perspective: 60px;-moz-perspective: 60px;-o-perspective: 60px;-ms-perspective: 60px;-webkit-transform: skew(10deg); -moz-transform: skew(10deg); -o-transform: skew(10deg); -ms-transform: skew(10deg);z-index:1"><div class="fl" onClick="selectfacelet(this)" id="u2" style="-webkit-transform: rotateX( 8deg );-moz-transform: rotateX( 8deg ); -o-transform: rotateX( 8deg ); -ms-transform: rotateX( 8deg );width: 100%;height: 100%;position: absolute;background-color:'+clr[0]+';border:2px solid black;"></div></div>';
+	
+	$('wrapper').innerHTML += '<div style="top:46px;left:41px;width:67px;height:38px;margin: 0 auto;position: absolute;-webkit-perspective: 60px;-moz-perspective: 60px;-o-perspective: 60px;-ms-perspective: 60px;-webkit-transform: skew(-10deg); -moz-transform: skew(-10deg); -o-transform: skew(-10deg); -ms-transform: skew(-10deg);z-index:1"><div class="fl" onClick="selectfacelet(this)" id="u3" style="-webkit-transform: rotateX( 8deg );-moz-transform: rotateX( 8deg ); -o-transform: rotateX( 8deg ); -ms-transform: rotateX( 8deg );width: 100%;height: 100%;position: absolute;background-color:'+clr[0]+';border:2px solid black;"></div></div>';
+	$('wrapper').innerHTML += '<div style="top:46px;left:126px;width: 63px;height: 38px;margin: 0 auto;position: absolute;-webkit-perspective: 60px;-moz-perspective: 60px;-o-perspective: 60px;-msperspective: 60px;z-index:1"><div class="fl" onClick="selectfacelet(this)" id="u4" style="-webkit-transform: rotateX( 8deg );-moz-transform: rotateX( 8deg ); -o-transform: rotateX( 8deg );transform: rotateX( 8deg );width: 100%;height: 100%;position: absolute;background-color:'+clr[0]+';border:2px solid black;"></div></div>';
+	$('wrapper').innerHTML += '<div style="top:46px;left:206px;width:67px;height:38px;margin: 0 auto;position: absolute;-webkit-perspective: 60px;-moz-perspective: 60px;-o-perspective: 60px;-ms-perspective: 60px;-webkit-transform: skew(10deg); -moz-transform: skew(10deg); -o-transform: skew(10deg); -ms-transform: skew(10deg);z-index:1"><div class="fl" onClick="selectfacelet(this)" id="u5" style="-webkit-transform: rotateX( 8deg );-moz-transform: rotateX( 8deg ); -o-transform: rotateX( 8deg ); -ms-transform: rotateX( 8deg );width: 100%;height: 100%;position: absolute;background-color:'+clr[0]+';border:2px solid black;"></div></div>';
+	
+	$('wrapper').innerHTML += '<div style="top:96px;left:28px;width:76px;height:47px;margin: 0 auto;position: absolute;-webkit-perspective: 60px;-moz-perspective: 60px;-o-perspective: 60px;-ms-perspective: 60px;-webkit-transform: skew(-10deg); -moz-transform: skew(-10deg); -o-transform: skew(-10deg); -ms-transform: skew(-10deg);z-index:1"><div class="fl" onClick="selectfacelet(this)" id="u6" style="-webkit-transform: rotateX( 8deg );-moz-transform: rotateX( 8deg ); -o-transform: rotateX( 8deg ); -ms-transform: rotateX( 8deg );width: 100%;height: 100%;position: absolute;background-color:'+clr[0]+';border:2px solid black;"></div></div>';
+	$('wrapper').innerHTML += '<div style="top:96px;left:122px;width: 72px;height:47px;margin: 0 auto;position: absolute;-webkit-perspective: 60px;-moz-perspective: 60px;-o-perspective: 60px;-msperspective: 60px;z-index:1"><div class="fl" onClick="selectfacelet(this)" id="u7" style="-webkit-transform: rotateX( 8deg );-moz-transform: rotateX( 8deg ); -o-transform: rotateX( 8deg );transform: rotateX( 8deg );width: 100%;height: 100%;position: absolute;background-color:'+clr[0]+';border:2px solid black;"></div></div>';
+	$('wrapper').innerHTML += '<div style="top:96px;left:211px;width:76px;height:47px;margin: 0 auto;position: absolute;-webkit-perspective: 60px;-moz-perspective: 60px;-o-perspective: 60px;-ms-perspective: 60px;-webkit-transform: skew(10deg); -moz-transform: skew(10deg); -o-transform: skew(10deg); -ms-transform: skew(10deg);z-index:1"><div class="fl" onClick="selectfacelet(this)" id="u8" style="-webkit-transform: rotateX( 8deg );-moz-transform: rotateX( 8deg ); -o-transform: rotateX( 8deg ); -ms-transform: rotateX( 8deg );width: 100%;height: 100%;position: absolute;background-color:'+clr[0]+';border:2px solid black;"></div></div>';
+	
+	/* F */
+	$('wrapper').innerHTML += '<div style="top:161px;left:28px;width:76px;height:47px;margin: 0 auto;position: absolute;-webkit-perspective: 60px;-moz-perspective: 60px;-o-perspective: 60px;-ms-perspective: 60px;-webkit-transform: skew(10deg); -moz-transform: skew(10deg); -o-transform: skew(10deg); -ms-transform: skew(10deg);z-index:1"><div class="fl" onClick="selectfacelet(this)" id="f0" style="-webkit-transform: rotateX( -8deg );-moz-transform: rotateX( -8deg ); -o-transform: rotateX( -8deg ); -ms-transform: rotateX( -8deg );width: 100%;height: 100%;position: absolute;background-color:'+clr[1]+';border:2px solid black;"></div></div>';
+	$('wrapper').innerHTML += '<div style="top:161px;left:122px;width: 72px;height:47px;margin: 0 auto;position: absolute;-webkit-perspective: 60px;-moz-perspective: 60px;-o-perspective: 60px;-msperspective: 60px;z-index:1"><div class="fl" onClick="selectfacelet(this)" id="f1" style="-webkit-transform: rotateX( -8deg );-moz-transform: rotateX( -8deg ); -o-transform: rotateX( -8deg );transform: rotateX( -8deg );width: 100%;height: 100%;position: absolute;background-color:'+clr[1]+';border:2px solid black;"></div></div>';
+	$('wrapper').innerHTML += '<div style="top:161px;left:211px;width:76px;height:47px;margin: 0 auto;position: absolute;-webkit-perspective: 60px;-moz-perspective: 60px;-o-perspective: 60px;-ms-perspective: 60px;-webkit-transform: skew(-10deg); -moz-transform: skew(-10deg); -o-transform: skew(-10deg); -ms-transform: skew(-10deg);z-index:1"><div class="fl" onClick="selectfacelet(this)" id="f2" style="-webkit-transform: rotateX( -8deg );-moz-transform: rotateX( -8deg ); -o-transform: rotateX( -8deg ); -ms-transform: rotateX( -8deg );width: 100%;height: 100%;position: absolute;background-color:'+clr[1]+';border:2px solid black;"></div></div>';
+	
+	$('wrapper').innerHTML += '<div style="top:220px;left:41px;width:67px;height:38px;margin: 0 auto;position: absolute;-webkit-perspective: 60px;-moz-perspective: 60px;-o-perspective: 60px;-ms-perspective: 60px;-webkit-transform: skew(10deg); -moz-transform: skew(10deg); -o-transform: skew(10deg); -ms-transform: skew(10deg);z-index:1"><div class="fl" onClick="selectfacelet(this)" id="f3" style="-webkit-transform: rotateX( -8deg );-moz-transform: rotateX( -8deg ); -o-transform: rotateX( -8deg ); -ms-transform: rotateX( -8deg );width: 100%;height: 100%;position: absolute;background-color:'+clr[1]+';border:2px solid black;"></div></div>';
+	$('wrapper').innerHTML += '<div style="top:220px;left:126px;width: 63px;height: 38px;margin: 0 auto;position: absolute;-webkit-perspective: 60px;-moz-perspective: 60px;-o-perspective: 60px;-msperspective: 60px;z-index:1"><div class="fl" onClick="selectfacelet(this)" id="f4" style="-webkit-transform: rotateX( -8deg );-moz-transform: rotateX( -8deg ); -o-transform: rotateX( -8deg );transform: rotateX( -8deg );width: 100%;height: 100%;position: absolute;background-color:'+clr[1]+';border:2px solid black;"></div></div>';
+	$('wrapper').innerHTML += '<div style="top:220px;left:206px;width:67px;height:38px;margin: 0 auto;position: absolute;-webkit-perspective: 60px;-moz-perspective: 60px;-o-perspective: 60px;-ms-perspective: 60px;-webkit-transform: skew(-10deg); -moz-transform: skew(-10deg); -o-transform: skew(-10deg); -ms-transform: skew(-10deg);z-index:1"><div class="fl" onClick="selectfacelet(this)" id="f5" style="-webkit-transform: rotateX( -8deg );-moz-transform: rotateX( -8deg ); -o-transform: rotateX( -8deg ); -ms-transform: rotateX( -8deg );width: 100%;height: 100%;position: absolute;background-color:'+clr[1]+';border:2px solid black;"></div></div>';
+	
+	$('wrapper').innerHTML += '<div style="top:271px;left:52px;width:60px;height:32px;margin: 0 auto;position: absolute;-webkit-perspective: 60px;-moz-perspective: 60px;-o-perspective: 60px;-ms-perspective: 60px;-webkit-transform: skew(10deg); -moz-transform: skew(10deg); -o-transform: skew(10deg); -ms-transform: skew(10deg);z-index:1"><div class="fl" onClick="selectfacelet(this)" id="f6" style="-webkit-transform: rotateX( -8deg );-moz-transform: rotateX( -8deg ); -o-transform: rotateX( -8deg ); -ms-transform: rotateX( -8deg );width: 100%;height: 100%;position: absolute;background-color:'+clr[1]+';border:2px solid black;"></div></div>';
+	$('wrapper').innerHTML += '<div style="top:271px;left:129px;width: 57px;height: 32px;margin: 0 auto;position: absolute;-webkit-perspective: 60px;-moz-perspective: 60px;-o-perspective: 60px;-msperspective: 60px;z-index:1"><div class="fl" onClick="selectfacelet(this)" id="f7" style="-webkit-transform: rotateX( -8deg );-moz-transform: rotateX( -8deg ); -o-transform: rotateX( -8deg );transform: rotateX( -8deg );width: 100%;height: 100%;position: absolute;background-color:'+clr[1]+';border:2px solid black;"></div></div>';
+	$('wrapper').innerHTML += '<div style="top:271px;left:201px;width:60px;height:32px;margin: 0 auto;position: absolute;-webkit-perspective: 60px;-moz-perspective: 60px;-o-perspective: 60px;-ms-perspective: 60px;-webkit-transform: skew(-10deg); -moz-transform: skew(-10deg); -o-transform: skew(-10deg); -ms-transform: skew(-10deg);z-index:1"><div class="fl" onClick="selectfacelet(this)" id="f8" style="-webkit-transform: rotateX( -8deg );-moz-transform: rotateX( -8deg ); -o-transform: rotateX( -8deg ); -ms-transform: rotateX( -8deg );width: 100%;height: 100%;position: absolute;background-color:'+clr[1]+';border:2px solid black;"></div></div>';
+	
+	/* B */
+	$('wrapper').innerHTML += '<div style="top:10px;left:60px;width:55px;height:43px;margin: 0 auto;position: absolute;-webkit-perspective: 60px;-moz-perspective: 60px;-o-perspective: 60px;-ms-perspective: 60px;-webkit-transform: skew(10deg); -moz-transform: skew(10deg); -o-transform: skew(10deg); -ms-transform: skew(10deg);"><div class="fl" onClick="selectfacelet(this)" id="b6" style="-webkit-transform: rotateX( -8deg );-moz-transform: rotateX( -8deg ); -o-transform: rotateX( -8deg ); -ms-transform: rotateX( -8deg );width: 100%;height: 100%;position: absolute;background-color:'+clr[4]+';border:2px solid black;z-index:-1"></div></div>';
+	$('wrapper').innerHTML += '<div style="top:10px;left:130px;width: 55px;height:43px;margin: 0 auto;position: absolute;-webkit-perspective: 60px;-moz-perspective: 60px;-o-perspective: 60px;-msperspective: 60px;"><div class="fl" onClick="selectfacelet(this)" id="b7" style="-webkit-transform: rotateX( -8deg );-moz-transform: rotateX( -8deg ); -o-transform: rotateX( -8deg );transform: rotateX( -8deg );width: 100%;height: 100%;position: absolute;background-color:'+clr[4]+';border:2px solid black;z-index:-1"></div></div>';
+	$('wrapper').innerHTML += '<div style="top:10px;left:198px;width:55px;height:43px;margin: 0 auto;position: absolute;-webkit-perspective: 60px;-moz-perspective: 60px;-o-perspective: 60px;-ms-perspective: 60px;-webkit-transform: skew(-10deg); -moz-transform: skew(-10deg); -o-transform: skew(-10deg); -ms-transform: skew(-10deg);"><div class="fl" onClick="selectfacelet(this)" id="b8" style="-webkit-transform: rotateX( -8deg );-moz-transform: rotateX( -8deg ); -o-transform: rotateX( -8deg ); -ms-transform: rotateX( -8deg );width: 100%;height: 100%;position: absolute;background-color:'+clr[4]+';border:2px solid black;z-index:-1"></div></div>';
+	
+	$('wrapper').innerHTML += '<div style="top:65px;left:68px;width:51px;height:38px;margin: 0 auto;position: absolute;-webkit-perspective: 60px;-moz-perspective: 60px;-o-perspective: 60px;-ms-perspective: 60px;-webkit-transform: skew(10deg); -moz-transform: skew(10deg); -o-transform: skew(10deg); -ms-transform: skew(10deg);z-index:-1"><div class="fl" onClick="selectfacelet(this)" id="b3" style="-webkit-transform: rotateX( -8deg );-moz-transform: rotateX( -8deg ); -o-transform: rotateX( -8deg ); -ms-transform: rotateX( -8deg );width: 100%;height: 100%;position: absolute;background-color:'+clr[4]+';border:2px solid black;"></div></div>';
+	$('wrapper').innerHTML += '<div style="top:65px;left:132px;width: 50px;height: 38px;margin: 0 auto;position: absolute;-webkit-perspective: 60px;-moz-perspective: 60px;-o-perspective: 60px;-msperspective: 60px;z-index:-1"><div class="fl" onClick="selectfacelet(this)" id="b4" style="-webkit-transform: rotateX( -8deg );-moz-transform: rotateX( -8deg ); -o-transform: rotateX( -8deg );transform: rotateX( -8deg );width: 100%;height: 100%;position: absolute;background-color:'+clr[4]+';border:2px solid black;"></div></div>';
+	$('wrapper').innerHTML += '<div style="top:65px;left:194px;width:51px;height:38px;margin: 0 auto;position: absolute;-webkit-perspective: 60px;-moz-perspective: 60px;-o-perspective: 60px;-ms-perspective: 60px;-webkit-transform: skew(-10deg); -moz-transform: skew(-10deg); -o-transform: skew(-10deg); -ms-transform: skew(-10deg);z-index:-1"><div class="fl" onClick="selectfacelet(this)" id="b5" style="-webkit-transform: rotateX( -8deg );-moz-transform: rotateX( -8deg ); -o-transform: rotateX( -8deg ); -ms-transform: rotateX( -8deg );width: 100%;height: 100%;position: absolute;background-color:'+clr[4]+';border:2px solid black;"></div></div>';
+	
+	$('wrapper').innerHTML += '<div style="top:115px;left:76px;width:48px;height:34px;margin: 0 auto;position: absolute;-webkit-perspective: 60px;-moz-perspective: 60px;-o-perspective: 60px;-ms-perspective: 60px;-webkit-transform: skew(10deg); -moz-transform: skew(10deg); -o-transform: skew(10deg); -ms-transform: skew(10deg);z-index:-1"><div class="fl" onClick="selectfacelet(this)" id="b0" style="-webkit-transform: rotateX( -8deg );-moz-transform: rotateX( -8deg ); -o-transform: rotateX( -8deg ); -ms-transform: rotateX( -8deg );width: 100%;height: 100%;position: absolute;background-color:'+clr[4]+';border:2px solid black;"></div></div>';
+	$('wrapper').innerHTML += '<div style="top:115px;left:135px;width: 44px;height: 34px;margin: 0 auto;position: absolute;-webkit-perspective: 60px;-moz-perspective: 60px;-o-perspective: 60px;-msperspective: 60px;z-index0:-1"><div class="fl" onClick="selectfacelet(this)" id="b1" style="-webkit-transform: rotateX( -8deg );-moz-transform: rotateX( -8deg ); -o-transform: rotateX( -8deg );transform: rotateX( -8deg );width: 100%;height: 100%;position: absolute;background-color:'+clr[4]+';border:2px solid black;"></div></div>';
+	$('wrapper').innerHTML += '<div style="top:115px;left:192px;width:48px;height:34px;margin: 0 auto;position: absolute;-webkit-perspective: 60px;-moz-perspective: 60px;-o-perspective: 60px;-ms-perspective: 60px;-webkit-transform: skew(-10deg); -moz-transform: skew(-10deg); -o-transform: skew(-10deg); -ms-transform: skew(-10deg);z-index:-1"><div class="fl" onClick="selectfacelet(this)" id="b2" style="-webkit-transform: rotateX( -8deg );-moz-transform: rotateX( -8deg ); -o-transform: rotateX( -8deg ); -ms-transform: rotateX( -8deg );width: 100%;height: 100%;position: absolute;background-color:'+clr[4]+';border:2px solid black;"></div></div>';
+	
+	/* D */
+	$('wrapper').innerHTML += '<div style="top:250px;left:62px;width:56px;height:42px;margin: 0 auto;position: absolute;-webkit-perspective: 60px;-moz-perspective: 60px;-o-perspective: 60px;-ms-perspective: 60px;-webkit-transform: skew(-10deg); -moz-transform: skew(-10deg); -o-transform: skew(-10deg); -ms-transform: skew(-10deg);z-index:-1"><div class="fl" onClick="selectfacelet(this)" id="d0" style="-webkit-transform: rotateX( 8deg );-moz-transform: rotateX( 8deg ); -o-transform: rotateX( 8deg ); -ms-transform: rotateX( 8deg );width: 100%;height: 100%;position: absolute;background-color:'+clr[3]+';border:2px solid black;"></div></div>';
+	$('wrapper').innerHTML += '<div style="top:250px;left:130px;width: 54px;height:42px;margin: 0 auto;position: absolute;-webkit-perspective: 60px;-moz-perspective: 60px;-o-perspective: 60px;-msperspective: 60px;z-index:-1"><div class="fl" onClick="selectfacelet(this)" id="d1" style="-webkit-transform: rotateX( 8deg );-moz-transform: rotateX( 8deg ); -o-transform: rotateX( 8deg );transform: rotateX( 8deg );width: 100%;height: 100%;position: absolute;background-color:'+clr[3]+';border:2px solid black;"></div></div>';
+	$('wrapper').innerHTML += '<div style="top:250px;left:198px;width:56px;height:42px;margin: 0 auto;position: absolute;-webkit-perspective: 60px;-moz-perspective: 60px;-o-perspective: 60px;-ms-perspective: 60px;-webkit-transform: skew(10deg); -moz-transform: skew(10deg); -o-transform: skew(10deg); -ms-transform: skew(10deg);z-index:-1"><div class="fl" onClick="selectfacelet(this)" id="d2" style="-webkit-transform: rotateX( 8deg );-moz-transform: rotateX( 8deg ); -o-transform: rotateX( 8deg ); -ms-transform: rotateX( 8deg );width: 100%;height: 100%;position: absolute;background-color:'+clr[3]+';border:2px solid black;"></div></div>';
+	
+	$('wrapper').innerHTML += '<div style="top:200px;left:70px;width:51px;height:40px;margin: 0 auto;position: absolute;-webkit-perspective: 60px;-moz-perspective: 60px;-o-perspective: 60px;-ms-perspective: 60px;-webkit-transform: skew(-10deg); -moz-transform: skew(-10deg); -o-transform: skew(-10deg); -ms-transform: skew(-10deg);z-index:-1"><div class="fl" onClick="selectfacelet(this)" id="d3" style="-webkit-transform: rotateX( 8deg );-moz-transform: rotateX( 8deg ); -o-transform: rotateX( 8deg ); -ms-transform: rotateX( 8deg );width: 100%;height: 100%;position: absolute;background-color:'+clr[3]+';border:2px solid black;"></div></div>';
+	$('wrapper').innerHTML += '<div style="top:200px;left:132px;width: 49px;height: 40px;margin: 0 auto;position: absolute;-webkit-perspective: 60px;-moz-perspective: 60px;-o-perspective: 60px;-msperspective: 60px;z-index:-1"><div class="fl" onClick="selectfacelet(this)" id="d4" style="-webkit-transform: rotateX( 8deg );-moz-transform: rotateX( 8deg ); -o-transform: rotateX( 8deg );transform: rotateX( 8deg );width: 100%;height: 100%;position: absolute;background-color:'+clr[3]+';border:2px solid black;"></div></div>';
+	$('wrapper').innerHTML += '<div style="top:200px;left:194px;width:51px;height:40px;margin: 0 auto;position: absolute;-webkit-perspective: 60px;-moz-perspective: 60px;-o-perspective: 60px;-ms-perspective: 60px;-webkit-transform: skew(10deg); -moz-transform: skew(10deg); -o-transform: skew(10deg); -ms-transform: skew(10deg);z-index:-1"><div class="fl" onClick="selectfacelet(this)" id="d5" style="-webkit-transform: rotateX( 8deg );-moz-transform: rotateX( 8deg ); -o-transform: rotateX( 8deg ); -ms-transform: rotateX( 8deg );width: 100%;height: 100%;position: absolute;background-color:'+clr[3]+';border:2px solid black;"></div></div>';
+	
+	$('wrapper').innerHTML += '<div style="top:154px;left:78px;width:45px;height:36px;margin: 0 auto;position: absolute;-webkit-perspective: 60px;-moz-perspective: 60px;-o-perspective: 60px;-ms-perspective: 60px;-webkit-transform: skew(-10deg); -moz-transform: skew(-10deg); -o-transform: skew(-10deg); -ms-transform: skew(-10deg);z-index:-1"><div class="fl" onClick="selectfacelet(this)" id="d6" style="-webkit-transform: rotateX( 8deg );-moz-transform: rotateX( 8deg ); -o-transform: rotateX( 8deg ); -ms-transform: rotateX( 8deg );width: 100%;height: 100%;position: absolute;background-color:'+clr[3]+';border:2px solid black;"></div></div>';
+	$('wrapper').innerHTML += '<div style="top:154px;left:135px;width: 45px;height: 36px;margin: 0 auto;position: absolute;-webkit-perspective: 60px;-moz-perspective: 60px;-o-perspective: 60px;-msperspective: 60px;z-index:-1"><div class="fl" onClick="selectfacelet(this)" id="d7" style="-webkit-transform: rotateX( 8deg );-moz-transform: rotateX( 8deg ); -o-transform: rotateX( 8deg );transform: rotateX( 8deg );width: 100%;height: 100%;position: absolute;background-color:'+clr[3]+';border:2px solid black;"></div></div>';
+	$('wrapper').innerHTML += '<div style="top:154px;left:192px;width:45px;height:36px;margin: 0 auto;position: absolute;-webkit-perspective: 60px;-moz-perspective: 60px;-o-perspective: 60px;-ms-perspective: 60px;-webkit-transform: skew(10deg); -moz-transform: skew(10deg); -o-transform: skew(10deg); -ms-transform: skew(10deg);z-index:-1"><div class="fl" onClick="selectfacelet(this)" id="d8" style="-webkit-transform: rotateX( 8deg );-moz-transform: rotateX( 8deg ); -o-transform: rotateX( 8deg ); -ms-transform: rotateX( 8deg );width: 100%;height: 100%;position: absolute;background-color:'+clr[3]+';border:2px solid black;"></div></div>';
+	
+	/* L */
+	$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="l6" class="fl" style="position:absolute;top:141px;left:-2px;width:54px;height:24px;-webkit-transform:rotate(75deg)skew(60deg);-moz-transform:rotate(75deg)skew(60deg);-o-transform:rotate(75deg)skew(60deg);-ms-transform:rotate(75deg)skew(60deg);background-color:'+clr[5]+';border:2px solid black;z-index:-1;"></div>';
+	$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="l7" class="fl" style="position:absolute;top:90px;left:12px;width:54px;height:17px;-webkit-transform:rotate(75deg)skew(60deg);-moz-transform:rotate(75deg)skew(60deg);-o-transform:rotate(75deg)skew(60deg);-ms-transform:rotate(75deg)skew(60deg);background-color:'+clr[5]+';border:2px solid black;z-index:-1;"></div>';
+	$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="l8" class="fl" style="position:absolute;top:42px;left:27px;width:45px;height:16px;-webkit-transform:rotate(75deg)skew(60deg);-moz-transform:rotate(75deg)skew(60deg);-o-transform:rotate(75deg)skew(60deg);-ms-transform:rotate(75deg)skew(60deg);background-color:'+clr[5]+';border:2px solid black;z-index:-1;"></div>';
+	
+	$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="l3" class="fl" style="position:absolute;top:195px;left:19px;width:40px;height:25px;-webkit-transform:rotate(75deg)skew(60deg);-moz-transform:rotate(75deg)skew(60deg);-o-transform:rotate(75deg)skew(60deg);-ms-transform:rotate(75deg)skew(60deg);background-color:'+clr[5]+';border:2px solid black;z-index:-1;"></div>';
+	$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="l4" class="fl" style="position:absolute;top:148px;left:35px;width:33px;height:13px;-webkit-transform:rotate(75deg)skew(60deg);-moz-transform:rotate(75deg)skew(60deg);-o-transform:rotate(75deg)skew(60deg);-ms-transform:rotate(75deg)skew(60deg);background-color:'+clr[5]+';border:2px solid black;z-index:-1;"></div>';
+	$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="l5" class="fl" style="position:absolute;top:104px;left:47px;width:30px;height:15px;-webkit-transform:rotate(75deg)skew(60deg);-moz-transform:rotate(75deg)skew(60deg);-o-transform:rotate(75deg)skew(60deg);-ms-transform:rotate(75deg)skew(60deg);background-color:'+clr[5]+';border:2px solid black;z-index:-1;"></div>';
+	
+	$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="l0" class="fl" style="position:absolute;top:243px;left:34px;width:34px;height:22px;-webkit-transform:rotate(75deg)skew(60deg);-moz-transform:rotate(75deg)skew(60deg);-o-transform:rotate(75deg)skew(60deg);-ms-transform:rotate(75deg)skew(60deg);background-color:'+clr[5]+';border:2px solid black;z-index:-1;"></div>';
+	$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="l1" class="fl" style="position:absolute;top:190px;left:48px;width:28px;height:16px;-webkit-transform:rotate(75deg)skew(60deg);-moz-transform:rotate(75deg)skew(60deg);-o-transform:rotate(75deg)skew(60deg);-ms-transform:rotate(75deg)skew(60deg);background-color:'+clr[5]+';border:2px solid black;z-index:-1;"></div>';
+	$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="l2" class="fl" style="position:absolute;top:149px;left:58px;width:24px;height:11px;-webkit-transform:rotate(75deg)skew(60deg);-moz-transform:rotate(75deg)skew(60deg);-o-transform:rotate(75deg)skew(60deg);-ms-transform:rotate(75deg)skew(60deg);background-color:'+clr[5]+';border:2px solid black;z-index:-1;"></div>';
+	
+	/* R */
+	$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="r0" class="fl" style="position:absolute;top:141px;left:264px;width:54px;height:24px;-webkit-transform:rotate(75deg)skew(60deg);-moz-transform:rotate(75deg)skew(60deg);-o-transform:rotate(75deg)skew(60deg);-ms-transform:rotate(75deg)skew(60deg);background-color:'+clr[2]+';border:2px solid black;z-index:-1;"></div>';
+	$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="r1" class="fl" style="position:absolute;top:84px;left:256px;width:40px;height:21px;-webkit-transform:rotate(75deg)skew(60deg);-moz-transform:rotate(75deg)skew(60deg);-o-transform:rotate(75deg)skew(60deg);-ms-transform:rotate(75deg)skew(60deg);background-color:'+clr[2]+';border:2px solid black;z-index:-1;"></div>';
+	$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="r2" class="fl" style="position:absolute;top:37px;left:247px;width:35px;height:16px;-webkit-transform:rotate(75deg)skew(60deg);-moz-transform:rotate(75deg)skew(60deg);-o-transform:rotate(75deg)skew(60deg);-ms-transform:rotate(75deg)skew(60deg);background-color:'+clr[2]+';border:2px solid black;z-index:-1;"></div>';
+	
+	$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="r3" class="fl" style="position:absolute;top:200px;left:254px;width:45px;height:19px;-webkit-transform:rotate(75deg)skew(60deg);-moz-transform:rotate(75deg)skew(60deg);-o-transform:rotate(75deg)skew(60deg);-ms-transform:rotate(75deg)skew(60deg);background-color:'+clr[2]+';border:2px solid black;z-index:-1;"></div>';
+	$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="r4" class="fl" style="position:absolute;top:149px;left:247px;width:35px;height:14px;-webkit-transform:rotate(75deg)skew(60deg);-moz-transform:rotate(75deg)skew(60deg);-o-transform:rotate(75deg)skew(60deg);-ms-transform:rotate(75deg)skew(60deg);background-color:'+clr[2]+';border:2px solid black;z-index:-1;"></div>';
+	$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="r5" class="fl" style="position:absolute;top:97px;left:238px;width:30px;height:15px;-webkit-transform:rotate(75deg)skew(60deg);-moz-transform:rotate(75deg)skew(60deg);-o-transform:rotate(75deg)skew(60deg);-ms-transform:rotate(75deg)skew(60deg);background-color:'+clr[2]+';border:2px solid black;z-index:-1;"></div>';
+	
+	$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="r6" class="fl" style="position:absolute;top:249px;left:246px;width:38px;height:15px;-webkit-transform:rotate(75deg)skew(60deg);-moz-transform:rotate(75deg)skew(60deg);-o-transform:rotate(75deg)skew(60deg);-ms-transform:rotate(75deg)skew(60deg);background-color:'+clr[2]+';border:2px solid black;z-index:-1;"></div>';
+	$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="r7" class="fl" style="position:absolute;top:195px;left:238px;width:33px;height:14px;-webkit-transform:rotate(75deg)skew(60deg);-moz-transform:rotate(75deg)skew(60deg);-o-transform:rotate(75deg)skew(60deg);-ms-transform:rotate(75deg)skew(60deg);background-color:'+clr[2]+';border:2px solid black;z-index:-1;"></div>';
+	$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="r8" class="fl" style="position:absolute;top:149px;left:233px;width:24px;height:11px;-webkit-transform:rotate(75deg)skew(60deg);-moz-transform:rotate(75deg)skew(60deg);-o-transform:rotate(75deg)skew(60deg);-ms-transform:rotate(75deg)skew(60deg);background-color:'+clr[2]+';border:2px solid black;z-index:-1;"></div>';
+}
+function writeqcubeview() {
+	$('wrapper').innerHTML = '<div style="position:absolute;left:-7px;top:-2px;width:296px;height:346px;background-color:black">';
+	
+	for(var i=0;i<9;i++){
+		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="u'+i+'" class="fl" style="top:'+((parseInt(i/3)*55)+5)+'px;left:'+(((i%3)*55)+60)+'px;background-color:'+clr[0]+';"></div>';
+		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="f'+i+'" class="fl" style="top:'+((parseInt(i/3)*55)+175)+'px;left:'+(((i%3)*55)+60)+'px;background-color:'+clr[1]+';"></div>';
+		$('wrapper').innerHTML += '<div id="b'+i+'" style="display:none;background-color:'+clr[4]+'"></div>';
+		$('wrapper').innerHTML += '<div id="d'+i+'" style="display:none;background-color:'+clr[3]+'"></div>';
+	}
+		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="r0" class="fl" style="top:115px;left:230px;height:110px;background-color:'+clr[2]+';"></div>';
+		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="r1" class="fl" style="top:60px;left:230px;background-color:'+clr[2]+';"></div>';
+		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="r2" class="fl" style="top:5px;left:230px;background-color:'+clr[2]+';"></div>';
+		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="r3" class="fl" style="top:230px;left:230px;background-color:'+clr[2]+';"></div>';
+		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="r6" class="fl" style="top:285px;left:230px;background-color:'+clr[2]+';"></div>';
+		$('wrapper').innerHTML += '<div id="r4" style="display:none;background-color:'+clr[2]+'"></div>';
+		$('wrapper').innerHTML += '<div id="r5" style="display:none;background-color:'+clr[2]+'"></div>';
+		$('wrapper').innerHTML += '<div id="r7" style="display:none;background-color:'+clr[2]+'"></div>';
+		$('wrapper').innerHTML += '<div id="r8" style="display:none;background-color:'+clr[2]+'"></div>';
+		
+		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="l6" class="fl" style="top:115px;left:0px;height:110px;background-color:'+clr[5]+';"></div>';
+		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="l7" class="fl" style="top:60px;left:0px;background-color:'+clr[5]+';"></div>';
+		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="l8" class="fl" style="top:5px;left:0px;background-color:'+clr[5]+';"></div>';
+		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="l3" class="fl" style="top:230px;left:0px;background-color:'+clr[5]+';"></div>';
+		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="l0" class="fl" style="top:285px;left:0px;background-color:'+clr[5]+';"></div>';
+		$('wrapper').innerHTML += '<div id="l1" style="display:none;background-color:'+clr[5]+'"></div>';
+		$('wrapper').innerHTML += '<div id="l2" style="display:none;background-color:'+clr[5]+'"></div>';
+		$('wrapper').innerHTML += '<div id="l4" style="display:none;background-color:'+clr[5]+'"></div>';
+		$('wrapper').innerHTML += '<div id="l5" style="display:none;background-color:'+clr[5]+'"></div>';
+	
+	$('wrapper').innerHTML += '</div>';
+}
+if (_alt == "alt") { writeisoview(); } else { writeheiseview(); }
+</script>
+</div>
+<script>
+window.onkeydown=dokeys;
+
+window.performance = window.performance || {};
+performance.now = (function() {
+    return performance.now || performance.mozNow || performance.msNow || performance.oNow || performance.webkitNow || function() { return new Date().getTime(); }; 
+})();
+
+function loadacubejs() {
+	var script = document.createElement("script");
+	script.src = "acube.js";
+	script.type = "text/javascript";
+	document.getElementsByTagName("head")[0].appendChild(script);
+}
+
+function docycle() {
+	for(var j=1; j<arguments.length; j++) {
+		if (arguments[0]) {
+			var temp = $(arguments[j][arguments[j].length-1]).style.backgroundColor;
+			var html = $(arguments[j][arguments[j].length-1]).innerHTML;
+			for (var i = (arguments[j].length-1); i > 0; i--) {
+				$(arguments[j][i]).style.backgroundColor=$(arguments[j][i-1]).style.backgroundColor;
+				if ($(arguments[j][i]).innerHTML != $(arguments[j][i-1]).innerHTML) { // speed optim
+					$(arguments[j][i]).innerHTML=$(arguments[j][i-1]).innerHTML;
+				}
+			}
+			$(arguments[j][0]).style.backgroundColor = temp;
+			$(arguments[j][0]).innerHTML = html;
+		
+		}
+		else {
+			var temp = $(arguments[j][0]).style.backgroundColor;
+			var html = $(arguments[j][0]).innerHTML;
+			for (var i = 0; i < (arguments[j].length-1); i++) {
+				$(arguments[j][i]).style.backgroundColor=$(arguments[j][i+1]).style.backgroundColor;
+				if ($(arguments[j][i]).innerHTML != $(arguments[j][i+1]).innerHTML) {
+					$(arguments[j][i]).innerHTML=$(arguments[j][i+1]).innerHTML;
+				}
+			}
+			$(arguments[j][arguments[j].length-1]).style.backgroundColor = temp;
+			$(arguments[j][arguments[j].length-1]).innerHTML = html;
+		}
+	}
+}
+
+function domove(move,half) {
+	if (move==0) { docycle(0,['f0','r0','b8','l8'],['f1','r1','b7','l7'],['f2','r2','b6','l6'],['u0','u6','u8','u2'],['u1','u3','u7','u5']); } // U
+	else if (move==1) { docycle(1,['f0','r0','b8','l8'],['f1','r1','b7','l7'],['f2','r2','b6','l6'],['u0','u6','u8','u2'],['u1','u3','u7','u5']);} // U'
+	else if (move==2) { docycle(1,['f2','u2','b2','d2'],['f5','u5','b5','d5'],['f8','u8','b8','d8'],['r0','r2','r8','r6'],['r1','r5','r7','r3']);} // R
+	else if (move==3) { docycle(0,['f2','u2','b2','d2'],['f5','u5','b5','d5'],['f8','u8','b8','d8'],['r0','r2','r8','r6'],['r1','r5','r7','r3']);} // R'
+	else if (move==4) { docycle(0,['f4','u4','b4','d4'],['f1','u1','b1','d1'],['f7','u7','b7','d7']);} // M
+	else if (move==5) { docycle(1,['f4','u4','b4','d4'],['f1','u1','b1','d1'],['f7','u7','b7','d7']);} // M'
+	else if (move==6) { docycle(1,['f0','f2','f8','f6'],['f1','f5','f7','f3'],['u6','r0','d2','l0'],['u7','r3','d1','l3'],['u8','r6','d0','l6']);} // F
+	else if (move==7) { docycle(0,['f0','f2','f8','f6'],['f1','f5','f7','f3'],['u6','r0','d2','l0'],['u7','r3','d1','l3'],['u8','r6','d0','l6']);} // F'
+	else if (move==8) { docycle(1,['f0','d0','b0','u0'],['f3','d3','b3','u3'],['f6','d6','b6','u6'],['l0','l2','l8','l6'],['l1','l5','l7','l3']);} // L
+	else if (move==9) { docycle(0,['f0','d0','b0','u0'],['f3','d3','b3','u3'],['f6','d6','b6','u6'],['l0','l2','l8','l6'],['l1','l5','l7','l3']);} // L'
+	else if (move==10) { docycle(1,['b7','b3','b1','b5'],['b8','b6','b0','b2'],['r2','u0','l2','d8'],['r5','u1','l5','d7'],['r8','u2','l8','d6']);} // B
+	else if (move==11) { docycle(0,['b7','b3','b1','b5'],['b8','b6','b0','b2'],['r2','u0','l2','d8'],['r5','u1','l5','d7'],['r8','u2','l8','d6']); } // B'
+	else if (move==12) { docycle(1,['d0','d2','d8','d6'],['d1','d5','d7','d3'],['f6','r6','b2','l2'],['f7','r7','b1','l1'],['f8','r8','b0','l0']);} // D
+	else if (move==13) { docycle(0,['d0','d2','d8','d6'],['d1','d5','d7','d3'],['f6','r6','b2','l2'],['f7','r7','b1','l1'],['f8','r8','b0','l0']); } // D'
+	else if (move==14) { docycle(1,['f4','r4','b4','l4'],['f3','r3','b5','l5'],['f5','r5','b3','l3']);} // E
+	else if (move==15) { docycle(0,['f4','r4','b4','l4'],['f3','r3','b5','l5'],['f5','r5','b3','l3']);} // E'
+	else if (move==16) { docycle(0,['f0','r0','b8','l8'],['f1','r1','b7','l7'],['f2','r2','b6','l6'],['u0','u6','u8','u2'],['u1','u3','u7','u5'],['f4','r4','b4','l4'],['f3','r3','b5','l5'],['f5','r5','b3','l3'],['d0','d2','d8','d6'],['d1','d5','d7','d3'],['f6','r6','b2','l2'],['f7','r7','b1','l1'],['f8','r8','b0','l0']); } // y
+	else if (move==17) { docycle(1,['f0','r0','b8','l8'],['f1','r1','b7','l7'],['f2','r2','b6','l6'],['u0','u6','u8','u2'],['u1','u3','u7','u5'],['f4','r4','b4','l4'],['f3','r3','b5','l5'],['f5','r5','b3','l3'],['d0','d2','d8','d6'],['d1','d5','d7','d3'],['f6','r6','b2','l2'],['f7','r7','b1','l1'],['f8','r8','b0','l0']); } // y'
+	else if (move==18) { docycle(1,['f2','u2','b2','d2'],['f5','u5','b5','d5'],['f8','u8','b8','d8'],['r0','r2','r8','r6'],['r1','r5','r7','r3'],['f4','u4','b4','d4'],['f1','u1','b1','d1'],['f7','u7','b7','d7'],['f0','u0','b0','d0'],['f3','u3','b3','d3'],['f6','u6','b6','d6'],['l0','l6','l8','l2'],['l1','l3','l7','l5']); } // x
+	else if (move==19) { docycle(0,['f2','u2','b2','d2'],['f5','u5','b5','d5'],['f8','u8','b8','d8'],['r0','r2','r8','r6'],['r1','r5','r7','r3'],['f4','u4','b4','d4'],['f1','u1','b1','d1'],['f7','u7','b7','d7'],['f0','u0','b0','d0'],['f3','u3','b3','d3'],['f6','u6','b6','d6'],['l0','l6','l8','l2'],['l1','l3','l7','l5']); } // x'
+	else if (move==20) { docycle(1,['f0','f2','f8','f6'],['f1','f5','f7','f3'],['u6','r0','d2','l0'],['u7','r3','d1','l3'],['u8','r6','d0','l6'],['u4','r4','d4','l4'],['u3','r1','d5','l1'],['u5','r7','d3','l7'],['b7','b5','b1','b3'],['b8','b2','b0','b6'],['r2','d8','l2','u0'],['r5','d7','l5','u1'],['r8','d6','l8','u2']); } // z
+	else if (move==21) { docycle(0,['f0','f2','f8','f6'],['f1','f5','f7','f3'],['u6','r0','d2','l0'],['u7','r3','d1','l3'],['u8','r6','d0','l6'],['u4','r4','d4','l4'],['u3','r1','d5','l1'],['u5','r7','d3','l7'],['b7','b5','b1','b3'],['b8','b2','b0','b6'],['r2','d8','l2','u0'],['r5','d7','l5','u1'],['r8','d6','l8','u2']); } // z'
+	else if (move==22) { domove(2); domove(5); } // r
+	else if (move==23) { domove(3); domove(4); } // r'
+	else if (move==24) { domove(8); domove(4); } // l
+	else if (move==25) { domove(9); domove(5); } // l'
+	// unmapped
+	else if (move==26) { docycle(1,['u4','r4','d4','l4'],['u3','r1','d5','l1'],['u5','r7','d3','l7']); } // S
+	else if (move==27) { docycle(0,['u4','r4','d4','l4'],['u3','r1','d5','l1'],['u5','r7','d3','l7']); } // S'
+	else if (move==28) { domove(26); domove(6); } // f
+	else if (move==29) { domove(27); domove(7); } // f'
+	else if (move==30) { domove(15); domove(0); } // u
+	else if (move==31) { domove(14); domove(1); } // u'
+	else if (move==32) { domove(10); domove(27); } // b
+	else if (move==33) { domove(11); domove(26); } // b'
+	else if (move==34) { domove(12); domove(14); } // d
+	else if (move==35) { domove(13); domove(15); } // d'
+	
+	if ($('scramble').value=='7' && half != 1) {domove(move,1);	}
+	
+	if (cubestate==1 && (move > 21 || move < 16)) {
+		settimer();
+		cubestate=2;
+	}
+}
+function dopowmove(move,pow) {
+	if (pow == 1) {domove(move);}
+	else if (pow == 2) {domove(move); domove(move);}
+	else if (pow == 3) {domove((move+1));}
+}
+function doalg(alg) {
+    while (alg.length > 0) {
+        if (alg.match(/^[UDFBRLESMrfubldyzx]/)) {
+            var slice = alg.charAt(0);
+            alg = alg.slice(1);
+            var pow = 1;
+            if (alg.match(/^['2]/)) {
+                pow = alg.charAt(0) === "'" ? 3 : 2;
+                alg = alg.slice(1) 
+			}
+			switch(slice) {
+				case "U": dopowmove(0,pow);	break;
+				case "R": dopowmove(2,pow);	break;
+				case "F": dopowmove(6,pow);	break;
+				case "D": dopowmove(12,pow); break;
+				case "L": dopowmove(8,pow); break;
+				case "B": dopowmove(10,pow); break;
+				case "E": dopowmove(14,pow); break;
+				case "M": dopowmove(4,pow); break;
+				case "y": dopowmove(16,pow); break;
+				case "x": dopowmove(18,pow); break;
+				case "z": dopowmove(20,pow); break;
+				case "r": dopowmove(22,pow); break;
+				case "l": dopowmove(24,pow); break;
+				case "S": dopowmove(26,pow); break;
+				case "f": dopowmove(28,pow); break;
+				case "u": dopowmove(30,pow); break;
+				case "b": dopowmove(32,pow); break;
+				case "d": dopowmove(34,pow); break;
+			}
+		}
+        else { alg = alg.slice(1) } 
+	}
+	getstate();
+}
+function toggle() {
+	if($('toggle').value == "Show Times") {
+		$('toggle').value = "Show Options";
+		$('toggleoptions').style.display = 'none';
+		$('toggletimes').style.display = 'block';
+	}
+	else if($('toggle').value == "Show Options") {
+		$('toggle').value = "Show Times";
+		$('toggleoptions').style.display = 'block';
+		$('toggletimes').style.display = 'none';
+	}
+}
+function settimer() {
+	solve_time = undefined;
+	start_time = Date.now();
+	window.timer = setInterval(function(){
+		$('timer').innerHTML = readtime(solve_time == undefined ? Date.now() - start_time : solve_time);
+		if (cubestate!=2) {
+			$('timer').innerHTML = '';
+			clearInterval(window.timer);
+		}
+	}, 67); // for lols
+}
+function readtime(time) {
+	if (time == 'DNF') { return time; }
+	time = parseInt(time);
+	var min = 0;
+	var sec = (Math.floor(time/1000)%60);
+	min = Math.floor(time/60000);
+	if (min!=0&&sec<10) { sec = '0'+sec; }
+	time = Math.floor(time/10);
+	time = time.toString().slice(-2);
+	if (min) return min+':'+sec+'.'+time;
+	else return sec+'.'+time;
+}
+function stoptimer() {
+	end_time = Date.now();
+	clearInterval(window.timer);
+	solve_time = end_time - start_time;
+	$('timer').innerHTML = readtime(solve_time);
+	times[times.length] = solve_time;
+	updatetimes();
+	cubestate = 0;
+}
+function scramble() {
+	if (cubestate > 0) {
+		times[times.length] = 'DNF';
+		updatetimes();
+	}	
+	switch ($('scramble').value) {
+		case '0': for (i=0;i<60;i++){ domove(Math.floor(Math.random()*36));} break;
+		case '1': 
+			var tmp = Array($('u4').style.backgroundColor,$('d4').style.backgroundColor);
+			for (i=0;i<60;i++){domove(scrambles[0][Math.floor(Math.random()*scrambles[0].length)]);} 
+			if ($('u4').style.backgroundColor!= tmp[0] && $('u4').style.backgroundColor!= tmp[1]){domove(5);}
+			break;
+		case '2': for (i=0;i<60;i++){ domove(Math.floor(Math.random()*4)); } break;
+		case '3': for (i=0;i<60;i++){ domove(scrambles[1][Math.floor(Math.random()*scrambles[1].length)]); } break;
+		case '4': for (i=0;i<60;i++){ domove(scrambles[2][Math.floor(Math.random()*scrambles[2].length)]); } break;
+		case '5': for (i=0;i<60;i++){ domove(scrambles[3][Math.floor(Math.random()*scrambles[3].length)]); } break;
+		case '6': for (i=0;i<60;i++){ domove(scrambles[4][Math.floor(Math.random()*scrambles[4].length)]); } break;
+		// halfturns
+		default: for (i=0;i<60;i++){ domove(Math.floor(Math.random()*36));}
+	}
+	cubestate=1;
+	$('timer').innerHTML = '';
+	if ($('clr').checked) {$('output').value='';}
+}
+function solvesim() {
+	for (i=0;i<9;i++){
+		if (i!=4){
+		$('u'+i).style.backgroundColor=$('u4').style.backgroundColor;
+		$('r'+i).style.backgroundColor=$('r4').style.backgroundColor;
+		$('l'+i).style.backgroundColor=$('l4').style.backgroundColor;
+		$('f'+i).style.backgroundColor=$('f4').style.backgroundColor;
+		$('b'+i).style.backgroundColor=$('b4').style.backgroundColor;
+		$('d'+i).style.backgroundColor=$('d4').style.backgroundColor;
+		}
+	}
+	if (cubestate > 0) {
+		times[times.length] = 'DNF';
+		updatetimes();
+	}
+	cubestate=0;
+	if ($('clr').checked) {$('output').value='';}
+}
+function checksolved() {
+	var sclrz = [$('u4').style.backgroundColor,$('r4').style.backgroundColor,$('l4').style.backgroundColor,$('f4').style.backgroundColor,$('b4').style.backgroundColor,$('d4').style.backgroundColor,$('flt6').style.backgroundColor];
+	for (i=0;i<9;i++){
+		if (($('u'+i).style.backgroundColor!=sclrz[0] && $('u'+i).style.backgroundColor!=sclrz[6]) || ($('r'+i).style.backgroundColor!=sclrz[1] && $('r'+i).style.backgroundColor!=sclrz[6]) || ($('l'+i).style.backgroundColor!=sclrz[2] && $('l'+i).style.backgroundColor!=sclrz[6]) || ($('f'+i).style.backgroundColor!=sclrz[3] && $('f'+i).style.backgroundColor!=sclrz[6]) || ($('b'+i).style.backgroundColor!=sclrz[4] && $('b'+i).style.backgroundColor!=sclrz[6]) || ($('d'+i).style.backgroundColor!=sclrz[5] && $('d'+i).style.backgroundColor!=sclrz[6])) {return 0;}
+		if(i==3) {i++;}
+	}
+	stoptimer();
+}
+function updatetimes() {
+	$('toggletimes').innerHTML = '';
+	var best = [times[0],'DNF',0,'DNF',0];
+	var five = [], twelve = [];
+	var temp;
+	for (var i=0;i<times.length;i++) {
+		five.push(times[i]); if (i>4) { 
+			five.shift();
+			temp = getavg(five,5);
+			if (temp[0] < best[1] || (temp[0] != 'DNF' && best[1] == 'DNF')) {
+				best[1] = temp[0]; best[2] = i;
+			}
+		}
+		twelve.push(times[i]); if (i>11) { 
+			twelve.shift();
+			temp = getavg(twelve,12);
+			if (temp[0] < best[3] || (temp[0] != 'DNF' && best[3] == 'DNF')) {
+				best[3] = temp[0]; best[4] = i;
+			}
+		}
+		if (times[i] < best[0] || (times[i] != 'DNF' && best[0] == 'DNF')) { best[0] = times[i]; }
+		$('toggletimes').innerHTML += readtime(times[i])+ ' ';
+	}
+	$('toggletimes').innerHTML += '<br>&nbsp;<br>Best time - ' + readtime(best[0]) + '<br>';
+	
+	if(five.length==5) { 
+		if (best[2] != 0) {
+			temp = [];
+			for(i=0;i<5;i++) { temp[i] = times[((best[2]-4)+i)];}
+			writeavg(temp,5,'Best');
+		}
+		writeavg(five,5,'Current');
+	}
+	if(twelve.length==12) {
+		if (best[4] != 0) {
+			temp = [];
+			for(i=0;i<12;i++) { temp[i] = times[((best[4]-11)+i)];}
+			writeavg(temp,12,'Best');
+		}
+		writeavg(twelve,12,'Current');
+	}
+	
+	$('toggletimes').innerHTML+='&nbsp;<br><input type="button" class="b" value="Reset Times" onClick="if(confirm(\'Are you sure?\')){times=[];$(\'toggletimes\').innerHTML=\'\';}">';
+}
+function writeavg(array,size,name) {
+	var best = getavg(array,size);
+	
+	$('toggletimes').innerHTML += name+' '+size+' - ';
+	
+	for (i=0;i<size;i++) {
+		if (best[1] == i || best[2] == i) {
+			$('toggletimes').innerHTML += "("+readtime(array[i])+") ";
+		}
+		else {$('toggletimes').innerHTML += readtime(array[i])+" ";}
+	}
+	
+	if (best[0] != 'DNF') $('toggletimes').innerHTML += "= "+readtime(best)+"<br>";
+	else $('toggletimes').innerHTML += "= DNF<br>";
+}
+function getavg(array,size) {
+	var best = [0,0,0];
+	for(var i=1;i<size;i++) { 
+		if(array[i]<array[best[1]] || (array[i] != 'DNF' && array[best[1]] == 'DNF')) { best[1] = i;} 
+		if(array[i]>array[best[2]] || array[i] == 'DNF') { best[2] = i;} 
+	}
+	for(i=0;i<size;i++) { 
+		if(i != best[1] && i != best[2]) {
+			if (array[i] == 'DNF') {best[0] = 'DNF';break;}
+			best[0] += array[i];
+		}
+	}
+	if (best[0] != 'DNF') best[0]/=(size-2);
+	return best;
+}
+function getstate() {
+	var temp = 0;
+	$('state').value='';
+	for(j=0;j<12;j++) {
+		temp = 0;
+		for(i=0;i<12;i++) {
+			if ($(kstate[j][0]).style.backgroundColor == $(astate[i][0]).style.backgroundColor && $(kstate[j][1]).style.backgroundColor == $(astate[i][1]).style.backgroundColor) {
+				temp =1;
+				$('state').value+=$(kstate[j][0]).innerHTML+aname[i]+" ";
+				break;
+			}
+			else if ($(kstate[j][0]).style.backgroundColor == $(astate[i][1]).style.backgroundColor && $(kstate[j][1]).style.backgroundColor == $(astate[i][0]).style.backgroundColor) {
+			temp=1;
+				$('state').value+=$(kstate[j][0]).innerHTML+aname[i].split("").reverse().join("")+" ";
+				break;
+			}
+		}
+		if (!temp) { $('state').value+=$(kstate[j][0]).innerHTML+'? '; }
+	}
+	$('state').value+=" ";
+	for(j=12;j<20;j++) {
+		temp = 0;
+		for(i=12;i<20;i++) {
+			if ($(kstate[j][0]).style.backgroundColor == $(astate[i][0]).style.backgroundColor && $(kstate[j][1]).style.backgroundColor == $(astate[i][1]).style.backgroundColor && $(kstate[j][2]).style.backgroundColor == $(astate[i][2]).style.backgroundColor) {
+				temp =1;
+				$('state').value+=$(kstate[j][0]).innerHTML+aname[i]+" ";
+				break;
+			}
+			else if ($(kstate[j][0]).style.backgroundColor == $(astate[i][1]).style.backgroundColor && $(kstate[j][1]).style.backgroundColor == $(astate[i][2]).style.backgroundColor && $(kstate[j][2]).style.backgroundColor == $(astate[i][0]).style.backgroundColor) {
+				temp =1;
+				if ($(kstate[j][0]).innerHTML == '@') {
+					$('state').value+="@"+aname[i]+" ";
+				}
+				else {
+					$('state').value+="+"+aname[i]+" ";
+				}
+				break;
+			}
+			else if ($(kstate[j][0]).style.backgroundColor == $(astate[i][2]).style.backgroundColor && $(kstate[j][1]).style.backgroundColor == $(astate[i][0]).style.backgroundColor && $(kstate[j][2]).style.backgroundColor == $(astate[i][1]).style.backgroundColor) {
+				temp =1;
+				if ($(kstate[j][0]).innerHTML == '@') {
+					$('state').value+="@"+aname[i]+" ";
+				}
+				else {
+					$('state').value+="-"+aname[i]+" ";
+				}
+				break;
+			}
+		}
+		if (!temp) { $('state').value+=$(kstate[j][0]).innerHTML+'? '; }
+	}
+}
+function selectdiv(obj,name) {
+	for (i=0;i<10;i++){
+		$(name+i).style.border = '2px solid black';
+	}
+	obj.style.border = '4px solid black';
+}
+function getcubie(obj) {
+	for (j=0;j<kstate.length;j++) {
+		for (k=0;k<kstate[j].length;k++) {
+			if (kstate[j][k] == obj.id) {
+				return kstate[j];
+			}
+		}
+	}
+	return 0;
+}
+function selectfacelet(obj) {
+	var cubie = getcubie(obj);
+	var grey = $('flt6').style.backgroundColor;
+
+	for (i=0;i<10;i++){
+		if($('flt'+i).style.border == '4px solid black' && i<7) {
+			obj.style.backgroundColor = $('flt'+i).style.backgroundColor;
+			if (obj.innerHTML != '' && obj.innerHTML != '@') {
+				for(j=0;cubie&&j<cubie.length;j++) {$(cubie[j]).innerHTML='';}
+			}
+			break;
+		}
+		
+		else if ($('flt'+i).style.border == '4px solid black' ) {
+			if (i == 7) {
+				for(j=0;cubie&&j<cubie.length;j++) {
+					$(cubie[j]).style.backgroundColor=clr[6];
+				}
+			}
+			if (i == 8) {
+				for(j=0;cubie&&j<cubie.length;j++) {
+					if ($(cubie[j]).innerHTML == '@') {
+						$(cubie[j]).innerHTML = '';
+					}
+					else {
+						$(cubie[j]).innerHTML = '@';
+					}
+				}
+			}
+			if (i == 9) {
+				if(cubie.length==2) {
+					if($(cubie[0]).style.backgroundColor==grey && $(cubie[1]).style.backgroundColor==grey) {
+						if ($(cubie[0]).innerHTML == '@') {
+							$(cubie[0]).innerHTML = '';$(cubie[1]).innerHTML = '';
+						}
+						else if ($(cubie[0]).innerHTML == '') {
+							$(cubie[0]).innerHTML = '-';$(cubie[1]).innerHTML = '-';
+						}
+						else if ($(cubie[0]).innerHTML == '-') {
+							$(cubie[0]).innerHTML = '';$(cubie[1]).innerHTML = '';
+						}
+					}
+					else {
+						docycle(0,[cubie[0],cubie[1]]);
+					}					
+				}
+				else if(cubie.length==3) {
+					if($(cubie[0]).style.backgroundColor==grey && $(cubie[1]).style.backgroundColor==grey && $(cubie[2]).style.backgroundColor==grey) {
+						if ($(cubie[0]).innerHTML == '@') {
+							for(j=0;cubie&&j<cubie.length;j++) {$(cubie[j]).innerHTML='';}
+						}
+						else if ($(cubie[0]).innerHTML == '') {
+							for(j=0;cubie&&j<cubie.length;j++) {$(cubie[j]).innerHTML='+';}
+						}
+						else if ($(cubie[0]).innerHTML == '+') {
+							for(j=0;cubie&&j<cubie.length;j++) {$(cubie[j]).innerHTML='-';}
+						}
+						else if ($(cubie[0]).innerHTML == '-') {
+							for(j=0;cubie&&j<cubie.length;j++) {$(cubie[j]).innerHTML='';}
+						}
+						
+					}
+					else {
+						docycle(0,[cubie[0],cubie[1],cubie[2]]);
+					}					
+				}
+			}
+		} 
+	}
+	getstate();
+}
+function selectpreset(obj) {
+	if(obj.id == "ps0") {
+		for (i=0;i<9;i++){
+		$('u'+i).style.backgroundColor=clr[0];	$('r'+i).style.backgroundColor=clr[2];
+		$('l'+i).style.backgroundColor=clr[5];	$('f'+i).style.backgroundColor=clr[1];
+		$('b'+i).style.backgroundColor=clr[4];	$('d'+i).style.backgroundColor=clr[3];
+		}	
+	}
+	if(obj.id == "ps1") {
+		for (i=0;i<9;i++){
+			if (i==4) {
+				$('u'+i).style.backgroundColor=clr[0];	$('r'+i).style.backgroundColor=clr[2];
+				$('l'+i).style.backgroundColor=clr[5];	$('f'+i).style.backgroundColor=clr[1];
+				$('b'+i).style.backgroundColor=clr[4];	$('d'+i).style.backgroundColor=clr[3];
+			}
+			else {
+				$('u'+i).style.backgroundColor=clr[6];	$('r'+i).style.backgroundColor=clr[6];
+				$('l'+i).style.backgroundColor=clr[6];	$('f'+i).style.backgroundColor=clr[6];
+				$('b'+i).style.backgroundColor=clr[6];	$('d'+i).style.backgroundColor=clr[6];
+			}
+		}
+	}
+	if(obj.id == "ps2") {
+		for (i=0;i<9;i++){
+		$('u'+i).style.backgroundColor=clr[0];	$('r'+i).style.backgroundColor=clr[2];
+		$('l'+i).style.backgroundColor=clr[2];	$('f'+i).style.backgroundColor=clr[1];
+		$('b'+i).style.backgroundColor=clr[1];	$('d'+i).style.backgroundColor=clr[0];
+		}
+	}
+	for (i=0;i<9;i++){
+		$('u'+i).innerHTML=''; $('r'+i).innerHTML=''; $('l'+i).innerHTML=''; $('f'+i).innerHTML=''; $('b'+i).innerHTML=''; $('d'+i).innerHTML='';
+	}
+	getstate();
+}
+function setview(view) {
+	var u_temp = [[],[],[],[],[],[],[],[],[],[],[],[]];
+	for(var i=0;i<9;i++) {
+		u_temp[0][i] = $('u'+i).style.backgroundColor;
+		u_temp[1][i] = $('r'+i).style.backgroundColor;
+		u_temp[2][i] = $('f'+i).style.backgroundColor;
+		u_temp[3][i] = $('d'+i).style.backgroundColor;
+		u_temp[4][i] = $('l'+i).style.backgroundColor;
+		u_temp[5][i] = $('b'+i).style.backgroundColor;
+		
+		u_temp[6][i] = $('u'+i).innerHTML;
+		u_temp[7][i] = $('r'+i).innerHTML;
+		u_temp[8][i] = $('f'+i).innerHTML;
+		u_temp[9][i] = $('d'+i).innerHTML;
+		u_temp[10][i] = $('l'+i).innerHTML;
+		u_temp[11][i] = $('b'+i).innerHTML;
+	}	
+	
+	if (view == 0) { writeheiseview() }
+	else if (view == 1) { writeisoview(); }
+	else if (view == 2) { writeqcubeview(); }
+	
+	for(var i=0;i<9;i++) {
+		$('u'+i).style.backgroundColor = u_temp[0][i];
+		$('r'+i).style.backgroundColor = u_temp[1][i];
+		$('f'+i).style.backgroundColor = u_temp[2][i];
+		$('d'+i).style.backgroundColor = u_temp[3][i];
+		$('l'+i).style.backgroundColor = u_temp[4][i];
+		$('b'+i).style.backgroundColor = u_temp[5][i];
+		
+		$('u'+i).innerHTML = u_temp[6][i];
+		$('r'+i).innerHTML = u_temp[7][i];
+		$('f'+i).innerHTML = u_temp[8][i];
+		$('d'+i).innerHTML = u_temp[9][i];
+		$('l'+i).innerHTML = u_temp[10][i];
+		$('b'+i).innerHTML = u_temp[11][i];
+	}	
+}
+function trans(type,alg) {
+	var out = '';
+	
+	var norm="URFDLBurfdlbMESyzx";
+	var tran=[
+		"BRUFLDbrufldMSEzyx", // rotx
+		"UFLDBRufldbrSEMyxz", // roty
+		"RDFLUBrdflubEMSxzy", // rotz
+		"ULFDRBulfdrbMESyzx", // mrlr
+		"URBDLFurbdlfMESyzx", // mrfb
+		"DRFULBdrfulbMESyzx"  // mrud
+	];
+		
+	if (type==0) {
+		while (alg.length > 0) {
+			if (alg.match(/^[UDFBRLESMrfubldyzx]/)) {
+				var slice = alg.charAt(0);
+				alg = alg.slice(1);
+				var pow = '\'';
+				if (alg.match(/^['2]/)) {
+					pow = alg.charAt(0) === "'" ? '' : '2';
+					alg = alg.slice(1) 
+				}
+				out=slice+pow+' '+out;
+			}
+			else { alg = alg.slice(1) } 
+		}
+	}
+	if (type>=1 && type<=6) {
+		while (alg.length > 0) {
+			if (alg.match(/^[UDFBRLESMrfubldyzx]/)) {
+				var slice = alg.charAt(0);
+				var loc = norm.indexOf(slice);
+				slice = tran[(type-1)][loc];
+				alg = alg.slice(1);
+				var pow = '';
+				if (alg.match(/^['2]/)) {
+					pow = alg.charAt(0) === "'" ? '\'' : '2';
+					alg = alg.slice(1) 
+				}
+				if (type==1) { switch(loc) {
+					case 14:if (pow == '') { pow = '\'';} else if (pow == '\'') {pow = '';}break;
+					case 15:if (pow == '') { pow = '\'';} else if (pow == '\'') {pow = '';}break;
+				} }
+				else if (type==2) { switch(loc) {
+					case 12:if (pow == '') { pow = '\'';} else if (pow == '\'') {pow = '';}break;
+					case 16:if (pow == '') { pow = '\'';} else if (pow == '\'') {pow = '';}break;
+				} }
+				else if (type==3) { switch(loc) {
+					case 12:if (pow == '') { pow = '\'';} else if (pow == '\'') {pow = '';}break;
+					case 17:if (pow == '') { pow = '\'';} else if (pow == '\'') {pow = '';}break;
+				} }
+				else if (type>=4 && type<=6) {
+					if (pow == '') { pow = '\'';} else if (pow == '\'') {pow = '';}
+					if (type==4) { switch(loc) {
+						case 12:if (pow == '') { pow = '\'';} else if (pow == '\'') {pow = '';}break;
+						case 17:if (pow == '') { pow = '\'';} else if (pow == '\'') {pow = '';}break;
+					} }
+					if (type==5) { switch(loc) {
+						case 14:if (pow == '') { pow = '\'';} else if (pow == '\'') {pow = '';}break;
+						case 16:if (pow == '') { pow = '\'';} else if (pow == '\'') {pow = '';}break;
+					} }
+					if (type==6) { switch(loc) {
+						case 13:if (pow == '') { pow = '\'';} else if (pow == '\'') {pow = '';}break;
+						case 15:if (pow == '') { pow = '\'';} else if (pow == '\'') {pow = '';}break;
+					} }
+				}	
+				
+				out+=slice+pow+' ';
+			}
+			else { alg = alg.slice(1) } 
+		}
+	}
+	return out.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
+}
+function writemani(alg) {
+	var out = '';
+	var mid = 0;
+	while (alg.length > 0) {
+			if (alg.match(/^[UDFBRLESMrfubldyzx]/)) {
+				var slice = alg.charAt(0);
+				alg = alg.slice(1);
+				var pow = '';
+				if (alg.match(/^['2]/)) {
+					pow = alg.charAt(0) === "'" ? '\'' : '2';
+					alg = alg.slice(1);
+				}
+				out+='<div class="l" onclick="mani(this)" id="m'+mid+'">'+slice+pow+'</div>';
+				mid++;
+			}
+			else { alg = alg.slice(1) } 
+		}
+	$('man').innerHTML = out;
+}
+function mani(obj) {
+	var mid = obj.id;
+	var num = 0;
+	mid = mid.slice(1); mid++;
+	var move = obj.innerHTML;
+	var axis = "URFDLBdlburfyxz";
+	var tran = [[2,3],[1,3],[3,3],[2,1],[1,1],[3,1],[2,1],[1,1],[3,1],[2,3],[1,3],[3,3]];
+	var slice = move.charAt(0);
+	var pow = move.slice(1);
+	var loc = axis.indexOf(slice);
+	var buf = Array();
+
+	for (i=1;i<10;i++){ if($('mo'+i).style.border == '4px solid black') {
+	
+		buf[0] = $('mo'+i).innerHTML;
+		for (j=mid;$('m'+j);j++) {
+			buf[1] = $('m'+j).innerHTML;
+			$('m'+j).innerHTML = buf[0];
+			buf[0] = buf[1];
+		} $('man').innerHTML+='<div class="l" onclick="mani(this)" id="m'+j+'">'+buf[0]+'</div>';
+		
+		num = (i%3);
+		if (num==0) {num=3;}
+		slice = parseInt((i+2)/3);
+		mid++;
+		while($('m'+mid)) {
+			for(j=0;j<num;j++) {$('m'+mid).innerHTML = trans(slice,$('m'+mid).innerHTML);}
+			mid++;
+		}
+		
+		$('alg').value = '';
+		for (j=0;$('m'+j);j++) {
+			$('alg').value += $('m'+j).innerHTML+' ';
+		}
+		
+	return 0; } }
+
+	if (loc != -1) {
+		if (loc > 11) {
+			$('man').removeChild(obj);
+			loc-=12;
+			slice='rot';
+		}
+		else if (loc > 5) {
+			slice = axis[(loc-6)];
+			
+			obj.innerHTML = slice+pow;
+		}
+		else {
+			slice = axis[(loc+6)];
+			
+			obj.innerHTML = slice+pow;
+		}
+		while($('m'+mid)) {
+			move = $('m'+mid).innerHTML;
+			num = tran[loc][1];
+			if (pow.charAt(0) == '2') { num = 2;}
+			else if (pow.charAt(0) == "'") { if (num==1) {num=3;} else {num=1;} }
+			for(i=0;i<num;i++) {move = trans(tran[loc][0],move);}
+			$('m'+mid).innerHTML = move;
+			if(slice=='rot') {$('m'+mid).id = 'm'+(mid-1); }
+			mid++;
+		}
+		$('alg').value = '';
+		for (i=0;$('m'+i);i++) {
+			$('alg').value += $('m'+i).innerHTML+' ';
+		}
+	}
+}
+function showrecon() {
+	$('solve').style.display = 'block';
+	$('solve').innerHTML+="<br>";
+	$('solve').innerHTML+="<span class=\"l\" onClick=\"selectpreset($('ps0'));doalg(_solve[0])\">Scramble</span> - ";
+	doalg(_solve[0]);
+	
+	var alg = _solve[0];
+	while (alg.length > 0) {if (alg.match(/^[UDFBRLESMrfubldyzx]/)) {
+		var slice = alg.charAt(0); alg = alg.slice(1);
+		if (alg.match(/^['2]/)) { slice+=alg.charAt(0);	alg = alg.slice(1) } 
+		$('solve').innerHTML+=slice+' ';
+	} else { alg = alg.slice(1) } }
+	
+	$('solve').innerHTML+="<br>&nbsp;<br>";
+	
+	var moveid=1;
+	
+	for(i=1;i<_solve.length;i++) { 
+		var alg = _solve[i];
+		while (alg.length > 0) {if (alg.match(/^[UDFBRLESMrfubldyzx]/)) {
+			var slice = alg.charAt(0); alg = alg.slice(1);
+			if (alg.match(/^['2]/)) { slice+=alg.charAt(0);	alg = alg.slice(1) } 
+			$('solve').innerHTML+="<div class=\"l\" onClick=\"dorecon("+moveid+");\">"+slice+"</div>";
+			moveid++;
+		} else { alg = alg.slice(1) } }
+		$('solve').innerHTML+="<br>";
+	}
+	
+	$('solve').innerHTML+="&nbsp;<br><input type='button' class='b' id='play' value='Play' onclick='playrecon()'>";
+}
+function dorecon(moveid) {
+	if ($('play').value == 'Stop') {
+		clearInterval(window.play);
+		$('play').value = 'Play';
+	}
+
+	selectpreset($('ps0')); doalg(_solve[0]);
+	var alg = '';
+	for(i=1;i<_solve.length;i++) { alg+=_solve[i]; }
+	
+	while(moveid) { if (alg.match(/^[UDFBRLESMrfubldyzx]/)) {
+		var slice = alg.charAt(0); alg = alg.slice(1);
+		if (alg.match(/^['2]/)) { slice+=alg.charAt(0);	alg = alg.slice(1) } 
+		doalg(slice); moveid--;
+	} else { alg = alg.slice(1) } }
+}
+function playrecon() {
+	if ($('play').value == 'Stop') {
+		clearInterval(window.play);
+		$('play').value = 'Play';
+		return 0;
+	}
+
+	window.recon = ''; for(i=1;i<_solve.length;i++) { window.recon+=_solve[i]; }
+	selectpreset($('ps0')); doalg(_solve[0]);
+	$('play').value = 'Stop';
+	
+	window.play = window.setInterval(function(){
+		if(window.recon.length>0) { if (window.recon.match(/^[UDFBRLESMrfubldyzx]/)) {
+		var slice = window.recon.charAt(0); window.recon = window.recon.slice(1);
+		if (window.recon.match(/^['2]/)) { slice+=window.recon.charAt(0);window.recon = window.recon.slice(1) } 
+		doalg(slice);
+		} else { window.recon = window.recon.slice(1); } }
+		else { clearInterval(window.play);  $('play').value = 'Play';}
+	}, 400);
+}
+function setmacro() {
+	var name=prompt("Enter Macro Name","");
+	var alg=prompt("Enter Algorithm","");
+	if (alg&&name) {
+		addmacro(alg,name);
+	}
+}
+function addmacro(alg,name) {
+	var id=0;
+	while($('macro_'+id)){id++;}
+	macros[id] = alg;
+	$('macros').innerHTML += "<input type=\"button\" class=\"b\" value=\""+name+"\" id=\"macro_"+id+"\" onclick=\"doalg(macros["+id+"])\">";
+}
+function visualcube() {
+	var vstate = "";
+	var sides = "urfdlb";
+	var csides = "324051";
+	var hax = "876543210";
+	var fileurl = "http://www.speedsolving.com/wiki/extensions/algdb/vcube/visualcube.php";
+	var buf;
+
+	for (j=0;j<6;j++) {
+		for (i=0;i<9;i++) {
+			if (j > 3) buf = hax[i];
+			else buf = i;
+			switch($(sides[j]+buf).style.backgroundColor) {
+				case $('flt0').style.backgroundColor:
+					vstate += "d";
+					break;
+				case $('flt1').style.backgroundColor:
+					vstate += "b";
+					break;	
+				case $('flt2').style.backgroundColor:
+					vstate += "r";
+					break;	
+				case $('flt3').style.backgroundColor:
+					vstate += "u";
+					break;	
+				case $('flt4').style.backgroundColor:
+					vstate += "f";
+					break;
+				case $('flt5').style.backgroundColor:
+					vstate += "l";
+					break;
+				default:
+					vstate += "n";
+					break;
+			}
+		}
+	}
+	
+	if (_colours != "" && _colours != "colours") {
+		vstate += "&sch=";
+		for (i=0;i<_colours.length;i++) {
+			if (i == (_colours.length-1)) vstate+=_colours[csides[i]];
+			else vstate+=_colours[csides[i]]+",";
+		}
+	}
+	
+	fileurl+="?fmt=png&fd="+vstate;
+
+	$('visualcube').innerHTML = "&nbsp<br>";
+	$('visualcube').innerHTML += "<a href=\""+fileurl+"\"><img src=\""+fileurl+"\"></a>";
+	$('visualcube').innerHTML += "<a href=\""+fileurl+"&r=y225x35\"><img src=\""+fileurl+"&r=y225x35\"></a>";
+	$('visualcube').innerHTML += "<a href=\""+fileurl+"&view=plan\"><img src=\""+fileurl+"&view=plan\"></a>";
+}
+function setmap(map) {
+	if (keys != kkeys && keys != qkeys && !confirm("This will overwrite your custom keymap\n\nProceed?")) {
+		return 0;
+	}
+	if (map == 0) { keys = kkeys; }
+	else if (map == 1) { keys = qkeys; }
+}
+function kds() {
+	if(kdsv) {
+		kdsv = 0;
+		window.onkeydown=dokeys;
+		$('kds').value = 'Disable Keys';
+	}
+	else {
+		kdsv = 1;
+		window.onkeydown=0;
+		$('kds').value = 'Enable Keys';
+	}
+}
+function dokeys(e) {	
+	var keyCode = 0;
+	if (e.keyCode) { keyCode = e.keyCode; } 
+	else if (e.which) { keyCode = e.which; }
+	
+	if (keyCode == 186 && browser == 1 ) {
+		keyCode = 59;
+	}
+	
+	if (remap) {
+		if (keyCode==27) {
+			setmap(0);
+			$('remap').value = 'Custom Keymap';
+			remap = 0;
+			return 0;
+		}
+	
+		keys[remap-1] = keyCode;
+		if (remap == kkeys.length) {
+			remap = 0;
+			$('remap').value = 'Custom Keymap';
+		} 
+		else {
+			$('remap').value = 'Please press key for '+ckeys[parseInt(remap/2)];
+			if (remap%2) { $('remap').value += "'" }
+			remap++;
+		}
+		return 0;
+	}
+	
+	if (keyCode==keys[0]) { domove(0);  $('output').value += 'U '; } // U
+	else if (keyCode==keys[1]) { domove(1);  $('output').value += 'U\' '; } // U'
+	else if (keyCode==keys[2]) { domove(2); $('output').value += 'R ';} // R
+	else if (keyCode==keys[3]) { domove(3); $('output').value += 'R\' '; } // R'
+	else if (keyCode==keys[4]) { domove(4); $('output').value += 'M '; } // M
+	else if (keyCode==keys[5]) { domove(5); $('output').value += 'M\' '; } // M'
+	else if (keyCode==keys[6]) { domove(6); $('output').value += 'F '; } // F
+	else if (keyCode==keys[7]) { domove(7); $('output').value += 'F\' '; } // F'
+	else if (keyCode==keys[8]) { domove(8); $('output').value += 'L '; } // L
+	else if (keyCode==keys[9]) { domove(9); $('output').value += 'L\' '; } // L'
+	else if (keyCode==keys[10]) { domove(10); $('output').value += 'B '; } // B
+	else if (keyCode==keys[11]) { domove(11); $('output').value += 'B\' '; } // B'
+	else if (keyCode==keys[12]) { domove(12); $('output').value += 'D '; } // D
+	else if (keyCode==keys[13]) { domove(13); $('output').value += 'D\' '; } // D'
+	else if (keyCode==keys[14]) { domove(14); $('output').value += 'E '; } // E
+	else if (keyCode==keys[15]) { domove(15); $('output').value += 'E\' '; } // E'
+	else if (keyCode==keys[16]) { domove(16); $('output').value += 'y '; } // y
+	else if (keyCode==keys[17]) { domove(17); $('output').value += 'y\' '; } // y'
+	else if (keyCode==keys[18]) { domove(18); $('output').value += 'x '; } // x
+	else if (keyCode==keys[19]) { domove(19); $('output').value += 'x\' '; } // x'
+	else if (keyCode==keys[20]) { domove(20); $('output').value += 'z '; } // z
+	else if (keyCode==keys[21]) { domove(21); $('output').value += 'z\' '; } // z'
+	else if (keyCode==keys[22]) { domove(22); $('output').value += 'r '; } // r
+	else if (keyCode==keys[23]) { domove(23); $('output').value += 'r\' '; } // r'
+	else if (keyCode==keys[24]) { domove(24); $('output').value += 'l '; } // l
+	else if (keyCode==keys[25]) { domove(25); $('output').value += 'l\' '; } // l'
+	
+	else if (keyCode==32) { if (cubestate == 2) { checksolved(); } else { scramble(); } } // SCRAMBLE
+	
+	else if (keyCode==27) { solvesim(); } // SOLVE
+	
+	getstate();
+	
+	return !(e.keyCode == 32); // eat spacebar
+}
+</script>
+<div style="padding-top:160px;z-index:-1"></div><div id="options" style="border:0px solid black;position:relative;left:480px;width:700px;">
+<div id="timer" style="position:absolute;font-size:80px;font-weight:700;color:#000000;left:200px;top:-125px;"></div>
+<input type="button" value="Show Options" class="b" id="toggle" onclick="toggle();" onFocus="this.blur();">
+<!--<input type="button" value="Scramble" class="b" onclick="scramble();getstate();" onFocus="this.blur();">
+<input type="button" value="Solve" class="b" onclick="solvesim();getstate();" onFocus="this.blur();">-->
+<select id="view" class="b" onchange="setview($('view').value);this.blur();"><option value="0">front view</option><option value="1">isometric</option><option value="2">qcube style</option></select>
+<select id="scramble" class="b"><option value="0">3x3x3</option><option value="1">&lt;M,U&gt;</option><option value="2">&lt;R,U&gt;</option><option value="3">&lt;L,U&gt;</option><option value="4">&lt;R,F,U&gt;</option><option value="5">&lt;R,U,L&gt;</option><option value="6">&lt;R,r,M,U&gt;</option><option value="7">Half Turns</option></select>
+<br>&nbsp;<br>
+<!-- TIMES --><div id="toggletimes" ></div><!-- /TIMES -->
+<!-- OPTIONS -->
+<div id="toggleoptions" style="display:none">
+<select id="k" class="b" onchange="setmap($('k').value);this.blur();"><option value="0">kSim layout</option><option value="1">heise layout</option></select>
+<input type="button" value="Custom Keymap" class="b" onclick="keys=new Array();remap = 1;$('remap').value = 'Please press key for '+ckeys[0];" id="remap">
+<input type="button" value="Disable Keys" class="b" onclick="kds();" id="kds" onFocus="this.blur();">
+<div id="solve" style="display:none"></div>
+<br>&nbsp;<br>
+<input type="button" value="Show Log" class="b" onclick="$('log').style.display='block';this.style.display='none';" id="slog" style="display:block;margin-bottom:20px;">
+<div id="log" style="display:none"><textarea id="output" class="b" style="width:600px;height:200px"></textarea>
+<br>&nbsp;<br>
+<input type="button" value="Hide Log" class="b" onclick="$('log').style.display='none';$('slog').style.display='block';">
+<input type="button" value="Clear" class="b" onclick="$('output').value ='';"> <input type="checkbox" id="clr" checked> (esc/space) to clear <br>&nbsp;<br></div>
+<!-- ACUBE -->
+<input type="text" id="state" class="b" value="" style="width:600px;font-size:14px;" onFocus="this.blur();">
+<br>&nbsp;<br>
+<script>
+for (i=0;i<7;i++){
+	document.write('<div id="flt'+i+'" onclick="selectdiv(this,\'flt\')" style="float:left;cursor: pointer;cursor: hand;width:20px;height:20px;margin-right:5px;border:2px solid black;background-color:'+clr[i]+'"></div>');
+}
+</script>
+<div id="flt7" onclick="selectdiv(this,'flt')" class="fli">?</div>
+<div id="flt9" onclick="selectdiv(this,'flt')" class="fli">+</div>
+<div id="flt8" onclick="selectdiv(this,'flt')" class="fli">@</div>
+<div id="ps0" onclick="selectpreset(this)" class="fli" style="width:auto;padding:0px 5px 0px 5px;">6 Colour</div>
+<div id="ps1" onclick="selectpreset(this)" class="fli" style="width:auto;padding:0px 5px 0px 5px;">Blank</div>
+<div id="ps2" onclick="selectpreset(this)" class="fli" style="width:auto;padding:0px 5px 0px 5px;">3 Colour</div>
+<br>&nbsp;<br>
+<input type="button" value="Show Solver" class="b" onclick="$('acube').style.display='block';this.style.display='none';" style="display:block;margin-bottom:20px" id="sacube">
+<div id="acube" style="display:none">
+<input id="slice" type="checkbox" onclick='set_slice();'><label for="slice">Slices</label>
+<input id="all" type="checkbox" onclick='set_all();'><label for="all">All</label>
+<input id="optimal" type="checkbox" onclick='set_optimal();'><label for="optimal">Optimal</label>
+<input type="radio" name="metric" id="f" value="f" onclick="set_metric()" checked="true"  ><label for="f">FTM</label>
+<input type="radio" name="metric" id="q" value="q" onclick="set_metric()"><label for="q">QTM</label>
+<input type="radio" name="metric" id="s" value="s" onclick="set_metric()"><label for="s">STM</label>
+<br>&nbsp;<br>
+<input type="button" value="Hide Solver" class="b" onclick="$('acube').style.display='none';$('sacube').style.display='block';">
+<button class="b" onclick='solve(state.value);'>Solve State</button>
+<button class="b" onclick='stop();'>Stop</button>
+<br>
+<textarea class="b" style="width: 600px; height: 200px ; font-family: monospace;" id="result"></textarea><ul id="algs">
+</ul>
+<br>&nbsp;<br>
+</div>
+<!-- /ACUBE -->
+<input type="button" value="Algorithm Tools" class="b" onclick="$('algman').style.display='block';this.style.display='none';" style="display:block;margin-bottom:20px" id="salgman">
+<div id="algman" style="display:none">
+<input type="button" value="Do Algorithm" class="b" onclick="doalg($('alg').value)" style="width:150px">
+<input type="button" value="Clear" class="b" onclick="$('alg').value = '';" style="width:50px">
+<input type="text" id="alg" class="b" value="" style="width:400px;font-size:14px;" onkeyup="writemani(this.value)" onmouseup="writemani(this.value)">
+<br>&nbsp;<br>
+<input type="button" value="Invert" class="b" onclick="$('alg').value = trans(0,$('alg').value);writemani($('alg').value);">
+<input type="button" value="Rotate x" class="b" onclick="$('alg').value = trans(1,$('alg').value);writemani($('alg').value);">
+<input type="button" value="Rotate y" class="b" onclick="$('alg').value = trans(2,$('alg').value);writemani($('alg').value);">
+<input type="button" value="Rotate z" class="b" onclick="$('alg').value = trans(3,$('alg').value);writemani($('alg').value);">
+<br>&nbsp;<br>
+<input type="button" value="Mirror L/R" class="b" onclick="$('alg').value = trans(4,$('alg').value);writemani($('alg').value);">
+<input type="button" value="Mirror F/B" class="b" onclick="$('alg').value = trans(5,$('alg').value);writemani($('alg').value);">
+<input type="button" value="Mirror U/D" class="b" onclick="$('alg').value = trans(6,$('alg').value);writemani($('alg').value);">
+<br>&nbsp;<br>
+<div id="mo0" class="fli" onClick="selectdiv(this,'mo')">*</div> <!-- mouseover change -->
+<div id="mo1" class="fli" onClick="selectdiv(this,'mo')">x</div><div id="mo2" class="fli" onClick="selectdiv(this,'mo')">x2</div><div id="mo3" class="fli" onClick="selectdiv(this,'mo')">x'</div>
+<div id="mo4" class="fli" onClick="selectdiv(this,'mo')">y</div><div id="mo5" class="fli" onClick="selectdiv(this,'mo')">y2</div><div id="mo6" class="fli" onClick="selectdiv(this,'mo')">y'</div>
+<div id="mo7" class="fli" onClick="selectdiv(this,'mo')">z</div><div id="mo8" class="fli" onClick="selectdiv(this,'mo')">z2</div><div id="mo9" class="fli" onClick="selectdiv(this,'mo')">z'</div>
+<br>&nbsp;<br>
+<div id="man"></div>
+<br>&nbsp;<br>
+<input type="button" value="Hide Algorithm Tools" class="b" onclick="$('algman').style.display='none';$('salgman').style.display='block';"><br>&nbsp;<br></div>
+<input type="button" class="b" value="Add Macro" onclick="setmacro()"> <span id="macros"></span>
+<br>&nbsp;<br>
+<input type="button" class="b" value="Generate VisualCube Images" onclick="visualcube()"> <div id="visualcube"></div>
+</div>
+<!-- /OPTIONS -->
+</div>
+<script>
+if (_align == 'swap') {
+	$('wrapper').style.left = '560px';
+	$('options').style.left = '20px';
+}
+if (_align == 'right') {
+	$('wrapper').style.cssFloat = 'right';
+	$('wrapper').style.styleFloat = 'right';
+	$('wrapper').style.paddingRight = '600px';
+	$('options').style.left = '20px';
+}
+if (_align == 'centre') {
+	$('timer').style.top = '-120px';
+	$('wrapper').style.left = '50%';
+	$('wrapper').style.marginLeft = '-270px';
+	$('options').style.left = '50%';
+	$('options').style.marginLeft = '-300px';
+	$('options').style.top = '520px';
+}
+$('view').selectedIndex = 0;
+$('k').selectedIndex = 0;
+$('scramble').selectedIndex = 0;
+$('state').value = 'UF UR UB UL DF DR DB DL FR FL BR BL  UFR URB UBL ULF DRF DFL DLB DBR';
+$('output').value = '';
+if (_solve != "" && _solve != "solve") {
+	_alg = "";	_solve = _solve.split(',');
+	toggle();
+	showrecon();
+}
+if (_macro != "" && _macro != "macro") {
+	_macro = _macro.split(',');
+	for (i=0;i<(parseInt(_macro.length));i+=2) {addmacro(_macro[(i+1)],_macro[i]);}
+	toggle();
+}
+if (_keys != "" && _keys != "keys") {
+	_keys = _keys.split(',');
+	keys=new Array();
+	for(i=0;i<_keys.length;i++) { keys[i] = _keys[i]; }
+}
+if (_kds=='nokeys') { kds(); }
+if (_alg!='alg' && _alg != '') { doalg(_alg); $('alg').value = _alg; writemani($('alg').value); toggle();}
+loadacubejs();
+</script>
+</body></html>
