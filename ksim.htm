@@ -37,7 +37,7 @@ ideas & testing - justin jaffray
 
 TODO:
 show key layout
-redesign options
+redesign options - add custom colours
 ?state=base64 (full) -/ acube state translation
 custom solver - read jaap's pruning guide
 viscube arrows
@@ -87,8 +87,11 @@ if (getParams("clear") == "clear") {
 		localStorage.removeItem('kds');
 		localStorage.removeItem('times');
 		localStorage.removeItem('macros');
+		localStorage.removeItem('cubestate');
 	}
 }
+
+window.onbeforeunload = function () {save('cubestate',JSON.stringify(savestate())); };
 
 var _align = getParams("align");
 var _alg = getParams("alg");
@@ -721,48 +724,62 @@ function selectpreset(obj) {
 		$('b'+i).style.backgroundColor=clr[1];	$('d'+i).style.backgroundColor=clr[0];
 		}
 	}
+	if(obj.id == "ps3") {
+		for (i=0;i<9;i++){
+		$('u'+i).style.backgroundColor=clr[0];	$('r'+i).style.backgroundColor=clr[5];
+		$('l'+i).style.backgroundColor=clr[2];	$('f'+i).style.backgroundColor=clr[3];
+		$('b'+i).style.backgroundColor=clr[1];	$('d'+i).style.backgroundColor=clr[4];
+		}
+	}
 	for (i=0;i<9;i++){
 		$('u'+i).innerHTML=''; $('r'+i).innerHTML=''; $('l'+i).innerHTML=''; $('f'+i).innerHTML=''; $('b'+i).innerHTML=''; $('d'+i).innerHTML='';
 	}
 	getstate();
 }
-function setview(view) {
-	var u_temp = [[],[],[],[],[],[],[],[],[],[],[],[]];
+function savestate() {
+	var temp = [[],[],[],[],[],[],[],[],[],[],[],[]];
 	for(var i=0;i<9;i++) {
-		u_temp[0][i] = $('u'+i).style.backgroundColor;
-		u_temp[1][i] = $('r'+i).style.backgroundColor;
-		u_temp[2][i] = $('f'+i).style.backgroundColor;
-		u_temp[3][i] = $('d'+i).style.backgroundColor;
-		u_temp[4][i] = $('l'+i).style.backgroundColor;
-		u_temp[5][i] = $('b'+i).style.backgroundColor;
+		temp[0][i] = $('u'+i).style.backgroundColor;
+		temp[1][i] = $('r'+i).style.backgroundColor;
+		temp[2][i] = $('f'+i).style.backgroundColor;
+		temp[3][i] = $('d'+i).style.backgroundColor;
+		temp[4][i] = $('l'+i).style.backgroundColor;
+		temp[5][i] = $('b'+i).style.backgroundColor;
 		
-		u_temp[6][i] = $('u'+i).innerHTML;
-		u_temp[7][i] = $('r'+i).innerHTML;
-		u_temp[8][i] = $('f'+i).innerHTML;
-		u_temp[9][i] = $('d'+i).innerHTML;
-		u_temp[10][i] = $('l'+i).innerHTML;
-		u_temp[11][i] = $('b'+i).innerHTML;
+		temp[6][i] = $('u'+i).innerHTML;
+		temp[7][i] = $('r'+i).innerHTML;
+		temp[8][i] = $('f'+i).innerHTML;
+		temp[9][i] = $('d'+i).innerHTML;
+		temp[10][i] = $('l'+i).innerHTML;
+		temp[11][i] = $('b'+i).innerHTML;
 	}	
+	return temp;
+}
+function loadstate(state) {
+	for(var i=0;i<9;i++) {
+		$('u'+i).style.backgroundColor = state[0][i];
+		$('r'+i).style.backgroundColor = state[1][i];
+		$('f'+i).style.backgroundColor = state[2][i];
+		$('d'+i).style.backgroundColor = state[3][i];
+		$('l'+i).style.backgroundColor = state[4][i];
+		$('b'+i).style.backgroundColor = state[5][i];
+		
+		$('u'+i).innerHTML = state[6][i];
+		$('r'+i).innerHTML = state[7][i];
+		$('f'+i).innerHTML = state[8][i];
+		$('d'+i).innerHTML = state[9][i];
+		$('l'+i).innerHTML = state[10][i];
+		$('b'+i).innerHTML = state[11][i];
+	}	
+}
+function setview(view) {
+	var u_temp = savestate();
 	
 	if (view == 0) { writeheiseview() }
 	else if (view == 1) { writeisoview(); }
 	else if (view == 2) { writeqcubeview(); }
 	
-	for(var i=0;i<9;i++) {
-		$('u'+i).style.backgroundColor = u_temp[0][i];
-		$('r'+i).style.backgroundColor = u_temp[1][i];
-		$('f'+i).style.backgroundColor = u_temp[2][i];
-		$('d'+i).style.backgroundColor = u_temp[3][i];
-		$('l'+i).style.backgroundColor = u_temp[4][i];
-		$('b'+i).style.backgroundColor = u_temp[5][i];
-		
-		$('u'+i).innerHTML = u_temp[6][i];
-		$('r'+i).innerHTML = u_temp[7][i];
-		$('f'+i).innerHTML = u_temp[8][i];
-		$('d'+i).innerHTML = u_temp[9][i];
-		$('l'+i).innerHTML = u_temp[10][i];
-		$('b'+i).innerHTML = u_temp[11][i];
-	}	
+	loadstate(u_temp);
 }
 function trans(type,alg) {
 	var out = '';
@@ -1229,6 +1246,7 @@ function dokeys(e) {
 		<div id="ps0" onclick="selectpreset(this)" class="fli" style="width:auto;padding:0px 5px 0px 5px;">6 Colour</div>
 		<div id="ps1" onclick="selectpreset(this)" class="fli" style="width:auto;padding:0px 5px 0px 5px;">Blank</div>
 		<div id="ps2" onclick="selectpreset(this)" class="fli" style="width:auto;padding:0px 5px 0px 5px;">3 Colour</div>
+		<div id="ps3" onclick="selectpreset(this)" class="fli" style="width:auto;padding:0px 5px 0px 5px;">Japanese</div>
 		
 		<br>&nbsp;<br>
 		
@@ -1298,13 +1316,16 @@ function dokeys(e) {
 	
 </div>
 <script>
-/* LOAD VIEW */
+/* LOAD VIEW & STATE */
 var loadview = load('view');
+var _loadstate = load('cubestate');
 if (!loadview) { writeheiseview(); $('view').selectedIndex = 0; } 
 else if (loadview == 'heise') { writeheiseview(); $('view').selectedIndex = 0; }
 else if (loadview == 'iso') { writeisoview(); $('view').selectedIndex = 1; }
 else if (loadview == 'qcube') { writeqcubeview(); $('view').selectedIndex = 2; }
-/* /LOAD VIEW */
+if (_loadstate) { loadstate(JSON.parse(_loadstate));  getstate();}
+else {$('state').value = 'UF UR UB UL DF DR DB DL FR FL BR BL  UFR URB UBL ULF DRF DFL DLB DBR';}
+/* /LOAD VIEW  & STATE */
 
 /* LOAD KEYMAP */
 var loadmap = load('keymap');
@@ -1371,7 +1392,6 @@ if (_align == 'centre') {
 }
 /* /SETUP ALIGNMENT */
 
-$('state').value = 'UF UR UB UL DF DR DB DL FR FL BR BL  UFR URB UBL ULF DRF DFL DLB DBR';
 $('output').value = '';
 
 if (_solve != "" && _solve != "solve") {
