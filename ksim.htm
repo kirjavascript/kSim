@@ -3,7 +3,8 @@
 <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
 <meta content="utf-8" http-equiv="encoding">
 <html>
-<head><title>kSim</title>
+<head>
+	<title>kSim</title>
 <style>
 body{color:#777;font-family:arial;font-size:15px;font-weight:200;}img{border:0px;}
 .fl{position:absolute;border:1px solid #000;width:50px;height:50px; text-align:center;font-size:20px;cursor:pointer;cursor:hand;}
@@ -16,7 +17,7 @@ body{color:#777;font-family:arial;font-size:15px;font-weight:200;}img{border:0px
 </style>
 </head>
 <body>
-<div id="wrapper" style="border:0px solid black;position:relative;margin-top:72px;margin-left:80px;width:0px;float:left;">
+<div id="wrapper" style="border:0px solid black;position:relative;margin-top:72px;margin-left:80px;width:0px;float:left;"></div>
 <script>
 /*
 ksim - thom barlow
@@ -26,25 +27,36 @@ visualcube - conrad rider
 ideas & testing - justin jaffray
 
 &alg - algorithm input
-&keys - keyboard map
-&nokeys - disable keys
 &colours - face colours (all six need to be specified for visualcube images to work)
 &solve - scramble,solve ,,,=splits
-&alt - alternative layout
 &macro - name,alg,name,alg
 &rfu - rfu only view
 &align - left,right,swap,centre
+&meepmode - enable meep mode
+&clear - clear local storage
 
 TODO:
 show key layout
-local storage saving
-3:19 < j`ey> Kirjava: you added "performance.now".. and still use Date.now()
-https://github.com/jgouly/jjtimer/blob/master/js/session.js#L135
-meepmode - 19:55 <Meep> i get much better times when i halve their width: http://dl.dropboxusercontent.com/u/10477021/cube/qcube.htm
+redesign options
+?state=base64 (full) -/ acube state translation
 custom solver - read jaap's pruning guide
 viscube arrows
 */
 function $(id){return document.getElementById(id);}
+
+window.onkeydown=dokeys;
+
+window.performance = window.performance || {};
+performance.now = (function() {
+    return performance.now || performance.mozNow || performance.msNow || performance.oNow || performance.webkitNow || function() { return new Date().getTime(); }; 
+})();
+
+function loadacubejs() {
+	var script = document.createElement("script");
+	script.src = "acube.js";
+	script.type = "text/javascript";
+	document.getElementsByTagName("head")[0].appendChild(script);
+}
 
 function getParams(sname) {
   var params = location.search.substr(location.search.indexOf("?")+1);
@@ -53,18 +65,41 @@ function getParams(sname) {
   { temp = params[i].split("="); if ( [temp[0]] == sname ) { if (temp.length == 1) { sval = sname;} else {sval = temp[1];} } }
   return unescape(sval);
 }
+
+function save(name,data) {
+	if(localStorage) {
+		localStorage.setItem(name,data);
+	}
+}
+
+function load(name) {
+	if(localStorage) {
+		return localStorage.getItem(name);
+	} else { return 0; }
+}
+
+if (getParams("clear") == "clear") { 
+	if(localStorage) {
+		localStorage.removeItem('keymap');
+		localStorage.removeItem('view');
+		localStorage.removeItem('scramble');
+		localStorage.removeItem('options');
+		localStorage.removeItem('kds');
+		localStorage.removeItem('times');
+		localStorage.removeItem('macros');
+	}
+}
+
 var _align = getParams("align");
 var _alg = getParams("alg");
-var _alt = getParams("alt");
-var _kds = getParams("nokeys");
-var _keys = getParams("keys");
 var _colours = getParams("colours");
 var _solve = getParams("solve");
 var _macro = getParams("macro");
+var meepmode = (getParams("meepmode") == "meepmode") ? 1 : 0;
 var start_time, end_time, solve_time, cubestate = 0;
 var remap=0, kdsv=0;
 var macros=[];
-var times = [];
+var times=[];
 var scrambles=[[0,1,4,5],[0,1,8,9],[0,1,2,3,6,7],[0,1,8,9,2,3],[0,1,4,5,2,3,22,23]];
 var ckeys="URMFLBDEyxzrl";
 var qkeys=[74,70,73,75,999,998,72,71,68,69,87,79,83,76,997,996,59,65,89,78,80,81,85,77,86,82];
@@ -86,6 +121,11 @@ var u=[2,202,26,253,50,304,22,149,46,200,70,252,42,96,66,148,90,200];
 var f=[76,70,100,122,124,174,132,70,156,122,180,174,188,70,212,122,237,174];
 var r=[125,226,106,278,85,330,182,226,162,278,142,330,238,226,218,278,198,330];
 var oops=[2,5,8,1,4,7,0,3,6];
+if (meepmode) { 
+	clr[0] = "black";
+	save('view','qcube'); 
+	document.write('<style>.fl{position:absolute;border:0px solid #000;width:50px;height:50px; text-align:center;font-size:20px;cursor:pointer;cursor:hand;}</style>');
+}
 function writeisoview() {
 	$('wrapper').innerHTML = '';
 	for (var i=0;i<9;i++){
@@ -96,7 +136,9 @@ function writeisoview() {
 		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="b'+i+'" class="u fl" style="top:'+(u[i*2]-60)+'px;left:'+(u[(i*2)+1]+158)+'px;background-color:'+clr[4]+';'+rfu+'"></div>';
 		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="l'+oops[i]+'" class="u fl" style="top:'+(u[i*2]-73)+'px;left:'+(u[(i*2)+1]-154)+'px;background-color:'+clr[5]+';'+rfu+'"></div>';
 	}
+	save('view','iso');
 }
+
 function writeheiseview() {	
 	$('wrapper').innerHTML = '';
 	
@@ -177,9 +219,20 @@ function writeheiseview() {
 	$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="r6" class="fl" style="position:absolute;top:249px;left:246px;width:38px;height:15px;-webkit-transform:rotate(75deg)skew(60deg);-moz-transform:rotate(75deg)skew(60deg);-o-transform:rotate(75deg)skew(60deg);-ms-transform:rotate(75deg)skew(60deg);background-color:'+clr[2]+';border:2px solid black;z-index:-1;"></div>';
 	$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="r7" class="fl" style="position:absolute;top:195px;left:238px;width:33px;height:14px;-webkit-transform:rotate(75deg)skew(60deg);-moz-transform:rotate(75deg)skew(60deg);-o-transform:rotate(75deg)skew(60deg);-ms-transform:rotate(75deg)skew(60deg);background-color:'+clr[2]+';border:2px solid black;z-index:-1;"></div>';
 	$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="r8" class="fl" style="position:absolute;top:149px;left:233px;width:24px;height:11px;-webkit-transform:rotate(75deg)skew(60deg);-moz-transform:rotate(75deg)skew(60deg);-o-transform:rotate(75deg)skew(60deg);-ms-transform:rotate(75deg)skew(60deg);background-color:'+clr[2]+';border:2px solid black;z-index:-1;"></div>';
+	save('view','heise');
 }
+
 function writeqcubeview() {
 	$('wrapper').innerHTML = '<div style="position:absolute;left:-7px;top:-2px;width:296px;height:346px;background-color:black">';
+	
+	var extr = '';
+	var extl = '';
+	
+	if (meepmode) {	
+		$('wrapper').innerHTML = '<div>'; 
+		extr='width:25px;left:242px;'; 
+		extl='width:25px;left:13px;';
+	}
 	
 	for(var i=0;i<9;i++){
 		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="u'+i+'" class="fl" style="top:'+((parseInt(i/3)*55)+5)+'px;left:'+(((i%3)*55)+60)+'px;background-color:'+clr[0]+';"></div>';
@@ -187,44 +240,29 @@ function writeqcubeview() {
 		$('wrapper').innerHTML += '<div id="b'+i+'" style="display:none;background-color:'+clr[4]+'"></div>';
 		$('wrapper').innerHTML += '<div id="d'+i+'" style="display:none;background-color:'+clr[3]+'"></div>';
 	}
-		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="r0" class="fl" style="top:115px;left:230px;height:110px;background-color:'+clr[2]+';"></div>';
-		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="r1" class="fl" style="top:60px;left:230px;background-color:'+clr[2]+';"></div>';
-		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="r2" class="fl" style="top:5px;left:230px;background-color:'+clr[2]+';"></div>';
-		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="r3" class="fl" style="top:230px;left:230px;background-color:'+clr[2]+';"></div>';
-		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="r6" class="fl" style="top:285px;left:230px;background-color:'+clr[2]+';"></div>';
+		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="r0" class="fl" style="top:115px;left:230px;'+extr+'height:110px;background-color:'+clr[2]+';"></div>';
+		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="r1" class="fl" style="top:60px;left:230px;'+extr+'background-color:'+clr[2]+';"></div>';
+		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="r2" class="fl" style="top:5px;left:230px;'+extr+'background-color:'+clr[2]+';"></div>';
+		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="r3" class="fl" style="top:230px;left:230px;'+extr+'background-color:'+clr[2]+';"></div>';
+		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="r6" class="fl" style="top:285px;left:230px;'+extr+'background-color:'+clr[2]+';"></div>';
+		
 		$('wrapper').innerHTML += '<div id="r4" style="display:none;background-color:'+clr[2]+'"></div>';
 		$('wrapper').innerHTML += '<div id="r5" style="display:none;background-color:'+clr[2]+'"></div>';
 		$('wrapper').innerHTML += '<div id="r7" style="display:none;background-color:'+clr[2]+'"></div>';
 		$('wrapper').innerHTML += '<div id="r8" style="display:none;background-color:'+clr[2]+'"></div>';
 		
-		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="l6" class="fl" style="top:115px;left:0px;height:110px;background-color:'+clr[5]+';"></div>';
-		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="l7" class="fl" style="top:60px;left:0px;background-color:'+clr[5]+';"></div>';
-		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="l8" class="fl" style="top:5px;left:0px;background-color:'+clr[5]+';"></div>';
-		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="l3" class="fl" style="top:230px;left:0px;background-color:'+clr[5]+';"></div>';
-		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="l0" class="fl" style="top:285px;left:0px;background-color:'+clr[5]+';"></div>';
+		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="l6" class="fl" style="top:115px;left:0px;'+extl+'height:110px;background-color:'+clr[5]+';"></div>';
+		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="l7" class="fl" style="top:60px;left:0px;'+extl+'background-color:'+clr[5]+';"></div>';
+		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="l8" class="fl" style="top:5px;left:0px;'+extl+'background-color:'+clr[5]+';"></div>';
+		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="l3" class="fl" style="top:230px;left:0px;'+extl+'background-color:'+clr[5]+';"></div>';
+		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="l0" class="fl" style="top:285px;left:0px;'+extl+'background-color:'+clr[5]+';"></div>';
 		$('wrapper').innerHTML += '<div id="l1" style="display:none;background-color:'+clr[5]+'"></div>';
 		$('wrapper').innerHTML += '<div id="l2" style="display:none;background-color:'+clr[5]+'"></div>';
 		$('wrapper').innerHTML += '<div id="l4" style="display:none;background-color:'+clr[5]+'"></div>';
 		$('wrapper').innerHTML += '<div id="l5" style="display:none;background-color:'+clr[5]+'"></div>';
 	
 	$('wrapper').innerHTML += '</div>';
-}
-if (_alt == "alt") { writeisoview(); } else { writeheiseview(); }
-</script>
-</div>
-<script>
-window.onkeydown=dokeys;
-
-window.performance = window.performance || {};
-performance.now = (function() {
-    return performance.now || performance.mozNow || performance.msNow || performance.oNow || performance.webkitNow || function() { return new Date().getTime(); }; 
-})();
-
-function loadacubejs() {
-	var script = document.createElement("script");
-	script.src = "acube.js";
-	script.type = "text/javascript";
-	document.getElementsByTagName("head")[0].appendChild(script);
+	save('view','qcube');
 }
 
 function docycle() {
@@ -296,7 +334,7 @@ function domove(move,half) {
 	else if (move==34) { domove(12); domove(14); } // d
 	else if (move==35) { domove(13); domove(15); } // d'
 	
-	if ($('scramble').value=='7' && half != 1) {domove(move,1);	}
+	if ($('scramble').value=='7' && half != 1 && (move>21||move<16)) {domove(move,1);	}
 	
 	if (cubestate==1 && (move > 21 || move < 16)) {
 		settimer();
@@ -348,18 +386,20 @@ function toggle() {
 		$('toggle').value = "Show Options";
 		$('toggleoptions').style.display = 'none';
 		$('toggletimes').style.display = 'block';
+		save('options','0');
 	}
 	else if($('toggle').value == "Show Options") {
 		$('toggle').value = "Show Times";
 		$('toggleoptions').style.display = 'block';
 		$('toggletimes').style.display = 'none';
+		save('options','1');
 	}
 }
 function settimer() {
 	solve_time = undefined;
-	start_time = Date.now();
+	start_time = performance.now();
 	window.timer = setInterval(function(){
-		$('timer').innerHTML = readtime(solve_time == undefined ? Date.now() - start_time : solve_time);
+		$('timer').innerHTML = readtime(solve_time == undefined ? performance.now() - start_time : solve_time);
 		if (cubestate!=2) {
 			$('timer').innerHTML = '';
 			clearInterval(window.timer);
@@ -379,7 +419,7 @@ function readtime(time) {
 	else return sec+'.'+time;
 }
 function stoptimer() {
-	end_time = Date.now();
+	end_time = performance.now();
 	clearInterval(window.timer);
 	solve_time = end_time - start_time;
 	$('timer').innerHTML = readtime(solve_time);
@@ -438,6 +478,8 @@ function checksolved() {
 	stoptimer();
 }
 function updatetimes() {
+	save('times',JSON.stringify(times));
+
 	$('toggletimes').innerHTML = '';
 	var best = [times[0],'DNF',0,'DNF',0];
 	var five = [], twelve = [];
@@ -479,7 +521,7 @@ function updatetimes() {
 		writeavg(twelve,12,'Current');
 	}
 	
-	$('toggletimes').innerHTML+='&nbsp;<br><input type="button" class="b" value="Reset Times" onClick="if(confirm(\'Are you sure?\')){times=[];$(\'toggletimes\').innerHTML=\'\';}">';
+	$('toggletimes').innerHTML+='&nbsp;<br><input type="button" class="b" value="Reset Times" onClick="if(confirm(\'Are you sure?\')){times=[];$(\'toggletimes\').innerHTML=\'\';localStorage.removeItem(\'times\');}">';
 }
 function writeavg(array,size,name) {
 	var best = getavg(array,size);
@@ -963,6 +1005,8 @@ function addmacro(alg,name) {
 	while($('macro_'+id)){id++;}
 	macros[id] = alg;
 	$('macros').innerHTML += "<input type=\"button\" class=\"b\" value=\""+name+"\" id=\"macro_"+id+"\" onclick=\"doalg(macros["+id+"])\">";
+	
+	save('macros',$('macros').innerHTML);
 }
 function visualcube() {
 	var vstate = "";
@@ -1018,22 +1062,22 @@ function visualcube() {
 	$('visualcube').innerHTML += "<a href=\""+fileurl+"&view=plan\"><img src=\""+fileurl+"&view=plan\"></a>";
 }
 function setmap(map) {
-	if (keys != kkeys && keys != qkeys && !confirm("This will overwrite your custom keymap\n\nProceed?")) {
-		return 0;
-	}
-	if (map == 0) { keys = kkeys; }
-	else if (map == 1) { keys = qkeys; }
+	if (map == 0) { keys = kkeys; save('keymap',keys);}
+	else if (map == 1) { keys = qkeys; save('keymap',keys);}
+	else if (map == "-1") { keys=new Array();remap = 1;$('remap').value = 'Please press key for '+ckeys[0]; }
 }
 function kds() {
 	if(kdsv) {
 		kdsv = 0;
 		window.onkeydown=dokeys;
 		$('kds').value = 'Disable Keys';
+		save('kds','0');
 	}
 	else {
 		kdsv = 1;
 		window.onkeydown=0;
 		$('kds').value = 'Enable Keys';
+		save('kds','1');
 	}
 }
 function dokeys(e) {	
@@ -1048,6 +1092,7 @@ function dokeys(e) {
 	if (remap) {
 		if (keyCode==27) {
 			setmap(0);
+			$('k').selectedIndex = 0;
 			$('remap').value = 'Custom Keymap';
 			remap = 0;
 			return 0;
@@ -1057,6 +1102,8 @@ function dokeys(e) {
 		if (remap == kkeys.length) {
 			remap = 0;
 			$('remap').value = 'Custom Keymap';
+			save('keymap',keys);
+			$('k').selectedIndex = 2;
 		} 
 		else {
 			$('remap').value = 'Please press key for '+ckeys[parseInt(remap/2)];
@@ -1102,90 +1149,208 @@ function dokeys(e) {
 	return !(e.keyCode == 32); // eat spacebar
 }
 </script>
-<div style="padding-top:160px;z-index:-1"></div><div id="options" style="border:0px solid black;position:relative;left:480px;width:700px;">
-<div id="timer" style="position:absolute;font-size:80px;font-weight:700;color:#000000;left:200px;top:-125px;"></div>
-<input type="button" value="Show Options" class="b" id="toggle" onclick="toggle();" onFocus="this.blur();">
-<!--<input type="button" value="Scramble" class="b" onclick="scramble();getstate();" onFocus="this.blur();">
-<input type="button" value="Solve" class="b" onclick="solvesim();getstate();" onFocus="this.blur();">-->
-<select id="view" class="b" onchange="setview($('view').value);this.blur();"><option value="0">front view</option><option value="1">isometric</option><option value="2">qcube style</option></select>
-<select id="scramble" class="b"><option value="0">3x3x3</option><option value="1">&lt;M,U&gt;</option><option value="2">&lt;R,U&gt;</option><option value="3">&lt;L,U&gt;</option><option value="4">&lt;R,F,U&gt;</option><option value="5">&lt;R,U,L&gt;</option><option value="6">&lt;R,r,M,U&gt;</option><option value="7">Half Turns</option></select>
-<br>&nbsp;<br>
-<!-- TIMES --><div id="toggletimes" ></div><!-- /TIMES -->
-<!-- OPTIONS -->
-<div id="toggleoptions" style="display:none">
-<select id="k" class="b" onchange="setmap($('k').value);this.blur();"><option value="0">kSim layout</option><option value="1">heise layout</option></select>
-<input type="button" value="Custom Keymap" class="b" onclick="keys=new Array();remap = 1;$('remap').value = 'Please press key for '+ckeys[0];" id="remap">
-<input type="button" value="Disable Keys" class="b" onclick="kds();" id="kds" onFocus="this.blur();">
-<div id="solve" style="display:none"></div>
-<br>&nbsp;<br>
-<input type="button" value="Show Log" class="b" onclick="$('log').style.display='block';this.style.display='none';" id="slog" style="display:block;margin-bottom:20px;">
-<div id="log" style="display:none"><textarea id="output" class="b" style="width:600px;height:200px"></textarea>
-<br>&nbsp;<br>
-<input type="button" value="Hide Log" class="b" onclick="$('log').style.display='none';$('slog').style.display='block';">
-<input type="button" value="Clear" class="b" onclick="$('output').value ='';"> <input type="checkbox" id="clr" checked> (esc/space) to clear <br>&nbsp;<br></div>
-<!-- ACUBE -->
-<input type="text" id="state" class="b" value="" style="width:600px;font-size:14px;" onFocus="this.blur();">
-<br>&nbsp;<br>
+<!-- SPACING --> <div style="padding-top:160px;z-index:-1"></div>
+
+<div id="options" style="border:0px solid black;position:relative;left:480px;width:700px;">
+
+	<div id="timer" style="position:absolute;font-size:80px;font-weight:700;color:#000000;left:200px;top:-125px;"></div>
+	
+	<input type="button" value="Show Options" class="b" id="toggle" onclick="toggle();" onFocus="this.blur();">
+	
+	<select id="view" class="b" onchange="setview($('view').value);this.blur();">
+		<option value="0">front view</option>
+		<option value="1">isometric</option>
+		<option value="2">qcube style</option>
+	</select>
+	
+	<select id="scramble" class="b" onchange="save('scramble',$('scramble').value);this.blur()";>
+		<option value="0">3x3x3</option>
+		<option value="1">&lt;M,U&gt;</option>
+		<option value="2">&lt;R,U&gt;</option>
+		<option value="3">&lt;L,U&gt;</option>
+		<option value="4">&lt;R,F,U&gt;</option>
+		<option value="5">&lt;R,U,L&gt;</option>
+		<option value="6">&lt;R,r,M,U&gt;</option>
+		<option value="7">Half Turns</option>
+	</select>
+	
+	<br>&nbsp;<br>
+	
+	<!-- TIMES --> <div id="toggletimes" ></div>
+	
+	<!-- OPTIONS -->
+	<div id="toggleoptions" style="display:none">
+	
+		<select id="k" class="b" onchange="setmap($('k').value);this.blur();">
+			<option value="0">kSim layout</option>
+			<option value="1">heise layout</option>
+			<option value="-1">Custom layout</option>
+		</select>
+		
+		<input type="button" value="Custom Keymap" class="b" onclick="keys=new Array();remap = 1;$('remap').value = 'Please press key for '+ckeys[0];" id="remap">
+	
+		<input type="button" value="Disable Keys" class="b" onclick="kds();" id="kds" onFocus="this.blur();">
+	
+		<div id="solve" style="display:none"></div>
+		
+		<br>&nbsp;<br>
+		
+		<input type="button" value="Show Log" class="b" onclick="$('log').style.display='block';this.style.display='none';" id="slog" style="display:block;margin-bottom:20px;">
+		
+		<div id="log" style="display:none">
+		
+			<textarea id="output" class="b" style="width:600px;height:200px"></textarea>
+		
+			<br>&nbsp;<br>
+		
+			<input type="button" value="Hide Log" class="b" onclick="$('log').style.display='none';$('slog').style.display='block';">
+		
+			<input type="button" value="Clear" class="b" onclick="$('output').value ='';">
+		
+			<input type="checkbox" id="clr" checked> (esc/space) to clear
+		
+			<br>&nbsp;<br>
+		
+		</div>
+	
+		<!-- ACUBE -->
+		<input type="text" id="state" class="b" value="" style="width:600px;font-size:14px;" onFocus="this.blur();">
+		
+		<br>&nbsp;<br>
+		
+		<script>
+		for (i=0;i<7;i++) {
+			document.write('<div id="flt'+i+'" onclick="selectdiv(this,\'flt\')" style="float:left;cursor: pointer;cursor: hand;width:20px;height:20px;margin-right:5px;border:2px solid black;background-color:'+clr[i]+'"></div>');
+		}
+		</script>
+		<div id="flt7" onclick="selectdiv(this,'flt')" class="fli">?</div>
+		<div id="flt9" onclick="selectdiv(this,'flt')" class="fli">+</div>
+		<div id="flt8" onclick="selectdiv(this,'flt')" class="fli">@</div>
+		<div id="ps0" onclick="selectpreset(this)" class="fli" style="width:auto;padding:0px 5px 0px 5px;">6 Colour</div>
+		<div id="ps1" onclick="selectpreset(this)" class="fli" style="width:auto;padding:0px 5px 0px 5px;">Blank</div>
+		<div id="ps2" onclick="selectpreset(this)" class="fli" style="width:auto;padding:0px 5px 0px 5px;">3 Colour</div>
+		
+		<br>&nbsp;<br>
+		
+		<input type="button" value="Show Solver" class="b" onclick="$('acube').style.display='block';this.style.display='none';" style="display:block;margin-bottom:20px" id="sacube">
+		
+		<div id="acube" style="display:none">
+			<input id="slice" type="checkbox" onclick='set_slice();'>
+			<label for="slice">Slices</label>
+			<input id="all" type="checkbox" onclick='set_all();'>
+			<label for="all">All</label>
+			<input id="optimal" type="checkbox" onclick='set_optimal();'>
+			<label for="optimal">Optimal</label>
+			<input type="radio" name="metric" id="f" value="f" onclick="set_metric()" checked="true"  >
+			<label for="f">FTM</label>
+			<input type="radio" name="metric" id="q" value="q" onclick="set_metric()">
+			<label for="q">QTM</label>
+			<input type="radio" name="metric" id="s" value="s" onclick="set_metric()">
+			<label for="s">STM</label>
+			<br>&nbsp;<br>
+			<input type="button" value="Hide Solver" class="b" onclick="$('acube').style.display='none';$('sacube').style.display='block';">
+			<button class="b" onclick='solve(state.value);'>Solve State</button>
+			<button class="b" onclick='stop();'>Stop</button>
+			<br>
+			<textarea class="b" style="width: 600px; height: 200px ; font-family: monospace;" id="result"></textarea>
+			<ul id="algs"></ul>
+			<br>&nbsp;<br>
+		</div>
+		<!-- /ACUBE -->
+		
+		<!-- ALGTRANS -->
+		<input type="button" value="Algorithm Tools" class="b" onclick="$('algman').style.display='block';this.style.display='none';" style="display:block;margin-bottom:20px" id="salgman">
+		
+		<div id="algman" style="display:none">
+			<input type="button" value="Do Algorithm" class="b" onclick="doalg($('alg').value)" style="width:150px">
+			<input type="button" value="Clear" class="b" onclick="$('alg').value = '';" style="width:50px">
+			<input type="text" id="alg" class="b" value="" style="width:400px;font-size:14px;" onkeyup="writemani(this.value)" onmouseup="writemani(this.value)">
+			<br>&nbsp;<br>
+			<input type="button" value="Invert" class="b" onclick="$('alg').value = trans(0,$('alg').value);writemani($('alg').value);">
+			<input type="button" value="Rotate x" class="b" onclick="$('alg').value = trans(1,$('alg').value);writemani($('alg').value);">
+			<input type="button" value="Rotate y" class="b" onclick="$('alg').value = trans(2,$('alg').value);writemani($('alg').value);">
+			<input type="button" value="Rotate z" class="b" onclick="$('alg').value = trans(3,$('alg').value);writemani($('alg').value);">
+			<br>&nbsp;<br>
+			<input type="button" value="Mirror L/R" class="b" onclick="$('alg').value = trans(4,$('alg').value);writemani($('alg').value);">
+			<input type="button" value="Mirror F/B" class="b" onclick="$('alg').value = trans(5,$('alg').value);writemani($('alg').value);">
+			<input type="button" value="Mirror U/D" class="b" onclick="$('alg').value = trans(6,$('alg').value);writemani($('alg').value);">
+				<br>&nbsp;<br>
+			<div id="mo0" class="fli" onClick="selectdiv(this,'mo')">*</div> <!-- mouseover change -->
+			<div id="mo1" class="fli" onClick="selectdiv(this,'mo')">x</div><div id="mo2" class="fli" onClick="selectdiv(this,'mo')">x2</div><div id="mo3" class="fli" onClick="selectdiv(this,'mo')">x'</div>
+			<div id="mo4" class="fli" onClick="selectdiv(this,'mo')">y</div><div id="mo5" class="fli" onClick="selectdiv(this,'mo')">y2</div><div id="mo6" class="fli" onClick="selectdiv(this,'mo')">y'</div>
+			<div id="mo7" class="fli" onClick="selectdiv(this,'mo')">z</div><div id="mo8" class="fli" onClick="selectdiv(this,'mo')">z2</div><div id="mo9" class="fli" onClick="selectdiv(this,'mo')">z'</div>
+			<br>&nbsp;<br>
+			<div id="man"></div>
+			<br>&nbsp;<br>
+			<input type="button" value="Hide Algorithm Tools" class="b" onclick="$('algman').style.display='none';$('salgman').style.display='block';"><br>&nbsp;<br>
+		</div>
+		<!-- /ALGTRANS -->
+			
+		<input type="button" class="b" value="Generate VisualCube Images" onclick="visualcube()"> <div id="visualcube"></div>
+		
+		<br>
+		
+		<input type="button" class="b" value="Add Macro" onclick="setmacro()"> <span id="macros"></span>
+		<input type="button" value="Clear Macros" class="b" onclick="$('macros').innerHTML = '';localStorage.removeItem('macros');" >
+		
+	</div>
+	<!-- /OPTIONS -->
+	
+</div>
 <script>
-for (i=0;i<7;i++){
-	document.write('<div id="flt'+i+'" onclick="selectdiv(this,\'flt\')" style="float:left;cursor: pointer;cursor: hand;width:20px;height:20px;margin-right:5px;border:2px solid black;background-color:'+clr[i]+'"></div>');
+/* LOAD VIEW */
+var loadview = load('view');
+if (!loadview) { writeheiseview(); $('view').selectedIndex = 0; } 
+else if (loadview == 'heise') { writeheiseview(); $('view').selectedIndex = 0; }
+else if (loadview == 'iso') { writeisoview(); $('view').selectedIndex = 1; }
+else if (loadview == 'qcube') { writeqcubeview(); $('view').selectedIndex = 2; }
+/* /LOAD VIEW */
+
+/* LOAD KEYMAP */
+var loadmap = load('keymap');
+if (loadmap == qkeys) {	$('k').selectedIndex = 1; }
+else if (loadmap == kkeys) { $('k').selectedIndex = 0; }
+else if (!loadmap) { $('k').selectedIndex = 0; }
+else { $('k').selectedIndex = 2; }
+if(loadmap) {
+	loadmap = loadmap.split(',');
+	keys=new Array();
+	for(i=0;i<loadmap.length;i++) { keys[i] = loadmap[i];}
 }
-</script>
-<div id="flt7" onclick="selectdiv(this,'flt')" class="fli">?</div>
-<div id="flt9" onclick="selectdiv(this,'flt')" class="fli">+</div>
-<div id="flt8" onclick="selectdiv(this,'flt')" class="fli">@</div>
-<div id="ps0" onclick="selectpreset(this)" class="fli" style="width:auto;padding:0px 5px 0px 5px;">6 Colour</div>
-<div id="ps1" onclick="selectpreset(this)" class="fli" style="width:auto;padding:0px 5px 0px 5px;">Blank</div>
-<div id="ps2" onclick="selectpreset(this)" class="fli" style="width:auto;padding:0px 5px 0px 5px;">3 Colour</div>
-<br>&nbsp;<br>
-<input type="button" value="Show Solver" class="b" onclick="$('acube').style.display='block';this.style.display='none';" style="display:block;margin-bottom:20px" id="sacube">
-<div id="acube" style="display:none">
-<input id="slice" type="checkbox" onclick='set_slice();'><label for="slice">Slices</label>
-<input id="all" type="checkbox" onclick='set_all();'><label for="all">All</label>
-<input id="optimal" type="checkbox" onclick='set_optimal();'><label for="optimal">Optimal</label>
-<input type="radio" name="metric" id="f" value="f" onclick="set_metric()" checked="true"  ><label for="f">FTM</label>
-<input type="radio" name="metric" id="q" value="q" onclick="set_metric()"><label for="q">QTM</label>
-<input type="radio" name="metric" id="s" value="s" onclick="set_metric()"><label for="s">STM</label>
-<br>&nbsp;<br>
-<input type="button" value="Hide Solver" class="b" onclick="$('acube').style.display='none';$('sacube').style.display='block';">
-<button class="b" onclick='solve(state.value);'>Solve State</button>
-<button class="b" onclick='stop();'>Stop</button>
-<br>
-<textarea class="b" style="width: 600px; height: 200px ; font-family: monospace;" id="result"></textarea><ul id="algs">
-</ul>
-<br>&nbsp;<br>
-</div>
-<!-- /ACUBE -->
-<input type="button" value="Algorithm Tools" class="b" onclick="$('algman').style.display='block';this.style.display='none';" style="display:block;margin-bottom:20px" id="salgman">
-<div id="algman" style="display:none">
-<input type="button" value="Do Algorithm" class="b" onclick="doalg($('alg').value)" style="width:150px">
-<input type="button" value="Clear" class="b" onclick="$('alg').value = '';" style="width:50px">
-<input type="text" id="alg" class="b" value="" style="width:400px;font-size:14px;" onkeyup="writemani(this.value)" onmouseup="writemani(this.value)">
-<br>&nbsp;<br>
-<input type="button" value="Invert" class="b" onclick="$('alg').value = trans(0,$('alg').value);writemani($('alg').value);">
-<input type="button" value="Rotate x" class="b" onclick="$('alg').value = trans(1,$('alg').value);writemani($('alg').value);">
-<input type="button" value="Rotate y" class="b" onclick="$('alg').value = trans(2,$('alg').value);writemani($('alg').value);">
-<input type="button" value="Rotate z" class="b" onclick="$('alg').value = trans(3,$('alg').value);writemani($('alg').value);">
-<br>&nbsp;<br>
-<input type="button" value="Mirror L/R" class="b" onclick="$('alg').value = trans(4,$('alg').value);writemani($('alg').value);">
-<input type="button" value="Mirror F/B" class="b" onclick="$('alg').value = trans(5,$('alg').value);writemani($('alg').value);">
-<input type="button" value="Mirror U/D" class="b" onclick="$('alg').value = trans(6,$('alg').value);writemani($('alg').value);">
-<br>&nbsp;<br>
-<div id="mo0" class="fli" onClick="selectdiv(this,'mo')">*</div> <!-- mouseover change -->
-<div id="mo1" class="fli" onClick="selectdiv(this,'mo')">x</div><div id="mo2" class="fli" onClick="selectdiv(this,'mo')">x2</div><div id="mo3" class="fli" onClick="selectdiv(this,'mo')">x'</div>
-<div id="mo4" class="fli" onClick="selectdiv(this,'mo')">y</div><div id="mo5" class="fli" onClick="selectdiv(this,'mo')">y2</div><div id="mo6" class="fli" onClick="selectdiv(this,'mo')">y'</div>
-<div id="mo7" class="fli" onClick="selectdiv(this,'mo')">z</div><div id="mo8" class="fli" onClick="selectdiv(this,'mo')">z2</div><div id="mo9" class="fli" onClick="selectdiv(this,'mo')">z'</div>
-<br>&nbsp;<br>
-<div id="man"></div>
-<br>&nbsp;<br>
-<input type="button" value="Hide Algorithm Tools" class="b" onclick="$('algman').style.display='none';$('salgman').style.display='block';"><br>&nbsp;<br></div>
-<input type="button" class="b" value="Add Macro" onclick="setmacro()"> <span id="macros"></span>
-<br>&nbsp;<br>
-<input type="button" class="b" value="Generate VisualCube Images" onclick="visualcube()"> <div id="visualcube"></div>
-</div>
-<!-- /OPTIONS -->
-</div>
-<script>
+/* /LOAD KEYMAP */
+
+/* LOAD SCRAMBLE */
+var loadscramble = load('scramble');
+if (!loadscramble) {$('scramble').selectedIndex = 0; }
+else { $('scramble').selectedIndex = load('scramble'); }
+/* /LOAD SCRAMBLE */
+
+/* OPTIONS TOGGLE */
+var loadoptions = load('options');
+if (loadoptions == '1') { toggle(); }
+/* /OPTIONS TOGGLE */
+
+/* KDS */
+var loadkds = load('kds');
+if (loadkds == '1') { kds(); }
+/* /KDS */
+
+/* LOAD TIMES */
+var loadtimes = load('times');
+if (loadtimes) {
+	times = JSON.parse(loadtimes);
+	updatetimes();
+}
+/* /LOAD TIMES */	
+
+/* LOAD MACROS */
+var loadmacros = load('macros');
+if (loadmacros) {
+	$('macros').innerHTML = loadmacros;
+}
+/* /LOAD MACROS */	
+
+/* SETUP ALIGNMENT */
 if (_align == 'swap') {
 	$('wrapper').style.left = '560px';
 	$('options').style.left = '20px';
@@ -1204,28 +1369,23 @@ if (_align == 'centre') {
 	$('options').style.marginLeft = '-300px';
 	$('options').style.top = '520px';
 }
-$('view').selectedIndex = 0;
-$('k').selectedIndex = 0;
-$('scramble').selectedIndex = 0;
+/* /SETUP ALIGNMENT */
+
 $('state').value = 'UF UR UB UL DF DR DB DL FR FL BR BL  UFR URB UBL ULF DRF DFL DLB DBR';
 $('output').value = '';
+
 if (_solve != "" && _solve != "solve") {
 	_alg = "";	_solve = _solve.split(',');
-	toggle();
 	showrecon();
 }
 if (_macro != "" && _macro != "macro") {
 	_macro = _macro.split(',');
 	for (i=0;i<(parseInt(_macro.length));i+=2) {addmacro(_macro[(i+1)],_macro[i]);}
-	toggle();
 }
-if (_keys != "" && _keys != "keys") {
-	_keys = _keys.split(',');
-	keys=new Array();
-	for(i=0;i<_keys.length;i++) { keys[i] = _keys[i]; }
-}
-if (_kds=='nokeys') { kds(); }
+
 if (_alg!='alg' && _alg != '') { doalg(_alg); $('alg').value = _alg; writemani($('alg').value); toggle();}
-loadacubejs();
+
+loadacubejs(); // LOAD ACUBE
 </script>
-</body></html>
+</body>
+</html>
