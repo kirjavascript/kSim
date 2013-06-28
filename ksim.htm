@@ -22,7 +22,7 @@ body{color:#777;font-family:arial;font-size:15px;font-weight:200;}img{border:0px
 /*
 ksim - thom barlow
 acube - josef jelinek & lucas garron
-timing - joey gouly
+cool stuff - joey gouly
 visualcube - conrad rider
 ideas & testing - justin jaffray
 
@@ -37,7 +37,7 @@ ideas & testing - justin jaffray
 
 TODO:
 show key layout
-redesign options - add custom colours
+redesign options - add custom colours - tabs for options?
 ?state=base64 (full) -/ acube state translation
 custom solver - read jaap's pruning guide
 viscube arrows
@@ -87,11 +87,19 @@ if (getParams("clear") == "clear") {
 		localStorage.removeItem('kds');
 		localStorage.removeItem('times');
 		localStorage.removeItem('macros');
+		localStorage.removeItem('macrodata');
 		localStorage.removeItem('cubestate');
+		localStorage.removeItem('alg');
 	}
 }
 
-window.onbeforeunload = function () {save('cubestate',JSON.stringify(savestate())); };
+window.onbeforeunload = function () {
+	if (cubestate > 0) {
+		times[times.length] = 'DNF'; 
+		save('times',JSON.stringify(times));
+	} 
+	save('cubestate',JSON.stringify(savestate()));
+};
 
 var _align = getParams("align");
 var _alg = getParams("alg");
@@ -127,6 +135,7 @@ var oops=[2,5,8,1,4,7,0,3,6];
 if (meepmode) { 
 	clr[0] = "black";
 	save('view','qcube'); 
+	localStorage.removeItem('cubestate');
 	document.write('<style>.fl{position:absolute;border:0px solid #000;width:50px;height:50px; text-align:center;font-size:20px;cursor:pointer;cursor:hand;}</style>');
 }
 function writeisoview() {
@@ -874,6 +883,7 @@ function writemani(alg) {
 			else { alg = alg.slice(1) } 
 		}
 	$('man').innerHTML = out;
+	save('alg',$('alg').value);
 }
 function mani(obj) {
 	var mid = obj.id;
@@ -1024,6 +1034,7 @@ function addmacro(alg,name) {
 	$('macros').innerHTML += "<input type=\"button\" class=\"b\" value=\""+name+"\" id=\"macro_"+id+"\" onclick=\"doalg(macros["+id+"])\">";
 	
 	save('macros',$('macros').innerHTML);
+	save('macrodata',JSON.stringify(macros));
 }
 function visualcube() {
 	var vstate = "";
@@ -1281,7 +1292,7 @@ function dokeys(e) {
 		
 		<div id="algman" style="display:none">
 			<input type="button" value="Do Algorithm" class="b" onclick="doalg($('alg').value)" style="width:150px">
-			<input type="button" value="Clear" class="b" onclick="$('alg').value = '';" style="width:50px">
+			<input type="button" value="Clear" class="b" onclick="$('alg').value = '';writemani('');" style="width:50px">
 			<input type="text" id="alg" class="b" value="" style="width:400px;font-size:14px;" onkeyup="writemani(this.value)" onmouseup="writemani(this.value)">
 			<br>&nbsp;<br>
 			<input type="button" value="Invert" class="b" onclick="$('alg').value = trans(0,$('alg').value);writemani($('alg').value);">
@@ -1309,7 +1320,8 @@ function dokeys(e) {
 		<br>
 		
 		<input type="button" class="b" value="Add Macro" onclick="setmacro()"> <span id="macros"></span>
-		<input type="button" value="Clear Macros" class="b" onclick="$('macros').innerHTML = '';localStorage.removeItem('macros');" >
+		<input type="button" value="Clear Macros" class="b" onclick="if(confirm('Are you sure?')){
+		$('macros').innerHTML = '';localStorage.removeItem('macros');localStorage.removeItem('macrodata'); }" >
 		
 	</div>
 	<!-- /OPTIONS -->
@@ -1368,8 +1380,17 @@ if (loadtimes) {
 var loadmacros = load('macros');
 if (loadmacros) {
 	$('macros').innerHTML = loadmacros;
+	macros = JSON.parse(load('macrodata'));
 }
 /* /LOAD MACROS */	
+
+/* LOAD ALG */
+var loadalg = load('alg');
+if (loadalg) {
+	$('alg').innerHTML = loadalg;
+	writemani(loadalg)
+}
+/* /LOAD ALG */	
 
 /* SETUP ALIGNMENT */
 if (_align == 'swap') {
@@ -1403,7 +1424,7 @@ if (_macro != "" && _macro != "macro") {
 	for (i=0;i<(parseInt(_macro.length));i+=2) {addmacro(_macro[(i+1)],_macro[i]);}
 }
 
-if (_alg!='alg' && _alg != '') { doalg(_alg); $('alg').value = _alg; writemani($('alg').value); toggle();}
+if (_alg!='alg' && _alg != '') { doalg(_alg); $('alg').value = _alg; writemani($('alg').value);}
 
 loadacubejs(); // LOAD ACUBE
 </script>
