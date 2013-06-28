@@ -37,7 +37,7 @@ ideas & testing - justin jaffray
 
 TODO:
 show key layout
-redesign options - add custom colours - tabs for options?
+redesign options - add custom colours - tabs for options? & about
 ?state=base64 (full) -/ acube state translation
 custom solver - read jaap's pruning guide
 viscube arrows
@@ -136,7 +136,6 @@ if (meepmode) {
 	clr[0] = "black";
 	save('view','qcube'); 
 	localStorage.removeItem('cubestate');
-	document.write('<style>.fl{position:absolute;border:0px solid #000;width:50px;height:50px; text-align:center;font-size:20px;cursor:pointer;cursor:hand;}</style>');
 }
 function writeisoview() {
 	$('wrapper').innerHTML = '';
@@ -239,35 +238,37 @@ function writeqcubeview() {
 	
 	var extr = '';
 	var extl = '';
+	var mbdr = '';
 	
 	if (meepmode) {	
 		$('wrapper').innerHTML = '<div>'; 
 		extr='width:25px;left:242px;'; 
 		extl='width:25px;left:13px;';
+		mbdr='border:0px solid #000;';
 	}
 	
 	for(var i=0;i<9;i++){
-		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="u'+i+'" class="fl" style="top:'+((parseInt(i/3)*55)+5)+'px;left:'+(((i%3)*55)+60)+'px;background-color:'+clr[0]+';"></div>';
-		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="f'+i+'" class="fl" style="top:'+((parseInt(i/3)*55)+175)+'px;left:'+(((i%3)*55)+60)+'px;background-color:'+clr[1]+';"></div>';
+		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="u'+i+'" class="fl" style="top:'+((parseInt(i/3)*55)+5)+'px;left:'+(((i%3)*55)+60)+'px;'+mbdr+'background-color:'+clr[0]+';"></div>';
+		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="f'+i+'" class="fl" style="top:'+((parseInt(i/3)*55)+175)+'px;left:'+(((i%3)*55)+60)+'px;'+mbdr+'background-color:'+clr[1]+';"></div>';
 		$('wrapper').innerHTML += '<div id="b'+i+'" style="display:none;background-color:'+clr[4]+'"></div>';
 		$('wrapper').innerHTML += '<div id="d'+i+'" style="display:none;background-color:'+clr[3]+'"></div>';
 	}
-		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="r0" class="fl" style="top:115px;left:230px;'+extr+'height:110px;background-color:'+clr[2]+';"></div>';
-		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="r1" class="fl" style="top:60px;left:230px;'+extr+'background-color:'+clr[2]+';"></div>';
-		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="r2" class="fl" style="top:5px;left:230px;'+extr+'background-color:'+clr[2]+';"></div>';
-		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="r3" class="fl" style="top:230px;left:230px;'+extr+'background-color:'+clr[2]+';"></div>';
-		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="r6" class="fl" style="top:285px;left:230px;'+extr+'background-color:'+clr[2]+';"></div>';
+		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="r0" class="fl" style="top:115px;left:230px;'+extr+mbdr+'height:110px;background-color:'+clr[2]+';"></div>';
+		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="r1" class="fl" style="top:60px;left:230px;'+extr+mbdr+'background-color:'+clr[2]+';"></div>';
+		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="r2" class="fl" style="top:5px;left:230px;'+extr+mbdr+'background-color:'+clr[2]+';"></div>';
+		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="r3" class="fl" style="top:230px;left:230px;'+extr+mbdr+'background-color:'+clr[2]+';"></div>';
+		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="r6" class="fl" style="top:285px;left:230px;'+extr+mbdr+'background-color:'+clr[2]+';"></div>';
 		
 		$('wrapper').innerHTML += '<div id="r4" style="display:none;background-color:'+clr[2]+'"></div>';
 		$('wrapper').innerHTML += '<div id="r5" style="display:none;background-color:'+clr[2]+'"></div>';
 		$('wrapper').innerHTML += '<div id="r7" style="display:none;background-color:'+clr[2]+'"></div>';
 		$('wrapper').innerHTML += '<div id="r8" style="display:none;background-color:'+clr[2]+'"></div>';
 		
-		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="l6" class="fl" style="top:115px;left:0px;'+extl+'height:110px;background-color:'+clr[5]+';"></div>';
-		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="l7" class="fl" style="top:60px;left:0px;'+extl+'background-color:'+clr[5]+';"></div>';
-		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="l8" class="fl" style="top:5px;left:0px;'+extl+'background-color:'+clr[5]+';"></div>';
-		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="l3" class="fl" style="top:230px;left:0px;'+extl+'background-color:'+clr[5]+';"></div>';
-		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="l0" class="fl" style="top:285px;left:0px;'+extl+'background-color:'+clr[5]+';"></div>';
+		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="l6" class="fl" style="top:115px;left:0px;'+extl+mbdr+'height:110px;background-color:'+clr[5]+';"></div>';
+		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="l7" class="fl" style="top:60px;left:0px;'+extl+mbdr+'background-color:'+clr[5]+';"></div>';
+		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="l8" class="fl" style="top:5px;left:0px;'+extl+mbdr+'background-color:'+clr[5]+';"></div>';
+		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="l3" class="fl" style="top:230px;left:0px;'+extl+mbdr+'background-color:'+clr[5]+';"></div>';
+		$('wrapper').innerHTML += '<div onClick="selectfacelet(this)" id="l0" class="fl" style="top:285px;left:0px;'+extl+mbdr+'background-color:'+clr[5]+';"></div>';
 		$('wrapper').innerHTML += '<div id="l1" style="display:none;background-color:'+clr[5]+'"></div>';
 		$('wrapper').innerHTML += '<div id="l2" style="display:none;background-color:'+clr[5]+'"></div>';
 		$('wrapper').innerHTML += '<div id="l4" style="display:none;background-color:'+clr[5]+'"></div>';
@@ -1387,7 +1388,7 @@ if (loadmacros) {
 /* LOAD ALG */
 var loadalg = load('alg');
 if (loadalg) {
-	$('alg').innerHTML = loadalg;
+	$('alg').value = loadalg;
 	writemani(loadalg)
 }
 /* /LOAD ALG */	
@@ -1424,7 +1425,7 @@ if (_macro != "" && _macro != "macro") {
 	for (i=0;i<(parseInt(_macro.length));i+=2) {addmacro(_macro[(i+1)],_macro[i]);}
 }
 
-if (_alg!='alg' && _alg != '') { doalg(_alg); $('alg').value = _alg; writemani($('alg').value);}
+if (_alg!='alg' && _alg != '') { solvesim(); doalg(_alg); $('alg').value = _alg; writemani($('alg').value);}
 
 loadacubejs(); // LOAD ACUBE
 </script>
