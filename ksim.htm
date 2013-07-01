@@ -13,7 +13,10 @@ body{color:#777;font-family:arial;font-size:15px;font-weight:200;}img{border:0px
 .r{height:47px;-webkit-transform:rotate(158deg)skew(-22deg);-moz-transform:rotate(159deg)skew(-22deg);-o-transform:rotate(158deg)skew(-22deg);-ms-transform:rotate(158deg)skew(-22deg);transform:rotate(158deg)skew(-22deg)}
 .b{background-color:#ededed;color:#777;font-family:arial;font-size:15px;font-weight:700;padding:6px 24px}
 .l{cursor:pointer;cursor:hand;float:left;font-weight:700;margin-right:5px;color:#00F}
-.fli{float:left;cursor:pointer;cursor:hand;width:20px;height:20px;margin-right:5px;border:2px solid #000;text-align:center;font-weight:700}
+.fli{float:left;cursor:pointer;cursor:hand;width:20px;height:20px;margin-right:5px;border:2px solid #000;text-align:center;font-weight:700;background-color:#FFF}
+.menutab {		background-color:#ededed;color:#777;font-family:arial;font-size:15px;font-weight:700;padding:6px 20px;cursor:pointer;cursor:hand;}
+.menutab:hover {background-color:#c0c0c0;color:#222}
+.menutabselect {		background-color:#c0c0c0;color:#222;font-family:arial;font-size:15px;font-weight:700;padding:6px 20px;cursor:pointer;cursor:hand;}
 </style>
 </head>
 <body>
@@ -37,7 +40,7 @@ ideas & testing - justin jaffray
 
 TODO:
 show key layout
-redesign options - add custom colours - tabs for options? & about
+add custom colours
 ?state=base64 (full) -/ acube state translation
 custom solver - read jaap's pruning guide
 viscube arrows
@@ -90,6 +93,7 @@ if (getParams("clear") == "clear") {
 		localStorage.removeItem('macrodata');
 		localStorage.removeItem('cubestate');
 		localStorage.removeItem('alg');
+		localStorage.removeItem('menu');
 	}
 }
 
@@ -1087,9 +1091,9 @@ function visualcube() {
 	fileurl+="?fmt=png&fd="+vstate;
 
 	$('visualcube').innerHTML = "&nbsp<br>";
-	$('visualcube').innerHTML += "<a href=\""+fileurl+"\"><img src=\""+fileurl+"\"></a>";
-	$('visualcube').innerHTML += "<a href=\""+fileurl+"&r=y225x35\"><img src=\""+fileurl+"&r=y225x35\"></a>";
-	$('visualcube').innerHTML += "<a href=\""+fileurl+"&view=plan\"><img src=\""+fileurl+"&view=plan\"></a>";
+	$('visualcube').innerHTML += "<a href=\""+fileurl+"\"><img style=\"border:6px solid #c0c0c0;\" src=\""+fileurl+"\"></a>";
+	$('visualcube').innerHTML += "&nbsp;&nbsp;<a href=\""+fileurl+"&r=y225x35\"><img style=\"border:6px solid #c0c0c0;\" src=\""+fileurl+"&r=y225x35\"></a>";
+	$('visualcube').innerHTML += "&nbsp;&nbsp;<a href=\""+fileurl+"&view=plan\"><img style=\"border:6px solid #c0c0c0;\" src=\""+fileurl+"&view=plan\"></a>";
 }
 function setmap(map) {
 	if (map == 0) { keys = kkeys; save('keymap',keys);}
@@ -1178,6 +1182,16 @@ function dokeys(e) {
 	
 	return !(e.keyCode == 32); // eat spacebar
 }
+function menu(item) {
+	var tabs = 5;
+	for(var i=0;i<tabs;i++) {
+		$('menutab'+i).className = "menutab";
+		$('menu'+i).style.display = "none";
+	}
+	$('menutab'+item).className = "menutabselect";
+	$('menu'+item).style.display = "block";
+	save('menu',item);
+}
 </script>
 <!-- SPACING --> <div style="padding-top:160px;z-index:-1"></div>
 
@@ -1211,61 +1225,50 @@ function dokeys(e) {
 	<!-- OPTIONS -->
 	<div id="toggleoptions" style="display:none">
 	
-		<select id="k" class="b" onchange="setmap($('k').value);this.blur();">
-			<option value="0">kSim layout</option>
-			<option value="1">heise layout</option>
-			<option value="-1">Custom layout</option>
-		</select>
-		
-		<input type="button" value="Custom Keymap" class="b" onclick="keys=new Array();remap = 1;$('remap').value = 'Please press key for '+ckeys[0];" id="remap">
+	<br>
+	<span id="menutab0" class="menutab" onClick="menu(0)">Keyboard</span>
+	<span id="menutab1" class="menutab" onClick="menu(1)">Cube</span>
+	<span id="menutab2" class="menutab" onClick="menu(2)">Solver</span>
+	<span id="menutab3" class="menutab" onClick="menu(3)">Algorithms</span>
+	<span id="menutab4" class="menutab" onClick="menu(4)">Log</span>
 	
-		<input type="button" value="Disable Keys" class="b" onclick="kds();" id="kds" onFocus="this.blur();">
+	<br>
 	
-		<div id="solve" style="display:none"></div>
+	<div id="menucontent" style="border:10px solid #c0c0c0;background-color:#ededed;color:#222;margin-top:5px;padding:10px;">
+		<div id="menu0" style="display:none;text-align:center;">
+			<!-- KEYBOARD OPTIONS -->
+			&nbsp;<br>
+			<select id="k" class="b" onchange="setmap($('k').value);this.blur();">
+				<option value="0">kSim layout</option>
+				<option value="1">heise layout</option>
+				<option value="-1">Custom layout</option>
+			</select>
 		
-		<br>&nbsp;<br>
-		
-		<input type="button" value="Show Log" class="b" onclick="$('log').style.display='block';this.style.display='none';" id="slog" style="display:block;margin-bottom:20px;">
-		
-		<div id="log" style="display:none">
-		
-			<textarea id="output" class="b" style="width:600px;height:200px"></textarea>
-		
+			<input type="button" value="Custom Keymap" class="b" onclick="keys=new Array();remap = 1;$('remap').value = 'Please press key for '+ckeys[0];" id="remap">
+	
+			<input type="button" value="Disable Keys" class="b" onclick="kds();" id="kds" onFocus="this.blur();">
 			<br>&nbsp;<br>
-		
-			<input type="button" value="Hide Log" class="b" onclick="$('log').style.display='none';$('slog').style.display='block';">
-		
-			<input type="button" value="Clear" class="b" onclick="$('output').value ='';">
-		
-			<input type="checkbox" id="clr" checked> (esc/space) to clear
-		
-			<br>&nbsp;<br>
-		
 		</div>
-	
-		<!-- ACUBE -->
-		<input type="text" id="state" class="b" value="" style="width:600px;font-size:14px;" onFocus="this.blur();">
-		
-		<br>&nbsp;<br>
-		
-		<script>
-		for (i=0;i<7;i++) {
-			document.write('<div id="flt'+i+'" onclick="selectdiv(this,\'flt\')" style="float:left;cursor: pointer;cursor: hand;width:20px;height:20px;margin-right:5px;border:2px solid black;background-color:'+clr[i]+'"></div>');
-		}
-		</script>
-		<div id="flt7" onclick="selectdiv(this,'flt')" class="fli">?</div>
-		<div id="flt9" onclick="selectdiv(this,'flt')" class="fli">+</div>
-		<div id="flt8" onclick="selectdiv(this,'flt')" class="fli">@</div>
-		<div id="ps0" onclick="selectpreset(this)" class="fli" style="width:auto;padding:0px 5px 0px 5px;">6 Colour</div>
-		<div id="ps1" onclick="selectpreset(this)" class="fli" style="width:auto;padding:0px 5px 0px 5px;">Blank</div>
-		<div id="ps2" onclick="selectpreset(this)" class="fli" style="width:auto;padding:0px 5px 0px 5px;">3 Colour</div>
-		<div id="ps3" onclick="selectpreset(this)" class="fli" style="width:auto;padding:0px 5px 0px 5px;">Japanese</div>
-		
-		<br>&nbsp;<br>
-		
-		<input type="button" value="Show Solver" class="b" onclick="$('acube').style.display='block';this.style.display='none';" style="display:block;margin-bottom:20px" id="sacube">
-		
-		<div id="acube" style="display:none">
+		<div id="menu1" style="display:none;text-align:center;">
+			<!-- CUBE OPTIONS -->
+			<script>
+			for (i=0;i<7;i++) {
+				document.write('<div id="flt'+i+'" onclick="selectdiv(this,\'flt\')" style="float:left;cursor: pointer;cursor: hand;width:20px;height:20px;margin-right:5px;border:2px solid black;background-color:'+clr[i]+'"></div>');
+			}
+			</script>
+			<div id="flt7" onclick="selectdiv(this,'flt')" class="fli">?</div>
+			<div id="flt9" onclick="selectdiv(this,'flt')" class="fli">+</div>
+			<div id="flt8" onclick="selectdiv(this,'flt')" class="fli">@</div>
+			<div id="ps0" onclick="selectpreset(this)" class="fli" style="width:auto;padding:0px 5px 0px 5px;">6 Colour</div>
+			<div id="ps1" onclick="selectpreset(this)" class="fli" style="width:auto;padding:0px 5px 0px 5px;">Blank</div>
+			<div id="ps2" onclick="selectpreset(this)" class="fli" style="width:auto;padding:0px 5px 0px 5px;">3 Colour</div>
+			<div id="ps3" onclick="selectpreset(this)" class="fli" style="width:auto;padding:0px 5px 0px 5px;">Japanese</div>
+			<br>&nbsp;<br>
+			<input type="button" class="b" value="Generate VisualCube Images" onclick="visualcube()"> <div id="visualcube"></div>
+		</div>
+		<div id="menu2" style="display:none">
+			<!-- ACUBE -->
+			<input type="text" id="state" class="b" value="" style="width:600px;font-size:14px;" onFocus="this.blur();"><br>&nbsp;<br>
 			<input id="slice" type="checkbox" onclick='set_slice();'>
 			<label for="slice">Slices</label>
 			<input id="all" type="checkbox" onclick='set_all();'>
@@ -1279,23 +1282,16 @@ function dokeys(e) {
 			<input type="radio" name="metric" id="s" value="s" onclick="set_metric()">
 			<label for="s">STM</label>
 			<br>&nbsp;<br>
-			<input type="button" value="Hide Solver" class="b" onclick="$('acube').style.display='none';$('sacube').style.display='block';">
 			<button class="b" onclick='solve(state.value);'>Solve State</button>
 			<button class="b" onclick='stop();'>Stop</button>
-			<br>
-			<textarea class="b" style="width: 600px; height: 200px ; font-family: monospace;" id="result"></textarea>
-			<ul id="algs"></ul>
 			<br>&nbsp;<br>
+			<textarea class="b" style="width: 600px; height: 300px ; font-family: monospace;" id="result"></textarea><!--<ul id="algs"></ul>-->
 		</div>
-		<!-- /ACUBE -->
-		
-		<!-- ALGTRANS -->
-		<input type="button" value="Algorithm Tools" class="b" onclick="$('algman').style.display='block';this.style.display='none';" style="display:block;margin-bottom:20px" id="salgman">
-		
-		<div id="algman" style="display:none">
+		<div id="menu3" style="display:none">
+			<!-- ALGORITHM TOOLS -->
 			<input type="button" value="Do Algorithm" class="b" onclick="doalg($('alg').value)" style="width:150px">
+			<input type="text" id="alg" class="b" value="" style="width:380px;font-size:14px;" onkeyup="writemani(this.value)" onmouseup="writemani(this.value)">
 			<input type="button" value="Clear" class="b" onclick="$('alg').value = '';writemani('');" style="width:50px">
-			<input type="text" id="alg" class="b" value="" style="width:400px;font-size:14px;" onkeyup="writemani(this.value)" onmouseup="writemani(this.value)">
 			<br>&nbsp;<br>
 			<input type="button" value="Invert" class="b" onclick="$('alg').value = trans(0,$('alg').value);writemani($('alg').value);">
 			<input type="button" value="Rotate x" class="b" onclick="$('alg').value = trans(1,$('alg').value);writemani($('alg').value);">
@@ -1313,20 +1309,23 @@ function dokeys(e) {
 			<br>&nbsp;<br>
 			<div id="man"></div>
 			<br>&nbsp;<br>
-			<input type="button" value="Hide Algorithm Tools" class="b" onclick="$('algman').style.display='none';$('salgman').style.display='block';"><br>&nbsp;<br>
-		</div>
-		<!-- /ALGTRANS -->
-			
-		<input type="button" class="b" value="Generate VisualCube Images" onclick="visualcube()"> <div id="visualcube"></div>
-		
-		<br>
-		
-		<input type="button" class="b" value="Add Macro" onclick="setmacro()"> <span id="macros"></span>
-		<input type="button" value="Clear Macros" class="b" onclick="if(confirm('Are you sure?')){
+			<input type="button" class="b" value="Add Macro" onclick="setmacro()"> <span id="macros"></span>
+			<input type="button" value="Clear Macros" class="b" onclick="if(confirm('Are you sure?')){
 		$('macros').innerHTML = '';localStorage.removeItem('macros');localStorage.removeItem('macrodata'); }" >
+		</div>
+		<div id="menu4" style="display:none">
+			<!-- LOG -->
+			<textarea id="output" class="b" style="width:600px;height:200px" readonly></textarea>
 		
+			<br>&nbsp;<br>
+		
+			<input type="button" value="Clear" class="b" onclick="$('output').value ='';">
+			
+			<input type="checkbox" id="clr" checked> (esc/space) to clear
+		</div>
 	</div>
-	<!-- /OPTIONS -->
+		
+	<div id="solve" style="display:none"></div>
 	
 </div>
 <script>
@@ -1352,23 +1351,26 @@ if(loadmap) {
 	keys=new Array();
 	for(i=0;i<loadmap.length;i++) { keys[i] = loadmap[i];}
 }
+var loadkds = load('kds');
+if (loadkds == '1') { kds(); }
 /* /LOAD KEYMAP */
-
-/* LOAD SCRAMBLE */
-var loadscramble = load('scramble');
-if (!loadscramble) {$('scramble').selectedIndex = 0; }
-else { $('scramble').selectedIndex = load('scramble'); }
-/* /LOAD SCRAMBLE */
 
 /* OPTIONS TOGGLE */
 var loadoptions = load('options');
 if (loadoptions == '1') { toggle(); }
 /* /OPTIONS TOGGLE */
 
-/* KDS */
-var loadkds = load('kds');
-if (loadkds == '1') { kds(); }
-/* /KDS */
+/* MENU SELECTION */
+var loadmenu = load('menu');
+if (loadmenu) { menu(loadmenu) }
+else { menu(0); }
+/* /MENU SELECTION */
+
+/* LOAD SCRAMBLE */
+var loadscramble = load('scramble');
+if (!loadscramble) {$('scramble').selectedIndex = 0; }
+else { $('scramble').selectedIndex = load('scramble'); }
+/* /LOAD SCRAMBLE */
 
 /* LOAD TIMES */
 var loadtimes = load('times');
@@ -1424,9 +1426,16 @@ if (_solve != "" && _solve != "solve") {
 if (_macro != "" && _macro != "macro") {
 	_macro = _macro.split(',');
 	for (i=0;i<(parseInt(_macro.length));i+=2) {addmacro(_macro[(i+1)],_macro[i]);}
+	menu(5);
 }
 
-if (_alg!='alg' && _alg != '') { solvesim(); doalg(_alg); $('alg').value = _alg; writemani($('alg').value);}
+if (_alg!='alg' && _alg != '') { 
+	solvesim(); 
+	doalg(_alg);
+	$('alg').value = _alg;
+	writemani($('alg').value);
+	menu(4);
+}
 
 loadacubejs(); // LOAD ACUBE
 </script>
