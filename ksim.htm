@@ -14,9 +14,10 @@ body{color:#777;font-family:arial;font-size:15px;font-weight:200;}img{border:0px
 .b{background-color:#ededed;color:#777;font-family:arial;font-size:15px;font-weight:700;padding:6px 24px}
 .l{cursor:pointer;cursor:hand;float:left;font-weight:700;margin-right:5px;color:#00F}
 .fli{float:left;cursor:pointer;cursor:hand;width:20px;height:20px;margin-right:5px;border:2px solid #000;text-align:center;font-weight:700;background-color:#FFF}
-.menutab {		background-color:#ededed;color:#777;font-family:arial;font-size:15px;font-weight:700;padding:6px 20px;cursor:pointer;cursor:hand;}
-.menutab:hover {background-color:#c0c0c0;color:#222}
-.menutabselect {		background-color:#c0c0c0;color:#222;font-family:arial;font-size:15px;font-weight:700;padding:6px 20px;cursor:pointer;cursor:hand;}
+.menutab{background-color:#ededed;color:#777;font-family:arial;font-size:15px;font-weight:700;padding:6px 20px;cursor:pointer;cursor:hand;}
+.menutab:hover{background-color:#c0c0c0;color:#222}
+.menutabselect {background-color:#c0c0c0;color:#222;font-family:arial;font-size:15px;font-weight:700;padding:6px 20px;cursor:pointer;cursor:hand;}
+.colour{cursor:pointer;cursor:hand;float:left;width:10px;height:10px;}
 </style>
 </head>
 <body>
@@ -39,11 +40,10 @@ ideas & testing - justin jaffray
 &clear - clear local storage
 
 TODO:
-show key layout
-add custom colours
+show key layout - ksim/heise
+split js
 ?state=base64 (full) -/ acube state translation
 custom solver - read jaap's pruning guide
-viscube arrows
 */
 function $(id){return document.getElementById(id);}
 
@@ -94,6 +94,7 @@ if (getParams("clear") == "clear") {
 		localStorage.removeItem('cubestate');
 		localStorage.removeItem('alg');
 		localStorage.removeItem('menu');
+		localStorage.removeItem('clr');
 	}
 }
 
@@ -123,12 +124,17 @@ var keys = kkeys;
 var browser = 0;
 if (navigator.userAgent.indexOf("Chrome")!=-1 || navigator.userAgent.indexOf("Safari")!=-1) { browser = 1; }
 else if (navigator.userAgent.indexOf("MSIE")!=-1) { browser = 1; }
+/* LOAD COLOURS */
 var clr = ["#FFFFFF","#00FF00","#FF0000","#F0FF00","#0000DD","#FFAA00","#C0C0C0"];
+var loadclr = load('clr');
+if (loadclr) {clr = JSON.parse(loadclr);}
 if (_colours != "" && _colours != "colours") {
 	localStorage.removeItem('cubestate');
 	_colours = _colours.split(',');
 	for(i=0;i<_colours.length;i++) { clr[i] = _colours[i]; }
+	save('clr',JSON.stringify(clr));
 }
+/* /LOAD COLOURS */
 var rfu='';if (getParams("rfu") == "rfu"){rfu = 'display:none;';}
 var aname = ["UF","UR","UB","UL","DF","DR","DB","DL","FR","FL","BR","BL","UFR","URB","UBL","ULF","DRF","DFL","DLB","DBR"];
 var astate = [["u4","f4"],["u4","r4"],["u4","b4"],["u4","l4"],["d4","f4"],["d4","r4"],["d4","b4"],["d4","l4"],["f4","r4"],["f4","l4"],["b4","r4"],["b4","l4"],["u4","f4","r4"],["u4","r4","b4"],["u4","b4","l4"],["u4","l4","f4"],["d4","r4","f4"],["d4","f4","l4"],["d4","l4","b4"],["d4","b4","r4"]];
@@ -1042,6 +1048,46 @@ function addmacro(alg,name) {
 	save('macros',$('macros').innerHTML);
 	save('macrodata',JSON.stringify(macros));
 }
+function showcolours(obj) {
+	if(obj.value == "Default Scheme") {
+		var fixclr = ["#FFFFFF","#00FF00","#FF0000","#F0FF00","#0000DD","#FFAA00","#C0C0C0"];
+		for(var i=0;i<6;i++){
+			$('flt'+i).style.backgroundColor = fixclr[i];
+			clr[i] = fixclr[i];
+		}
+		$('let').style.backgroundColor = $('flt'+$('face').value).style.backgroundColor;
+		save('clr',JSON.stringify(clr));
+		return 0;
+	}
+	obj.value = "Default Scheme";
+	
+	$('scheme').style.display = 'block';
+	for(var lum=0;lum<=100;lum+=10){
+		for(var hue=0;hue<=360;hue+=10){
+			$('scheme').innerHTML+='<div style="background-color:hsl('+hue+',100%,'+lum+'%)" onClick="sc(this)" class="colour"></div>';
+		}
+		$('scheme').innerHTML+='<div style="clear:both"></div>';
+	}
+		
+	var drop='<select id="face" class="b" style="position:absolute;left:370px;top:0px;height:35px;width:75px;padding:5px" onChange="$(\'let\').style.backgroundColor = $(\'flt\'+this.value).style.backgroundColor;">';
+	drop+='<option value="0">U</option>';
+	drop+='<option value="1">F</option>';
+	drop+='<option value="2">R</option>';
+	drop+='<option value="3">D</option>';
+	drop+='<option value="4">B</option>';
+	drop+='<option value="5">L</option>';
+	drop+='</select>';
+	$('scheme').innerHTML +=drop;
+	$('scheme').innerHTML +='<div id="let" style="background-color:'+$('flt0').style.backgroundColor+';position:absolute;left:370px;top:35px;height:75px;width:75px;"></div>';
+}
+function sc(obj) {
+	var facelet = $('face').value;
+	var bgc = obj.style.backgroundColor;
+	$('flt'+facelet).style.backgroundColor = bgc;
+	clr[facelet] = bgc;
+	$('let').style.backgroundColor = bgc;
+	save('clr',JSON.stringify(clr));
+}
 function visualcube() {
 	var vstate = "";
 	var sides = "urfdlb";
@@ -1080,12 +1126,18 @@ function visualcube() {
 		}
 	}
 	
-	if (_colours != "" && _colours != "colours") {
-		vstate += "&sch=";
-		for (i=0;i<_colours.length;i++) {
-			if (i == (_colours.length-1)) vstate+=_colours[csides[i]];
-			else vstate+=_colours[csides[i]]+",";
+	vstate += "&sch=";
+	var clrvalue;
+	for (i=0;i<6;i++) {		
+		clrvalue = clr[csides[i]].replace(/^.*#/, '');
+		
+		if(clr[csides[i]][0] == 'r') {
+			var digits = /(.*?)rgb\((\d+), (\d+), (\d+)\)/.exec(clr[csides[i]]);
+			clrvalue = (parseInt(digits[2])|(parseInt(digits[3]) << 8) | (parseInt(digits[4]) << 16)).toString(16);
 		}
+			
+		if (i == 5) vstate+=clrvalue;
+		else vstate+=clrvalue+",";
 	}
 	
 	fileurl+="?fmt=png&fd="+vstate;
@@ -1253,7 +1305,7 @@ function menu(item) {
 			<!-- CUBE OPTIONS -->
 			<script>
 			for (i=0;i<7;i++) {
-				document.write('<div id="flt'+i+'" onclick="selectdiv(this,\'flt\')" style="float:left;cursor: pointer;cursor: hand;width:20px;height:20px;margin-right:5px;border:2px solid black;background-color:'+clr[i]+'"></div>');
+				document.write('<div id="flt'+i+'" onclick="selectdiv(this,\'flt\');" style="float:left;cursor: pointer;cursor: hand;width:20px;height:20px;margin-right:5px;border:2px solid black;background-color:'+clr[i]+'"></div>');
 			}
 			</script>
 			<div id="flt7" onclick="selectdiv(this,'flt')" class="fli">?</div>
@@ -1263,6 +1315,9 @@ function menu(item) {
 			<div id="ps1" onclick="selectpreset(this)" class="fli" style="width:auto;padding:0px 5px 0px 5px;">Blank</div>
 			<div id="ps2" onclick="selectpreset(this)" class="fli" style="width:auto;padding:0px 5px 0px 5px;">3 Colour</div>
 			<div id="ps3" onclick="selectpreset(this)" class="fli" style="width:auto;padding:0px 5px 0px 5px;">Japanese</div>
+			<br>&nbsp;<br>
+			<div id="scheme" style="border:5px solid #c0c0c0;width:445px;margin: 0 auto;display:none;position:relative;margin-bottom:15px;"></div>
+			<input type="button" class="b" onClick="showcolours(this)" value="Change Colour Scheme">
 			<br>&nbsp;<br>
 			<input type="button" class="b" value="Generate VisualCube Images" onclick="visualcube()"> <div id="visualcube"></div>
 		</div>
@@ -1355,12 +1410,9 @@ var loadkds = load('kds');
 if (loadkds == '1') { kds(); }
 /* /LOAD KEYMAP */
 
-/* OPTIONS TOGGLE */
+/* MENU SELECTION */
 var loadoptions = load('options');
 if (loadoptions == '1') { toggle(); }
-/* /OPTIONS TOGGLE */
-
-/* MENU SELECTION */
 var loadmenu = load('menu');
 if (loadmenu) { menu(loadmenu) }
 else { menu(0); }
