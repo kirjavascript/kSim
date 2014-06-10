@@ -1202,117 +1202,6 @@
 		$('menu'+item).style.display = "block";
 		save('menu',item);
 	}
-	
-	window.onload = function() {
-
-		/* LOAD VIEW & STATE */
-		var loadview = load('view');
-		var _loadstate = load('cubestate');
-		if (!loadview) { writeheiseview(); $('view').selectedIndex = 0; } 
-		else if (loadview == 'heise') { writeheiseview(); $('view').selectedIndex = 0; }
-		else if (loadview == 'iso') { writeisoview(); $('view').selectedIndex = 1; }
-		else if (loadview == 'qcube') { writeqcubeview(); $('view').selectedIndex = 2; }
-		if (_loadstate) { loadstate(JSON.parse(_loadstate));  getstate();}
-		else {$('state').value = 'UF UR UB UL DF DR DB DL FR FL BR BL  UFR URB UBL ULF DRF DFL DLB DBR';}
-		/* /LOAD VIEW  & STATE */
-
-		/* LOAD KEYMAP */
-		var loadmap = load('keymap');
-		if (loadmap == qkeys) {	$('k').selectedIndex = 1; }
-		else if (loadmap == kkeys) { $('k').selectedIndex = 0; }
-		else if (!loadmap) { $('k').selectedIndex = 0; }
-		else { $('k').selectedIndex = 2; }
-		if(loadmap) {
-			loadmap = loadmap.split(',');
-			keys=new Array();
-			for(i=0;i<loadmap.length;i++) { keys[i] = loadmap[i];}
-		}
-		var loadkds = load('kds');
-		if (loadkds == '1') { kds(); }
-		/* /LOAD KEYMAP */
-
-		/* MENU SELECTION */
-		var loadoptions = load('options');
-		if (loadoptions == '1') { toggle(); }
-		var loadmenu = load('menu');
-		if (loadmenu) { menu(loadmenu) }
-		else { menu(0); }
-		/* /MENU SELECTION */
-
-		/* LOAD SCRAMBLE */
-		var loadscramble = load('scramble');
-		if (!loadscramble) {$('scramble').selectedIndex = 0; }
-		else { $('scramble').selectedIndex = load('scramble'); }
-		/* /LOAD SCRAMBLE */
-
-		/* LOAD TIMES */
-		var loadtimes = load('times');
-		if (loadtimes) {
-			times = JSON.parse(loadtimes);
-			updatetimes();
-		}
-		/* /LOAD TIMES */	
-
-		/* LOAD MACROS */
-		var loadmacros = load('macros');
-		if (loadmacros) {
-			$('macros').innerHTML = loadmacros;
-			macros = JSON.parse(load('macrodata'));
-		}
-		/* /LOAD MACROS */	
-
-		/* LOAD ALG */
-		var loadalg = load('alg');
-		if (loadalg) {
-			$('alg').value = loadalg;
-			writemani(loadalg)
-		}
-		/* /LOAD ALG */	
-
-		/* SETUP ALIGNMENT */
-		if (_align == 'swap') {
-			$('wrapper').style.left = '560px';
-			$('options').style.left = '20px';
-		}
-		if (_align == 'right') {
-			$('wrapper').style.cssFloat = 'right';
-			$('wrapper').style.styleFloat = 'right';
-			$('wrapper').style.paddingRight = '600px';
-			$('options').style.left = '20px';
-		}
-		if (_align == 'centre') {
-			$('timer').style.top = '-120px';
-			$('wrapper').style.left = '50%';
-			$('wrapper').style.marginLeft = '-180px';
-			$('options').style.left = '50%';
-			$('options').style.marginLeft = '-300px';
-			$('options').style.top = '520px';
-		}
-		/* /SETUP ALIGNMENT */
-
-		$('output').value = '';
-
-		if (_solve != "" && _solve != "solve") {
-			_alg = "";	_solve = _solve.split(',');
-			showrecon();
-		}
-		if (_macro != "" && _macro != "macro") {
-			_macro = _macro.split(',');
-			for (i=0;i<(parseInt(_macro.length));i+=2) {addmacro(_macro[(i+1)],_macro[i]);}
-			menu(5);
-		}
-
-		if (_alg!='alg' && _alg != '') { 
-			solvesim(); 
-			doalg(_alg);
-			$('alg').value = _alg;
-			writemani($('alg').value);
-			menu(4);
-		}
-
-		loadjs("acube"); // LOAD ACUBE
-
-	};
 	</script>
 <!-- SPACING --> <div style="padding-top:160px;z-index:-1"></div>
 
@@ -1452,5 +1341,113 @@
 	<div id="solve" style="display:none"></div>
 	
 </div>
+<script>
+		/* LOAD VIEW & STATE */
+		var loadview = load('view');
+		var _loadstate = load('cubestate');
+		if (!loadview) { writeheiseview(); $('view').selectedIndex = 0; } 
+		else if (loadview == 'heise') { writeheiseview(); $('view').selectedIndex = 0; }
+		else if (loadview == 'iso') { writeisoview(); $('view').selectedIndex = 1; }
+		else if (loadview == 'qcube') { writeqcubeview(); $('view').selectedIndex = 2; }
+		if (_loadstate) { loadstate(JSON.parse(_loadstate));  getstate();}
+		else {$('state').value = 'UF UR UB UL DF DR DB DL FR FL BR BL  UFR URB UBL ULF DRF DFL DLB DBR';}
+		/* /LOAD VIEW  & STATE */
+
+		/* LOAD KEYMAP */
+		var loadmap = load('keymap');
+		if (loadmap == qkeys) {	$('k').selectedIndex = 1; }
+		else if (loadmap == kkeys) { $('k').selectedIndex = 0; }
+		else if (!loadmap) { $('k').selectedIndex = 0; }
+		else { $('k').selectedIndex = 2; }
+		if(loadmap) {
+			loadmap = loadmap.split(',');
+			keys=new Array();
+			for(i=0;i<loadmap.length;i++) { keys[i] = loadmap[i];}
+		}
+		var loadkds = load('kds');
+		if (loadkds == '1') { kds(); }
+		/* /LOAD KEYMAP */
+
+		/* MENU SELECTION */
+		var loadoptions = load('options');
+		if (loadoptions == '1') { toggle(); }
+		var loadmenu = load('menu');
+		if (loadmenu) { menu(loadmenu) }
+		else { menu(0); }
+		/* /MENU SELECTION */
+
+		/* LOAD SCRAMBLE */
+		var loadscramble = load('scramble');
+		if (!loadscramble) {$('scramble').selectedIndex = 0; }
+		else { $('scramble').selectedIndex = load('scramble'); }
+		/* /LOAD SCRAMBLE */
+
+		/* LOAD TIMES */
+		var loadtimes = load('times');
+		if (loadtimes) {
+			times = JSON.parse(loadtimes);
+			updatetimes();
+		}
+		/* /LOAD TIMES */	
+
+		/* LOAD MACROS */
+		var loadmacros = load('macros');
+		if (loadmacros) {
+			$('macros').innerHTML = loadmacros;
+			macros = JSON.parse(load('macrodata'));
+		}
+		/* /LOAD MACROS */	
+
+		/* LOAD ALG */
+		var loadalg = load('alg');
+		if (loadalg) {
+			$('alg').value = loadalg;
+			writemani(loadalg)
+		}
+		/* /LOAD ALG */	
+
+		/* SETUP ALIGNMENT */
+		if (_align == 'swap') {
+			$('wrapper').style.left = '560px';
+			$('options').style.left = '20px';
+		}
+		if (_align == 'right') {
+			$('wrapper').style.cssFloat = 'right';
+			$('wrapper').style.styleFloat = 'right';
+			$('wrapper').style.paddingRight = '600px';
+			$('options').style.left = '20px';
+		}
+		if (_align == 'centre') {
+			$('timer').style.top = '-120px';
+			$('wrapper').style.left = '50%';
+			$('wrapper').style.marginLeft = '-180px';
+			$('options').style.left = '50%';
+			$('options').style.marginLeft = '-300px';
+			$('options').style.top = '520px';
+		}
+		/* /SETUP ALIGNMENT */
+
+		$('output').value = '';
+
+		if (_solve != "" && _solve != "solve") {
+			_alg = "";	_solve = _solve.split(',');
+			showrecon();
+		}
+		if (_macro != "" && _macro != "macro") {
+			_macro = _macro.split(',');
+			for (i=0;i<(parseInt(_macro.length));i+=2) {addmacro(_macro[(i+1)],_macro[i]);}
+			menu(5);
+		}
+
+		if (_alg!='alg' && _alg != '') { 
+			solvesim(); 
+			doalg(_alg);
+			$('alg').value = _alg;
+			writemani($('alg').value);
+			menu(4);
+		}
+
+		loadjs("acube"); // LOAD ACUBE
+</script>
 </body>
 </html>
