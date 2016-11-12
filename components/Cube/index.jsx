@@ -14,7 +14,10 @@ class CubeUI extends React.Component {
         let { uFace, fFace, rFace, lFace, bFace, dFace } = this.props.cube;
 
         return <div className={styles.wrapper}>
-            <div className={styles.cube}>
+            <div className={styles.cube}
+                style={{
+                    transform: 'scale(2)'
+                }}>
                 <Face face={rFace} type="R" />
                 <Face face={bFace} type="B" />
                 <Face face={dFace} type="D" />
@@ -72,6 +75,7 @@ class Face extends React.Component {
                     height={stickerSize}
                     stroke={SASSVars.grey}
                     strokeWidth={2}
+                    strokeOpacity={1}
                     fill={facelet}/>;
             })}
         </svg>;

@@ -7,6 +7,7 @@
 .cube {
 
     position: relative;
+    transform-origin: 105px 160px;
 
     :global {
         svg {
