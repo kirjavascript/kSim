@@ -11,8 +11,6 @@ class CubeUI extends React.Component {
 
     render() {
 
-        console.log('render');
-
         let { uFace, fFace, rFace, lFace, bFace, dFace } = this.props.cube;
 
         return <div className={styles.wrapper}>
@@ -35,7 +33,7 @@ class Face extends React.Component {
         U: { left: 0, top: 0 },
         F: { left: 0, top: 90 },
         R: { left: 116, top: 65 },
-        L: { left: -137, top: 75 },
+        L: { left: -136, top: 75 },
         B: { left: -20, top: -15 },
         D: { left: -10, top: 127 }
     }
@@ -52,10 +50,7 @@ class Face extends React.Component {
             'U': [`perspective(${size * 3}px) rotateX(60deg)`, `${size / 2}px 0px 0px`],
             'F': [`perspective(${size * 3}px) rotateX(-60deg)`, `${size / 2}px ${size}px 0px`],
             'R': [`perspective(${size * 3}px) rotateY(103deg) rotateZ(-40deg) scale(1.1)`, `${size / 2}px 0px 0px`],
-            'B': [`matrix3d(-1, -0, 0, -0, 
-                    0.172539, 0.907719, 0, 0.001372, 
-                    0, 0, 1, 0, 
-                    225, 19, 0, 1)`,'0px 0px 0px'],
+            'B': ['matrix3d(-1, -0, 0, -0, 0.172539, 0.907719, 0, 0.001372, 0, 0, 1, 0, 225, 19, 0, 1)','0px 0px 0px'],
             'D': ['matrix3d(1.045455, -0, 0, 0, 0.192513, -0.680481, 0, 0.001604, 0, 0, 1, 0, 5, 170, 0, 1)','0px 0px 0px'],
             'L': [`perspective(${size * 3}px) rotateY(-105deg) rotateZ(40deg) scale(1.1)`, `${size / 2}px 0px 0px`]
         }[type];

@@ -1,16 +1,16 @@
 import { action, computed, observable, autorun } from 'mobx';
 import SASSVars from '!!sass-variables!../components/variables.scss';
 import keyboard from './keyboard';
-import { moveToObject, cloneArray } from './util';
-
-/*
- 1
-402
- 3
- 5
-*/
+import { moveToObject, cloneArray, doCycle } from './util';
 
 class Cube {
+
+    /*
+     1
+    402
+     3
+     5
+    */
 
     @observable centres = [
         // U B R F L D
@@ -55,7 +55,7 @@ class Cube {
         let { centres, corners, edges, colours } = this;
         return [
             corners[2][1], edges[2][1], corners[1][2],
-            edges[6][0], centres[3], edges[6][0],
+            edges[6][0], centres[3], edges[5][0],
             corners[6][2], edges[10][1], corners[5][1]
         ].map((facelet) => colours[facelet]);
     }
@@ -109,14 +109,13 @@ class Cube {
 
     moveList = {
         R (order) {
-            let edges = cloneArray(this.edges);
-
-            console.log('R');
-            this.edges.replace(edges);
+            let { edges, corners } = this;
+            doCycle(edges, order, [5, 9, 4, 1]);
+            doCycle(corners, order, [5, 4, 0, 1], [-1, 1, 1, -1]);
         }
     }
 
-    @action moves(str) {
+    @action doMoves(str) {
         str
             .replace(/\s/g,'')
             .split(/(\w2|\w'|\w)/)

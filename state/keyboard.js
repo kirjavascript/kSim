@@ -13,5 +13,7 @@ export default function(cube) {
 
 let keys = {
     i: 'R',
+    k: 'R\'',
+    8: 'R2',
     I: 'r',
 };
