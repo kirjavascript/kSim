@@ -1,0 +1,16 @@
+.wrapper {
+    position: absolute;
+    left: calc(50% - 105px);
+    top: calc(50% - 160px);
+}
+
+.cube {
+
+    position: relative;
+
+    :global {
+        svg {
+            position: absolute;
+        }
+    }
+}

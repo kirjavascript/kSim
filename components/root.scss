@@ -1,0 +1,97 @@
+.debug {
+    color: #eff1f5;
+    background: #bf616a;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 20px;
+    white-space: pre-wrap;
+    margin: 40px 0 0 0;
+}
+
+.input {
+    position: absolute;
+    top: 0;
+    right: 5px;
+    font-size: 16px;
+    padding: 15px;
+    font-weight: 900;
+    background-color: #3d4350;
+    color: #a6b2c0;
+    border: 0;
+    width: 150px;
+    margin: 0;
+}
+
+// base...
+
+@font-face {
+  font-family: 'Inconsolata';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Inconsolata'), url(https://fonts.gstatic.com/s/inconsolata/v12/BjAYBlHtW3CJxDcjzrnZCI4P5ICox8Kq3LLUNMylGO4.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
+}
+
+svg {
+    shape-rendering: crispEdges;
+}
+
+html {
+    font-family: 'Inconsolata', sans-serif;
+    margin: 0;
+    padding: 10px;
+    background-color: #272b33;
+    color: #a6b2c0;
+}
+
+a {
+    text-decoration: none;
+    font-weight: bold;
+    color: #3399ff;
+    letter-spacing: -1px;
+
+    &:active,
+    &:visited,
+    &:hover,
+    &:link {
+        text-decoration: none;
+    }
+}
+
+input, button, select {
+    color: #F8F8F8;
+    outline: none;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    display: block;
+    margin: 5px;
+    -moz-appearance:none;
+    text-align: left;
+    background-color: #3d4350;
+    color: #a6b2c0;
+    width: 170px;
+}
+
+input {
+    width: 144px;
+    padding: 6px 13px;
+    cursor: default;
+}
+
+h1 {
+    margin: 10px 0px;
+}
+
+h2 {
+    margin: 0px 0px 10px 0px;
+}
+
+::selection {
+    background-color: #3d4350;
+    color: #a6b2c0;
+}
+::-moz-selection {
+    background-color: #3d4350;
+    color: #a6b2c0;
+}
