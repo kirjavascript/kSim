@@ -1,7 +1,7 @@
 import { action, computed, observable, autorun } from 'mobx';
 import SASSVars from '!!sass-variables!../components/variables.scss';
 import keyboard from './keyboard';
-import { moveToObject, doMove, solved } from './util';
+import { moveToObject, doMove, solved } from './moves';
 let { centres, edges, corners } = solved;
 
 class Cube {
@@ -81,9 +81,9 @@ class Cube {
         str
             .replace(/\s/g,'')
             .split(/(\w2|\w'|\w)/)
-            .filter((m) => m)
-            .forEach((m) => {
-                doMove(this, moveToObject(m));
+            .filter((move) => move)
+            .forEach((move) => {
+                doMove(this, move);
             });
     }
 

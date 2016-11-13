@@ -114,7 +114,12 @@ let moveList = {
 };
 
 function doMove(cube, obj) {
-    let { order, move } = obj;
+    let order, move;
+    if (typeof obj == 'string') {
+        obj = moveToObject(obj);
+    }
+    order = obj.order;
+    move = obj.move;
 
     if (moveList[move]) {
         moveList[move](cube, order);

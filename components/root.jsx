@@ -5,6 +5,7 @@ import styles from './root.scss';
 import cube from '../state/cube';
 
 import CubeUI from './Cube/index.jsx';
+import Menus from './Menus/index.jsx';
 
 @observer
 class Root extends React.Component {
@@ -19,7 +20,7 @@ class Root extends React.Component {
 
         return <div>
             <CubeUI cube={cube} />
-
+            <Menus />
         </div>;
     }
 

@@ -1,11 +1,9 @@
-import { moveToObject } from './util';
-
 export default function(cube) {
 
     window.addEventListener('keydown', (e) => {
 
         if (keys[e.key]) {
-            cube.doMove(moveToObject(keys[e.key]));
+            cube.doMove(keys[e.key]);
         }
         else if (e.key == 'Escape') {
             cube.reset();
