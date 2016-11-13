@@ -20,6 +20,8 @@ class Cube {
         SASSVars.yellow
     ];
 
+    // faces
+
     @computed get dFace() {
         let { centres, corners, edges, colours } = this;
         return [
@@ -74,6 +76,8 @@ class Cube {
         ].map((facelet) => colours[facelet]);
     }
 
+    // moves
+
     @action doMove(obj) {
         doMove(this, obj);
         this.history.push(obj);
@@ -88,6 +92,8 @@ class Cube {
                 this.doMove(move);
             });
     }
+
+    // etc
 
     @action reset() {
         this.centres.replace(centres);

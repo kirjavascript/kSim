@@ -49,6 +49,10 @@ module.exports = (env={}) => {
                         },
                         { loader:'svgo-loader' },
                     ]
+                },
+                {
+                    test: /\.json$/,
+                    use: [{ loader:'json-loader' }]
                 }
             ]
         },
@@ -75,6 +79,7 @@ module.exports = (env={}) => {
             test: /\.jsx?$/,
             enforce: 'pre',
             loader: 'eslint-loader',
+            exclude: /lib/,
             options: {
                 configFile: '.eslintrc',
                 failOnWarning: false,

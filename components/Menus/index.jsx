@@ -4,6 +4,7 @@ import config from '../../state/config';
 import Menu from './menu.jsx';
 import Slider from './slider.jsx';
 import Keymap from './Keymap/index.jsx';
+import MoveLog from './MoveLog/index.jsx';
 
 @observer
 class Menus extends React.Component {
@@ -41,8 +42,8 @@ class Menus extends React.Component {
             </div>
 
             <div className={styles.right}>
-                <Menu title="Move Log" name="movelog">
-asd
+                <Menu title="Move History" name="movelog">
+                    <MoveLog/>
                 </Menu>
             </div>
         </div>;
