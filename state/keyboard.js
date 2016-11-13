@@ -9,7 +9,8 @@ export default function(cube) {
 
     window.addEventListener('keydown', (e) => {
 
-        if (e.target.tagName.toLowerCase() == 'input') {
+        let { tagName, type } = e.target;
+        if (tagName.toLowerCase() == 'input' && type == 'text') {
             return;
         }
 
@@ -17,7 +18,7 @@ export default function(cube) {
             cube.doMoves(config.keymap[e.key]);
         }
         else if (e.key == ' ') {
-            cube.scramble();
+            cube.spacebar();
         }
         else if (e.key == 'Escape') {
             cube.reset();
@@ -46,6 +47,7 @@ let defaultKeys = [
     ['h', 'M'],
     ['d', 'L'],
     ['e', 'L\''],
+    ['3', 'L2'],
     ['D', 'l'],
     ['E', 'l\''],
     [';', 'y'],

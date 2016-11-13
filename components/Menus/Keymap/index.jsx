@@ -3,6 +3,7 @@ import styles from './styles.scss';
 
 import DeleteIcon from 'react-icons/lib/go/x';
 import AddIcon from 'react-icons/lib/go/plus';
+import config from '../../../state/config';
 
 @observer
 class Keymap extends React.Component {
@@ -11,20 +12,20 @@ class Keymap extends React.Component {
         super(props);
 
         this.addKeymap = () => {
-            this.props.config.keymapArray.unshift(['','']);
+            config.keymapArray.unshift(['','']);
         };
     }
 
     render() {
-        let { keymapArray } = this.props.config;
+        let { keymapArray } = config;
         return <div>
 
             <div className={styles.add} onClick={this.addKeymap}>
                 Add new keymap <AddIcon/>
             </div>
             
-
-            {keymapArray.map((map, i) => <Mapping key={i} map={map} array={keymapArray}/>)}
+            {keymapArray.map((map, i) => 
+                <Mapping key={i} map={map} array={keymapArray}/>)}
         </div>;
     }
 }

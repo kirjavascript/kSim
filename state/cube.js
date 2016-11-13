@@ -1,6 +1,7 @@
 import { action, computed, observable, autorun } from 'mobx';
 import SASSVars from '!!sass-variables!../components/variables.scss';
 import keyboard from './keyboard';
+import scramble from '../lib/scramble';
 import { moveToObject, doMove, solved } from './moves';
 let { centres, edges, corners } = solved;
 
@@ -81,6 +82,10 @@ class Cube {
         if (!noHistory) {
             this.historyAdd(obj);
         }
+        if (this.state == 'ready'
+            && !/(x|y|z)/.test(obj)) {
+            this.startTimer();
+        }
         doMove(this, obj);
     }
 
@@ -108,6 +113,35 @@ class Cube {
         this.historyMove++;
     }
 
+    // timer stuff
+
+    @observable state = 'idle'; // idle, ready, running
+    @observable scramble = '';
+    @observable timer = 0;
+
+    @action startTimer() {
+        this.state = 'running';
+        let startTime = performance.now();
+        let loop = () => {
+            requestAnimationFrame(loop);
+            this.timer = performance.now() - startTime;
+        };
+        loop();
+    }
+
+    @action newScramble() {
+        this.reset();
+        this.scramble = scramble();
+        this.doMoves(this.scramble, true);
+        this.state = 'ready';
+    }
+
+    @action spacebar() {
+        if (this.state == 'idle') {
+            this.newScramble();
+        }
+    }
+
     // etc
 
     @action softReset() {
@@ -120,11 +154,9 @@ class Cube {
         this.softReset();
         this.history.replace([]);
         this.historyMove = 0;
+        this.scramble = '';
     }
 
-    @action scramble() {
-        console.log('look at qqtimer');
-    }
 
     constructor(str) {
         // str && this.moves(str);

@@ -23,6 +23,7 @@ class MoveLog extends React.Component {
         this.mutateHistory = (value) => {
             let moves = cube.history.toJS().slice().splice(0, value);
             cube.softReset();
+            cube.doMoves(cube.scramble, true);
             cube.doMoves(moves.join(''), true);
         };
     }

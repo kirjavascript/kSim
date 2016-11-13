@@ -9,35 +9,27 @@
     color: $grey;
     outline: none;
     border: none;
-    // margin: 5px;
     -moz-appearance: none;
     background-color: $white;
-    position: absolute;
-    top: 0px;
-    left: 0px;
+    margin: 0 2.5px;
     height: 22px;
 }
 
 .move {
     @extend .key;
     width: 80px;
-    position: absolute;
-    top: 0px;
-    left: 50px;
 }
 
 .wrapper {
-    position: relative;
-    height: 35px;
+    display: inline-block;
+    margin-bottom: 5px;
 }
 
 .delete {
-    position: absolute;
-    top: 5px;
-    left: 150px;
     width: 20px;
     height: 20px;
     cursor: pointer;
+    padding: 0 5px;
 }
 
 .add {

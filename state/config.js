@@ -9,7 +9,8 @@ class Config {
     @observable menus = {
         display: 1,
         keymap: 1,
-        movelog: 1
+        movelog: 1,
+        timer: 1
     };
 
     @computed get keymap() {

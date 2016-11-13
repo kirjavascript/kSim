@@ -1,12 +1,10 @@
-import { observer } from 'mobx-react';
 import styles from './styles.scss';
-import config from '../../state/config';
 import Menu from './menu.jsx';
 import Keymap from './Keymap/index.jsx';
 import MoveLog from './MoveLog/index.jsx';
 import Display from './Display/index.jsx';
+import Timer from './Timer/index.jsx';
 
-@observer
 class Menus extends React.Component {
 
     render() {
@@ -17,11 +15,15 @@ class Menus extends React.Component {
                 </Menu>
 
                 <Menu title="Keymap" name="keymap">
-                    <Keymap config={config} />
+                    <Keymap />
                 </Menu>
             </div>
 
             <div className={styles.right}>
+                <Menu title="Timer" name="timer">
+                    <Timer/>
+                </Menu>
+
                 <Menu title="Move History" name="movelog">
                     <MoveLog/>
                 </Menu>
