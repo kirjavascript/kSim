@@ -4,11 +4,11 @@ class Config {
 
     @observable opacity = 1;
     @observable scale = 1;
-    @observable strokeWidth = 2;
+    @observable faceletBorder = 1;
     @observable keymapArray = [];
     @observable menus = {
-        display: 0,
-        keymap: 0,
+        display: 1,
+        keymap: 1,
         movelog: 1
     };
 

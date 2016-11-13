@@ -9,7 +9,6 @@ class Cube {
     @observable centres = centres;
     @observable edges = edges;
     @observable corners = corners;
-    @observable history = [];
 
     @observable colours = [
         SASSVars.white,
@@ -78,28 +77,49 @@ class Cube {
 
     // moves
 
-    @action doMove(obj) {
+    @action doMove(obj, noHistory=false) {
+        if (!noHistory) {
+            this.historyAdd(obj);
+        }
         doMove(this, obj);
-        this.history.push(obj);
     }
 
-    @action doMoves(str) {
+    @action doMoves(str, noHistory=false) {
         str
             .replace(/\s/g,'')
             .split(/(\w2|\w'|\w)/)
             .filter((move) => move)
             .forEach((move) => {
-                this.doMove(move);
+                this.doMove(move, noHistory);
             });
+    }
+
+    // history
+
+    @observable history = [];
+    @observable historyMove = 0;
+
+    @action historyAdd(obj) {
+        // check historyMove == length
+        if (this.historyMove != this.history.length) {
+            this.history.replace(cube.history.splice(0, this.historyMove));
+        }
+        this.history.push(obj);
+        this.historyMove++;
     }
 
     // etc
 
-    @action reset() {
+    @action softReset() {
         this.centres.replace(centres);
         this.edges.replace(edges);
         this.corners.replace(corners);
+    }
+
+    @action reset() {
+        this.softReset();
         this.history.replace([]);
+        this.historyMove = 0;
     }
 
     @action scramble() {

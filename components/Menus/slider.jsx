@@ -10,6 +10,9 @@ class Slider extends React.Component {
         let { obj, accessor } = this.props;
 
         this.onChange = (e) => {
+            if (this.props.onMutate) {
+                this.props.onMutate(+e.target.value);
+            }
             obj[accessor] = +e.target.value;
         };
     }
@@ -25,8 +28,7 @@ class Slider extends React.Component {
                 step={step}
                 value={obj[accessor]}
                 onChange={this.onChange}
-                max={max}
-                {...etc} />
+                max={max} />
         </div>;
     }
 

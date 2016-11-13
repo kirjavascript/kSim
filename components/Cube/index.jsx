@@ -45,7 +45,7 @@ class Face extends React.Component {
 
     render() {
 
-        let { opacity, strokeWidth } = config;
+        let { opacity, faceletBorder } = config;
 
         let { face, type, gap=15, size=220 } = this.props;
 
@@ -78,7 +78,7 @@ class Face extends React.Component {
                     width={stickerSize}
                     height={stickerSize}
                     stroke={SASSVars.grey}
-                    strokeWidth={strokeWidth}
+                    strokeWidth={faceletBorder?2:0}
                     strokeOpacity={1}
                     fill={facelet}/>;
             })}
