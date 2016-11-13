@@ -1,1 +1,1 @@
-# kSim Deluxe
+# kSim v2

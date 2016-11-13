@@ -9,6 +9,16 @@ class Cube {
     @observable centres = centres;
     @observable edges = edges;
     @observable corners = corners;
+    @observable history = [];
+
+    @observable colours = [
+        SASSVars.white,
+        SASSVars.blue,
+        SASSVars.red,
+        SASSVars.green,
+        SASSVars.orange,
+        SASSVars.yellow
+    ];
 
     @computed get dFace() {
         let { centres, corners, edges, colours } = this;
@@ -64,17 +74,9 @@ class Cube {
         ].map((facelet) => colours[facelet]);
     }
 
-    @observable colours = [
-        SASSVars.white,
-        SASSVars.blue,
-        SASSVars.red,
-        SASSVars.green,
-        SASSVars.orange,
-        SASSVars.yellow
-    ];
-
     @action doMove(obj) {
         doMove(this, obj);
+        this.history.push(obj);
     }
 
     @action doMoves(str) {
@@ -83,7 +85,7 @@ class Cube {
             .split(/(\w2|\w'|\w)/)
             .filter((move) => move)
             .forEach((move) => {
-                doMove(this, move);
+                this.doMove(move);
             });
     }
 
@@ -91,6 +93,11 @@ class Cube {
         this.centres.replace(centres);
         this.edges.replace(edges);
         this.corners.replace(corners);
+        this.history.replace([]);
+    }
+
+    @action scramble() {
+        console.log('look at qqtimer');
     }
 
     constructor(str) {

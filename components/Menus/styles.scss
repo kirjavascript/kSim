@@ -1,21 +1,83 @@
-$width: 150px;
+@import '../variables.scss';
 
-.left {
+// panels
+
+$width: 200px;
+
+.abs {
     position: absolute;
-    left: 0;
     top: 0;
+    bottom: 0;
     width: $width;
-    background: #FFFFFF;
+    height: 100%;
+    overflow: auto;
 }
 
+.left {
+    @extend .abs;
+    left: 0;
+    border-right: 1px solid $lightgrey;
+}
+
+.right {
+    @extend .abs;
+    right: 0;
+    border-left: 1px solid $lightgrey;
+}
+
+// menu
+
+.menu {
+
+    
+    .title {
+
+        background-color: $lightgrey;
+        cursor: pointer;
+        z-index: 2;
+        position: relative;
+        min-height: 45px;
+        border-bottom: 1px solid $grey;
+
+        h2 {
+            display: inline-block;
+            color: $red;
+            padding: 10px;
+            margin: 0;
+        }
+
+        svg {
+            width: 25px;
+            height: 25px;
+            position: absolute;
+            right: 10px;
+            top: 10px;
+        }
+    }
+
+    .bodywrap {
+        overflow: hidden;
+    }
+
+    .body {
+        padding: 10px;
+        border-bottom: 1px solid $lightgrey;
+        z-index: 1;
+        position: relative;
+    }
+}
+
+// slider
+
 .slide {
+    margin: 10px 0;
     :global {
         input {
             background: none;
             box-shadow: none;
-            padding: 0 5px;
+            padding: 0 0px;
             margin: 0;
-            width: $width;
+            width: 100%;
             max-width: none;
             -webkit-appearance: none;
             border-radius: 8px;

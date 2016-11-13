@@ -1,3 +1,5 @@
+@import './variables.scss';
+
 .debug {
     color: #eff1f5;
     background: #bf616a;
@@ -5,7 +7,7 @@
     font-size: 14px;
     padding: 20px;
     white-space: pre-wrap;
-    margin: 40px 0 0 0;
+    margin: 100vh 0 0 0;
 }
 
 .input {
@@ -34,6 +36,20 @@
 
 svg {
     shape-rendering: crispEdges;
+    overflow: visible;
+}
+
+h1 {
+    opacity: 0.1;
+    margin: 0;
+    font-size: 30px;
+    position: absolute;
+    left: 10px;
+    bottom: 10px;
+    z-index: 1;
+    span {
+        color: $red;
+    }
 }
 
 html {
@@ -47,7 +63,7 @@ html {
 a {
     text-decoration: none;
     font-weight: bold;
-    color: #3399ff;
+    color: $white;
     letter-spacing: -1px;
 
     &:active,
@@ -56,31 +72,6 @@ a {
     &:link {
         text-decoration: none;
     }
-}
-
-input, button, select {
-    color: #F8F8F8;
-    outline: none;
-    border: none;
-    padding: 5px 10px;
-    cursor: pointer;
-    display: block;
-    margin: 5px;
-    -moz-appearance:none;
-    text-align: left;
-    background-color: #3d4350;
-    color: #a6b2c0;
-    width: 170px;
-}
-
-input {
-    width: 144px;
-    padding: 6px 13px;
-    cursor: default;
-}
-
-h1 {
-    margin: 10px 0px;
 }
 
 h2 {

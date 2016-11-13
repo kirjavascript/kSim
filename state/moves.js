@@ -74,7 +74,7 @@ let moveList = {
     },
     r (cube, order) {
         doMove(cube, {order, move: 'R' });
-        doMove(cube, invertOrder({order, move: 'M' }));
+        doMove(cube, invertMove({order, move: 'M' }));
     },
     l (cube, order) {
         doMove(cube, {order, move: 'L' });
@@ -86,11 +86,11 @@ let moveList = {
     },
     b (cube, order) {
         doMove(cube, {order, move: 'B' });
-        doMove(cube, invertOrder({order, move: 'S' }));
+        doMove(cube, invertMove({order, move: 'S' }));
     },
     u (cube, order) {
         doMove(cube, {order, move: 'U' });
-        doMove(cube, invertOrder({order, move: 'E' }));
+        doMove(cube, invertMove({order, move: 'E' }));
     },
     d (cube, order) {
         doMove(cube, {order, move: 'D' });
@@ -98,18 +98,18 @@ let moveList = {
     },
     y (cube, order) {
         doMove(cube, {order, move: 'U' });
-        doMove(cube, invertOrder({order, move: 'E' }));
-        doMove(cube, invertOrder({order, move: 'D' }));
+        doMove(cube, invertMove({order, move: 'E' }));
+        doMove(cube, invertMove({order, move: 'D' }));
     },
     x (cube, order) {
         doMove(cube, {order, move: 'R' });
-        doMove(cube, invertOrder({order, move: 'M' }));
-        doMove(cube, invertOrder({order, move: 'L' }));
+        doMove(cube, invertMove({order, move: 'M' }));
+        doMove(cube, invertMove({order, move: 'L' }));
     },
     z (cube, order) {
         doMove(cube, {order, move: 'F' });
         doMove(cube, {order, move: 'S' });
-        doMove(cube, invertOrder({order, move: 'B' }));
+        doMove(cube, invertMove({order, move: 'B' }));
     },
 };
 
@@ -174,7 +174,7 @@ function twist(arr, cubieIndex, order) {
     }
 }
 
-function invertOrder(obj) {
+function invertMove(obj) {
     if (obj.order != 2) {
         obj.order = obj.order == 1 ? -1 : 1;
     }

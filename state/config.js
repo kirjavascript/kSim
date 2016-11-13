@@ -5,6 +5,20 @@ class Config {
     @observable opacity = 1;
     @observable scale = 1;
     @observable strokeWidth = 2;
+    @observable keymapArray = [];
+    @observable menus = {
+        display: 0,
+        keymap: 0,
+        movelog: 1
+    };
+
+    @computed get keymap() {
+        let keys = {};
+        this.keymapArray.forEach((map) => {
+            keys[map[0]] = map[1];
+        });
+        return keys;
+    }
 
 }
 

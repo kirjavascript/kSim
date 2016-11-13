@@ -1,0 +1,49 @@
+@import '../../variables.scss';
+
+.key {
+    width: 30px;
+    text-align: center;
+    padding: 5px;
+    line-height: 30px;
+
+    color: $grey;
+    outline: none;
+    border: none;
+    // margin: 5px;
+    -moz-appearance: none;
+    background-color: $white;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    height: 22px;
+}
+
+.move {
+    @extend .key;
+    width: 80px;
+    position: absolute;
+    top: 0px;
+    left: 50px;
+}
+
+.wrapper {
+    position: relative;
+    height: 35px;
+}
+
+.delete {
+    position: absolute;
+    top: 5px;
+    left: 150px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.add {
+    background-color: $lightgrey;
+    text-align: center;
+    padding: 5px;
+    margin-bottom: 10px;
+    cursor: pointer;
+}

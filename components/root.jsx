@@ -19,8 +19,21 @@ class Root extends React.Component {
         let { cube } = this.props;
 
         return <div>
-            <CubeUI cube={cube} />
+
+            <h1>
+                <a href="http://www.github.com/kirjavascript/kSim" target="_blank">
+                &lt;<span>kSim</span>/&gt;
+                </a>
+            </h1>
+
             <Menus />
+
+            <CubeUI cube={cube} />
+
+            {false && __DEV__ && <pre className={styles.debug}>
+                {JSON.stringify(cube.history,null,4)}
+            </pre>}
+            
         </div>;
     }
 

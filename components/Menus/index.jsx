@@ -1,59 +1,50 @@
 import { observer } from 'mobx-react';
 import styles from './styles.scss';
-import Down from 'react-icons/lib/go/chevron-down';
 import config from '../../state/config';
+import Menu from './menu.jsx';
+import Slider from './slider.jsx';
+import Keymap from './Keymap/index.jsx';
 
 @observer
 class Menus extends React.Component {
 
-    constructor(props) {
-        super(props);
-
-        this.onChange = (e) => {
-            config.opacity = +e.target.value;
-        };
-
-        this.onScale = (e) => {
-            config.scale = +e.target.value;
-        };
-
-        this.onBorder = (e) => {
-            config.strokeWidth = +e.target.value;
-        };
-    }
-
     render() {
         return <div>
-
             <div className={styles.left}>
-                asd
-                <Down/>
-                <div className={styles.slide}>
-                    <input type="range"
+
+                <Menu title="Display" name="display">
+                    <Slider
+                        name="Opacity"
                         min="0.2"
                         step="0.01"
-                        value={config.opacity}
-                        onChange={this.onChange}
-                        max={1}/>
-                </div>
-                <div className={styles.slide}>
-                    <input type="range"
+                        obj={config}
+                        accessor="opacity" />
+
+                    <Slider
+                        name="Zoom"
                         min="0.5"
                         step="0.01"
-                        value={config.scale}
-                        onChange={this.onScale}
-                        max={3}/>
-                </div>
-                <div className={styles.slide}>
-                    <input type="range"
-                        min="0"
-                        step="0.1"
-                        value={config.strokeWidth}
-                        onChange={this.onBorder}
-                        max={5}/>
-                </div>
+                        max="2"
+                        obj={config}
+                        accessor="scale" />
+
+                    <Slider
+                        name="Border"
+                        max="5"
+                        obj={config}
+                        accessor="strokeWidth" />
+                </Menu>
+
+                <Menu title="Keymap" name="keymap">
+                    <Keymap config={config} />
+                </Menu>
             </div>
 
+            <div className={styles.right}>
+                <Menu title="Move Log" name="movelog">
+asd
+                </Menu>
+            </div>
         </div>;
     }
 
