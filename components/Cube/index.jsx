@@ -2,6 +2,8 @@ import { observer } from 'mobx-react';
 import SASSVars from '!!sass-variables!../variables.scss';
 import styles from './styles.scss';
 
+import config from '../../state/config';
+
 @observer
 class CubeUI extends React.Component {
 
@@ -16,7 +18,7 @@ class CubeUI extends React.Component {
         return <div className={styles.wrapper}>
             <div className={styles.cube}
                 style={{
-                    transform: 'scale(2)'
+                    transform: `scale(${config.scale})`
                 }}>
                 <Face face={rFace} type="R" />
                 <Face face={bFace} type="B" />
@@ -43,6 +45,8 @@ class Face extends React.Component {
 
     render() {
 
+        let { opacity, strokeWidth } = config;
+
         let { face, type, gap=15, size=220 } = this.props;
 
         let stickerSize = size/3 - gap;
@@ -59,7 +63,7 @@ class Face extends React.Component {
         }[type];
 
         return <svg style={{
-            opacity: 1,
+            opacity: opacity,
             width: size,
             height: size,
             transformOrigin,
@@ -74,7 +78,7 @@ class Face extends React.Component {
                     width={stickerSize}
                     height={stickerSize}
                     stroke={SASSVars.grey}
-                    strokeWidth={2}
+                    strokeWidth={strokeWidth}
                     strokeOpacity={1}
                     fill={facelet}/>;
             })}

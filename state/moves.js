@@ -200,5 +200,6 @@ function cloneArray(arr) {
 export {
     doMove,
     moveToObject,
+    moveList,
     solved
 };
