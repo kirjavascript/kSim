@@ -21,7 +21,7 @@ export default function(cube) {
             cube.spacebar();
         }
         else if (e.key == 'Escape') {
-            cube.reset();
+            cube.escape();
         }
         
     });

@@ -1,10 +1,7 @@
 import { observer } from 'mobx-react';
 
 import cube from '../../../state/cube';
-// import alg from '../../../lib/alg';
-// import Checkbox from '../checkbox.jsx';
-// import Slider from '../slider.jsx';
-// import styles from './styles.scss';
+import styles from './styles.scss';
 
 @observer
 class Timer extends React.Component {
@@ -22,13 +19,18 @@ class Timer extends React.Component {
     render() {
 
         return <div>
+
             <div>
                 <strong>Status:</strong> {cube.state}
             </div>
+
             {cube.scramble && <div>
                 <strong>Scramble:</strong> {cube.scramble}
             </div>}
-            {cube.timer}
+
+            {cube.timer != 0 && <div className={styles.timer}>
+                {cube.timer}
+            </div>}
         </div>;
     }
 }

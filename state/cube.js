@@ -122,11 +122,21 @@ class Cube {
     @action startTimer() {
         this.state = 'running';
         let startTime = performance.now();
-        let loop = () => {
-            requestAnimationFrame(loop);
-            this.timer = performance.now() - startTime;
+        this.timerLoop = () => {
+            requestAnimationFrame(this.timerLoop);
+            let diff = performance.now() - startTime;
+            let seconds = (diff/1000).toFixed(2);
+            let minutes = (seconds/60)|0;
+            if (minutes) {
+                seconds = (seconds%60).toFixed(2);
+                seconds = seconds < 10 ? '0' + seconds : seconds;
+                this.timer = `${minutes}:${seconds}`;
+            }
+            else {
+                this.timer = seconds;
+            }
         };
-        loop();
+        this.timerLoop();
     }
 
     @action newScramble() {
@@ -136,9 +146,28 @@ class Cube {
         this.state = 'ready';
     }
 
+    @computed get solved() {
+        return [...'urbldf']
+            .map((face) => `${face}Face`)
+            .map((face) => (
+                this[face]
+                    .filter((d,i,a)=>a.indexOf(d)==i)
+                    .length
+            ))
+            .reduce((a,b)=>a+b) == 6;
+    }
+
+    @action escape() {
+        this.reset();
+        // check if running, add DNF
+    }
+
     @action spacebar() {
         if (this.state == 'idle') {
             this.newScramble();
+        }
+        else if (this.state == 'running') {
+            1;
         }
     }
 
