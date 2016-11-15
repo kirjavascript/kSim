@@ -3,6 +3,7 @@ import SASSVars from '!!sass-variables!../components/variables.scss';
 import keyboard from './keyboard';
 import scramble from '../lib/scramble';
 import { moveToObject, doMove, solved } from './moves';
+import { uFace, rFace, fFace, dFace, lFace, bFace } from './faces';
 let { centres, edges, corners } = solved;
 
 class Cube {
@@ -22,59 +23,12 @@ class Cube {
 
     // faces
 
-    @computed get dFace() {
-        let { centres, corners, edges, colours } = this;
-        return [
-            corners[6][0], edges[10][0], corners[5][0],
-            edges[11][0], centres[5], edges[9][0],
-            corners[7][0], edges[8][0], corners[4][0]
-        ].map((facelet) => colours[facelet]);
-    }
-
-    @computed get uFace() {
-        let { centres, corners, edges, colours } = this;
-        return [
-            corners[3][0], edges[0][0], corners[0][0],
-            edges[3][0], centres[0], edges[1][0],
-            corners[2][0], edges[2][0], corners[1][0]
-        ].map((facelet) => colours[facelet]);
-    }
-
-    @computed get fFace() {
-        let { centres, corners, edges, colours } = this;
-        return [
-            corners[2][1], edges[2][1], corners[1][2],
-            edges[6][0], centres[3], edges[5][0],
-            corners[6][2], edges[10][1], corners[5][1]
-        ].map((facelet) => colours[facelet]);
-    }
-
-    @computed get rFace() {
-        let { centres, corners, edges, colours } = this;
-        return [
-            corners[1][1], edges[1][1], corners[0][2],
-            edges[5][1], centres[2], edges[4][1],
-            corners[5][2], edges[9][1], corners[4][1]
-        ].map((facelet) => colours[facelet]);
-    }
-
-    @computed get lFace() {
-        let { centres, corners, edges, colours } = this;
-        return [
-            corners[3][1], edges[3][1], corners[2][2],
-            edges[7][1], centres[4], edges[6][1],
-            corners[7][2], edges[11][1], corners[6][1]
-        ].map((facelet) => colours[facelet]);
-    }
-
-    @computed get bFace() {
-        let { centres, corners, edges, colours } = this;
-        return [
-            corners[0][1], edges[0][1], corners[3][2],
-            edges[4][0], centres[1], edges[7][0],
-            corners[4][2], edges[8][1], corners[7][1]
-        ].map((facelet) => colours[facelet]);
-    }
+    @computed get uFace() { return uFace(this); }
+    @computed get rFace() { return rFace(this); }
+    @computed get fFace() { return fFace(this); }
+    @computed get dFace() { return dFace(this); }
+    @computed get lFace() { return lFace(this); }
+    @computed get bFace() { return bFace(this); }
 
     // moves
 
@@ -123,17 +77,19 @@ class Cube {
         this.state = 'running';
         let startTime = performance.now();
         this.timerLoop = () => {
-            requestAnimationFrame(this.timerLoop);
-            let diff = performance.now() - startTime;
-            let seconds = (diff/1000).toFixed(2);
-            let minutes = (seconds/60)|0;
-            if (minutes) {
-                seconds = (seconds%60).toFixed(2);
-                seconds = seconds < 10 ? '0' + seconds : seconds;
-                this.timer = `${minutes}:${seconds}`;
-            }
-            else {
-                this.timer = seconds;
+            if (this.timerLoop) {
+                requestAnimationFrame(this.timerLoop);
+                let diff = performance.now() - startTime;
+                let seconds = (diff/1000).toFixed(2);
+                let minutes = (seconds/60)|0;
+                if (minutes) {
+                    seconds = (seconds%60).toFixed(2);
+                    seconds = seconds < 10 ? '0' + seconds : seconds;
+                    this.timer = `${minutes}:${seconds}`;
+                }
+                else {
+                    this.timer = seconds;
+                }
             }
         };
         this.timerLoop();
