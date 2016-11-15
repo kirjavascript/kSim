@@ -139,18 +139,27 @@ class Cube {
         this.timerLoop();
     }
 
+    @action stopTimer(solved) {
+        this.timerLoop = null;
+        this.state = 'idle';
+        if (!solved) {
+            this.timer = 'DNF';
+        }
+        // add time
+    }
+
     @action newScramble() {
         this.reset();
         this.scramble = scramble();
         this.doMoves(this.scramble, true);
+        this.timer = 0;
         this.state = 'ready';
     }
 
     @computed get solved() {
         return [...'urbldf']
-            .map((face) => `${face}Face`)
             .map((face) => (
-                this[face]
+                this[`${face}Face`]
                     .filter((d,i,a)=>a.indexOf(d)==i)
                     .length
             ))
@@ -159,15 +168,20 @@ class Cube {
 
     @action escape() {
         this.reset();
-        // check if running, add DNF
+        if (~['running','ready'].indexOf(this.state)) {
+            this.stopTimer(false);
+        }
+        else if (this.state == 'idle') {
+            this.timer = 0;
+        }
     }
 
     @action spacebar() {
         if (this.state == 'idle') {
             this.newScramble();
         }
-        else if (this.state == 'running') {
-            1;
+        else if (this.state == 'running' && this.solved) {
+            this.stopTimer(true);
         }
     }
 
