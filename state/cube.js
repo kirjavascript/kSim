@@ -1,6 +1,7 @@
 import { action, computed, observable, autorun } from 'mobx';
 import SASSVars from '!!sass-variables!../components/variables.scss';
 import keyboard from './keyboard';
+import storage from './storage';
 import scramble from '../lib/scramble';
 import { moveToObject, doMove, solved } from './moves';
 import { uFace, rFace, fFace, dFace, lFace, bFace } from './faces';
@@ -59,9 +60,9 @@ class Cube {
     @observable historyMove = 0;
 
     @action historyAdd(obj) {
-        // check historyMove == length
         if (this.historyMove != this.history.length) {
-            this.history.replace(cube.history.splice(0, this.historyMove));
+            this.history
+                .replace(cube.history.splice(0, this.historyMove));
         }
         this.history.push(obj);
         this.historyMove++;
@@ -90,6 +91,7 @@ class Cube {
                 else {
                     this.timer = seconds;
                 }
+                // return diff
             }
         };
         this.timerLoop();
@@ -156,17 +158,21 @@ class Cube {
         this.scramble = '';
     }
 
-
-    constructor(str) {
-        // str && this.moves(str);
-    }
-
 }
 
 
 let cube = new Cube();
 
+// attach keyboard events
 keyboard(cube);
+
+// load / save to localStorage
+storage(cube, 'cube');
+
+// fix timer bug
+if (cube.state == 'running' && !cube.timerLoop) {
+    cube.stopTimer(false);
+}
 
 if (__DEV__) {
     window.cube = cube;

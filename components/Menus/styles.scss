@@ -25,6 +25,18 @@ $width: 25%;
     border-left: 1px solid $lightgrey;
 }
 
+.button {
+    background-color: $lightgrey;
+    text-align: center;
+    padding: 5px;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+.code {
+    float: right;
+}
+
 // menu
 
 .menu {

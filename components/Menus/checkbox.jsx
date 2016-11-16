@@ -15,7 +15,7 @@ class Checkbox extends React.Component {
 
     render() {
 
-        return <div>
+        return <div className={this.props.className}>
             <span style={{paddingRight: 5}}>{this.props.label}</span>
             <svg viewBox="0 0 40 40" width="15" height="15" display="inline-block" onClick={this.toggle} style={{cursor:'pointer',marginBottom:-3}}>
                 <rect x="0" y="0" fill={SASSVars.lightgrey} width="40" height="40" rx="10"/>

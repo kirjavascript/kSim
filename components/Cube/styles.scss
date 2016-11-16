@@ -11,6 +11,7 @@
 
     :global {
         svg {
+            shape-rendering: crispEdges;
             position: absolute;
         }
     }

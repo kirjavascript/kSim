@@ -68,7 +68,7 @@ class Mapping extends React.Component {
             <input
                 type="text"
                 value={move}
-                placeholder="move"
+                placeholder="move(s)"
                 className={styles.move}
                 onChange={this.onChangeMove}/>
 

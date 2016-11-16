@@ -20,11 +20,7 @@ class Root extends React.Component {
 
         return <div>
 
-            <h1>
-                <a href="http://www.github.com/kirjavascript/kSim" target="_blank">
-                &lt;<span>kSim</span>/&gt;
-                </a>
-            </h1>
+            <h1>kSim</h1>
 
             <Menus />
 

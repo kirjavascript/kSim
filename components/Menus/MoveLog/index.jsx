@@ -6,6 +6,15 @@ import Checkbox from '../checkbox.jsx';
 import Slider from '../slider.jsx';
 import styles from './styles.scss';
 
+function simplify(moves) {
+    try {
+        return alg.cube.simplify(moves);
+    }
+    catch (e) {
+        return `${e}`;
+    }
+}
+
 @observer
 class MoveLog extends React.Component {
 
@@ -31,7 +40,7 @@ class MoveLog extends React.Component {
     render() {
 
         let moves = this.state.simple ? 
-            alg.cube.simplify(cube.history.join(' ')) : 
+            simplify(cube.history.join(' ')) : 
             cube.history.join(' ');
 
         return <div>

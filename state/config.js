@@ -1,4 +1,5 @@
 import { action, computed, observable, autorun } from 'mobx';
+import storage from './storage';
 
 class Config {
 
@@ -10,7 +11,8 @@ class Config {
         display: 1,
         keymap: 1,
         movelog: 1,
-        timer: 1
+        timer: 1,
+        about: 1
     };
 
     @computed get keymap() {
@@ -25,6 +27,9 @@ class Config {
 
 
 let config = new Config();
+
+// load / save to localStorage
+storage(config, 'config');
 
 if (__DEV__) {
     window.config = config;
