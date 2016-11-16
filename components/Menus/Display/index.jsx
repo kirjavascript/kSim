@@ -66,12 +66,17 @@ class Display extends React.Component {
 
             <div onMouseLeave={this.colourMouseLeave}>
                 <Motion
-                    defaultStyle={{marginTop:-275, opacity: 0}}
+                    defaultStyle={{marginTop:-272, opacity: 0}}
                     style={{
-                        marginTop: spring(this.state.showPicker?0:-275),
+                        marginTop: spring(this.state.showPicker?0:-272),
                         opacity: spring(+this.state.showPicker)
                     }}>
-                    {(style) => <div className={styles.picker} style={style}>
+                    {(style) => <div 
+                        className={styles.picker} 
+                        style={{
+                            ...style,
+                            display: style.opacity ? 'block' : 'none'
+                        }}>
                         <ChromePicker
                             onChange={this.setColour}
                             color={cube.colours[this.state.colourIndex]}
