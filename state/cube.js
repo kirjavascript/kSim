@@ -3,6 +3,7 @@ import SASSVars from '!!sass-variables!../components/variables.scss';
 import keyboard from './keyboard';
 import storage from './storage';
 import scramble from '../lib/scramble';
+import acube from './acube';
 import { moveToObject, doMove, solved } from './moves';
 import { uFace, rFace, fFace, dFace, lFace, bFace } from './faces';
 let { centres, edges, corners } = solved;
@@ -30,6 +31,10 @@ class Cube {
     @computed get dFace() { return dFace(this); }
     @computed get lFace() { return lFace(this); }
     @computed get bFace() { return bFace(this); }
+
+    // acube.js
+
+    @computed get acube() { return acube(this); }
 
     // moves
 
@@ -103,7 +108,7 @@ class Cube {
         if (!solved) {
             this.timer = 'DNF';
         }
-        // add time
+        // add time (get diff)
     }
 
     @action newScramble() {

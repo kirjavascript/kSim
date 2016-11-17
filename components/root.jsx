@@ -18,7 +18,7 @@ class Root extends React.Component {
 
         let { cube } = this.props;
 
-        return <div>
+        return <section>
 
             <h1>kSim</h1>
 
@@ -26,11 +26,12 @@ class Root extends React.Component {
 
             <CubeUI cube={cube} />
 
-            {false && __DEV__ && <pre className={styles.debug}>
-                {JSON.stringify(cube.history,null,4)}
+            {__DEV__ && <pre className={styles.debug}>
+                {JSON.stringify(cube.acube,null,4)}
             </pre>}
             
-        </div>;
+
+        </section>;
     }
 
 }

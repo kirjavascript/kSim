@@ -64,7 +64,7 @@ class Display extends React.Component {
                 checked={!!config.faceletBorder}
                 onToggle={this.toggleBorder}/>
 
-            <div onMouseLeave={this.colourMouseLeave}>
+            <div onMouseLeave={this.colourMouseLeave} style={{overflow:'hidden'}}>
                 <Motion
                     defaultStyle={{marginTop:-272, opacity: 0}}
                     style={{
