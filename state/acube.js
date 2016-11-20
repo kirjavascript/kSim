@@ -9,7 +9,7 @@ export default function (cube) {
     // kSim to acube position translation
     let pos = {
         edges: [2, 1, 0, 3, 10, 9, 8, 11, 5, 6, 4, 7],
-        corners: []
+        corners: [1, 0, 3, 2, 5, 6, 7, 4]
     };
 
     // face index is the _index_ the number appears in the centres array
@@ -17,8 +17,35 @@ export default function (cube) {
         return edges[d].map((e) => faces[centres.indexOf(e)]);
     });
 
+    let cornersOut = pos.corners.map((d) => {
+        // swap positions b and c because acube goes anti-clockwise (?)
+        let [a, b, c] = corners[d];
+        return [a, c, b].map((e) => faces[centres.indexOf(e)]);
+    })
+    .map((arr) => {
+        // get orientation
+        let index = arr.findIndex((d) => {
+            return ~[...'UD'].indexOf(d);
+        });
+
+        let a,b,c;
+
+        // evil array destructuring hacking
+        return do {
+            if (!index) {
+                arr;
+            }
+            else if (index == 1) {
+                ['-', ...([a,b,c]=arr,[b,c,a])];
+            }
+            else {
+                ['+', ...([a,b,c]=arr,[c,a,b])];
+            }
+        };
+    });
+
     return {
-        centres,
-        edges: edgesOut.map((d) => d.join``).join` `
+        edges: edgesOut.map((d) => d.join``).join` `,
+        corners: cornersOut.map((d) => d.join``).join` `
     };
 }
