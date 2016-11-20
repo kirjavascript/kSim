@@ -27,7 +27,6 @@ class Solver extends React.Component {
         };
         this.onSelect = (value) => {
             config.acube.metric = value;
-            console.log(value);
         };
 
     }
@@ -69,7 +68,7 @@ class Solver extends React.Component {
                 className={styles.input}
                 label="Optimal"
                 checked={optimal} onToggle={this.toggleOptimal}/>
-                
+
             <div>
                 <strong>State:</strong> {cube.acube}
             </div>
