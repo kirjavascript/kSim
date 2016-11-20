@@ -24,13 +24,10 @@ export default function (cube) {
     })
     .map((arr) => {
         // get orientation
-        let index = arr.findIndex((d) => {
-            return ~[...'UD'].indexOf(d);
-        });
-
-        let a,b,c;
+        let index = arr.findIndex((d) => ~[...'UD'].indexOf(d));
 
         // evil array destructuring hacking
+        let a,b,c;
         return do {
             if (!index) {
                 arr;
@@ -44,8 +41,8 @@ export default function (cube) {
         };
     });
 
-    return {
-        edges: edgesOut.map((d) => d.join``).join` `,
-        corners: cornersOut.map((d) => d.join``).join` `
-    };
+    return [
+        edgesOut.map((d) => d.join``).join` `,
+        cornersOut.map((d) => d.join``).join` `
+    ].join` `;
 }

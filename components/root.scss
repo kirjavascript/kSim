@@ -73,6 +73,29 @@ a {
     }
 }
 
+:global {
+    .button {
+        background-color: $lightgrey;
+        text-align: center;
+        padding: 5px;
+        margin-bottom: 10px;
+        cursor: pointer;
+    }
+}
+
+::-webkit-input-placeholder {
+    color: lighten($grey, 30%);
+}
+::-moz-placeholder {
+    color: lighten($grey, 30%);
+}
+:-ms-input-placeholder {
+    color: lighten($grey, 30%);
+}
+:-moz-placeholder {
+    color: lighten($grey, 30%);
+}
+
 h2 {
     margin: 0px 0px 10px 0px;
 }

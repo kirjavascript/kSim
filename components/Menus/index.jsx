@@ -3,6 +3,7 @@ import Menu from './menu.jsx';
 import Keymap from './Keymap/index.jsx';
 import MoveLog from './MoveLog/index.jsx';
 import Display from './Display/index.jsx';
+import Solver from './Solver/index.jsx';
 import Timer from './Timer/index.jsx';
 import CodeIcon from 'react-icons/lib/go/octoface';
 import { clearStorage } from '../../state/storage';
@@ -12,6 +13,10 @@ class Menus extends React.Component {
     render() {
         return <div>
             <div className={styles.left}>
+
+                <Menu title="Solver" name="solver">
+                    <Solver />
+                </Menu>
 
                 <Menu title="Display" name="display">
                     <Display />

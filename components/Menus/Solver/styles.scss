@@ -1,0 +1,31 @@
+@import '../../variables.scss';
+
+.input {
+    padding: 3px 10px 10px 0;
+    display: inline-block;
+}
+
+.button {
+    background-color: $lightgrey;
+    text-align: center;
+    padding: 5px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    width: 70%;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+.metric {
+    width: 30%;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+.wrapper {
+    min-height: 25px;
+    position: relative;
+    margin-bottom: 10px; 
+}

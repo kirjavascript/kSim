@@ -88,6 +88,8 @@ module.exports = (env={}) => {
                 fix: true
             }
         })
+
+        // config.devtool = 'source-map';
     }
 
     if (env.closure) {

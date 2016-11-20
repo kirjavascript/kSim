@@ -1,8 +1,8 @@
 @import '../variables.scss';
 
-$border: 1px solid darken($grey, 25%);
+$border: 1px solid $lightgrey;
 
-$height: 30px;
+$height: 26px;
 
 .wrapper {
     position: relative;
@@ -22,14 +22,15 @@ $height: 30px;
 }
 
 .cell {
-    width: 100%;
+    // width: 100%;
     height: $height;
     border: $border;
     background-color: $white;
     color: $grey;
     cursor: default;
     line-height: $height;
-    padding-left: 12px;
+    padding-left: 5px;
+    width: calc(100% - 6px);
 }
 
 .cell-noselect {
@@ -62,16 +63,16 @@ $height: 30px;
     background-color: $lightgrey;
     border: $border;
     position: absolute;
-    right: -14px;
-    top: 1px;
+    right: 0px;
+    top: 0px;
     cursor: default;
     text-align: center;
     z-index: 14;
 
     > svg {
         position: absolute;
-        top: 7px;
-        right: 7px;
+        top: 5px;
+        right: 5px;
     } 
 }
 
@@ -82,8 +83,8 @@ $height: 30px;
     border-left: $border;
     border-right: $border;
     position: absolute;
-    height: 34px;
-    line-height: 34px;
+    height: 30px;
+    line-height: 30px;
     top: 0;
     left: 0;
     &:last-of-type {

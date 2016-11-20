@@ -3,7 +3,7 @@ import SASSVars from '!!sass-variables!../components/variables.scss';
 import keyboard from './keyboard';
 import storage from './storage';
 import scramble from '../lib/scramble';
-import acube from './acube';
+import acube from './acubeState';
 import { moveToObject, doMove, solved } from './moves';
 import { uFace, rFace, fFace, dFace, lFace, bFace } from './faces';
 let { centres, edges, corners } = solved;
@@ -168,9 +168,6 @@ class Cube {
 
 let cube = new Cube();
 
-// attach keyboard events
-keyboard(cube);
-
 // load / save to localStorage
 storage(cube, 'cube');
 
@@ -178,6 +175,9 @@ storage(cube, 'cube');
 if (cube.state == 'running' && !cube.timerLoop) {
     cube.stopTimer(false);
 }
+
+// attach keyboard events
+keyboard(cube);
 
 if (__DEV__) {
     window.cube = cube;

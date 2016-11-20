@@ -21,7 +21,7 @@ import { Motion, spring } from 'react-motion';
 
 import DownIcon from 'react-icons/lib/go/chevron-down';
 import styles from './select.scss';
-let height = 34;
+let height = 30;
 
 class Select extends React.Component {
 

@@ -9,11 +9,21 @@ class Config {
     @observable keymapArray = [];
     @observable menus = {
         display: 1,
-        keymap: 1,
+        keymap: 0,
         movelog: 1,
         timer: 1,
-        about: 1
+        about: 1,
+        solver: 1
     };
+
+    @observable acube = {
+        status: 'idle',
+        output: '',
+        slices: 0,
+        all: 0,
+        optimal: 0,
+        metric: 'FTM'
+    }
 
     @computed get keymap() {
         let keys = {};
