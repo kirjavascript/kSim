@@ -1,14 +1,10 @@
 .wrapper {
     position: absolute;
-    left: calc(50% - 105px);
-    top: calc(50% - 160px);
+    z-index: 100;
 }
 
 .cube {
-
     position: relative;
-    transform-origin: 105px 160px;
-
     :global {
         svg {
             shape-rendering: crispEdges;

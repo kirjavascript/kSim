@@ -36,7 +36,12 @@ class Solver extends React.Component {
 
 
         this.solve = () => {
-            solve(cube.acube);
+            if (cube.solved) {
+                config.acube.output.replace([]);
+            }
+            else {
+                solve(cube.acube);
+            }
         };
     }
 

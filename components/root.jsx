@@ -24,7 +24,7 @@ class Root extends React.Component {
 
             <Menus />
 
-            <CubeUI cube={cube} />
+            <CubeUI />
 
             {false && __DEV__ && <pre className={styles.debug}>
                 {JSON.stringify(cube.acube,null,4)}
