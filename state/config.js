@@ -17,9 +17,9 @@ class Config {
     };
 
     @observable acube = {
-        status: 'idle',
-        output: '',
-        slices: 0,
+        status: 'idle', // idle, solving
+        output: [],
+        slices: 1,
         all: 0,
         optimal: 0,
         metric: 'FTM'

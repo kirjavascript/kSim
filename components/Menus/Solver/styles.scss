@@ -29,3 +29,20 @@
     position: relative;
     margin-bottom: 10px; 
 }
+
+.output {
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+.alg {
+    // outline: 1px solid $lightgrey;
+    padding: 2px;
+    margin: 10px 0;
+    clear: both;
+
+    > div {
+        text-align: right;
+        font-size: 12px;
+    }
+}

@@ -7,7 +7,12 @@ import Select from '../select.jsx';
 import styles from './styles.scss';
 
 import cube from '../../../state/cube';
-import acube from './acube.js';
+import config from '../../../state/config';
+
+import '!!script-loader!../../../lib/acube';
+let { init, solve } = window.__acube__;
+
+init(config);
 
 @observer
 class Solver extends React.Component {
@@ -29,16 +34,20 @@ class Solver extends React.Component {
             config.acube.metric = value;
         };
 
+
+        this.solve = () => {
+            solve(cube.acube);
+        };
     }
 
     render() {
 
-        let { slices, all, optimal, metric } = config.acube;
+        let { slices, all, optimal, metric, output } = config.acube;
 
         return <div>
 
             <div className={styles.wrapper}>
-                <div className={styles.button} onClick={acube.solve}>
+                <div className={styles.button} onClick={this.solve}>
                     {config.acube.status == 'idle' ? 'Start' : 'Stop'}
                 </div>
 
@@ -73,7 +82,22 @@ class Solver extends React.Component {
                 <strong>State:</strong> {cube.acube}
             </div>
 
-            <pre>{config.acube.output}</pre>
+            {!!output.length && <div className={styles.output}>
+                {Array.from(output).map((line,i) => {
+                    let match = line.match(/([^\(]*) \(([^\)]*q[^\)]*f[^\)]*s)\)/);
+                    return do {
+                        if (match) {
+                            <div key={i} className={styles.alg}>
+                                <strong>{match[1]}</strong>
+                                <div>{match[2]}</div>
+                            </div>;
+                        }
+                        else {
+                            <div key={i}>{line}</div>;
+                        }
+                    };
+                })}
+            </div>}
 
         </div>;
     }

@@ -27,7 +27,7 @@ class CubeUI extends React.Component {
                 <Face face={uFace} type="U" />
                 <Face face={fFace} type="F" />
             </div>
-        </div>;
+        </div>; 
     }
 }
 
