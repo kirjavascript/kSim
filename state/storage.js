@@ -4,7 +4,7 @@ export default function (obj, name) {
 
     let saved = localStorage.getItem(name);
 
-    if (saved) {
+    if (saved != null) {
         try {
             saved = JSON.parse(saved);
 

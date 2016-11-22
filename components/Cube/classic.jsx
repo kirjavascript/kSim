@@ -5,7 +5,7 @@ import styles from './styles.scss';
 import Face from './face.jsx';
 
 @observer
-class Classic extends React.Component {
+export default class extends React.Component {
 
     render() {
 
@@ -33,5 +33,3 @@ class Classic extends React.Component {
         </div>;
     }
 }
-
-export default Classic;
