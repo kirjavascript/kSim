@@ -18,7 +18,7 @@ class Root extends React.Component {
 
         let { cube } = this.props;
 
-        return <section>
+        return <div>
 
             <h1>kSim</h1>
 
@@ -31,9 +31,13 @@ class Root extends React.Component {
             </pre>}
             
 
-        </section>;
+        </div>;
     }
 
 }
 
-render(<Root cube={cube}/>, document.querySelector('#root'));
+document.addEventListener('DOMContentLoaded', () => {
+    let node = document.body.appendChild(document.createElement('section'));
+    render(<Root cube={cube}/>, node);
+});
+
