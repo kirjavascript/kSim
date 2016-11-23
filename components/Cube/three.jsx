@@ -7,18 +7,26 @@ import Face from './face.jsx';
 
 require('!!three/examples/js/controls/OrbitControls.js');
 
-let scene, camera, renderer, controls;
-
-
 let width = window.innerWidth, height = window.innerHeight;
 
 function hash2hex(str) {
     return parseInt(str.slice(1), 16);
 }
 
+let loop, reactiveStore;
+
 function init(node) {
 
+    if (!node) {
+        // node is unmounting...
+        loop = null;
+        reactiveStore(); // dispose
+        return;
+    }
+
     let { uFace, fFace, rFace, lFace, bFace, dFace } = cube;
+
+    let scene, camera, renderer, controls;
 
     scene = new THREE.Scene();
 
@@ -103,11 +111,18 @@ function init(node) {
     // renderer.setClearColor(0x272b33, 1);
     renderer.setSize( width, height );
     
-    node.appendChild( renderer.domElement );
+    node && node.appendChild( renderer.domElement );
 
     controls = new THREE.OrbitControls(camera, renderer.domElement);
 
-    autorun(() => {
+    loop = () => {
+        loop && requestAnimationFrame(loop);        
+        renderer.render( scene, camera );
+    };
+
+    loop();
+
+    reactiveStore = autorun(() => {
 
         // update colours
 
@@ -137,16 +152,11 @@ function init(node) {
         camera.fov = 75/config.scale;
         camera.updateProjectionMatrix();
     });
-
-    ~function animate() {
-        requestAnimationFrame(animate);        
-        renderer.render( scene, camera );
-    } ();
 }
 
 function sticker({ x = 0, y = 0, z = 0 }) {
 
-    let geometry = new THREE.BoxGeometry( 220, 5, 220 );
+    let geometry = new THREE.BoxGeometry( 220, 15, 220 );
     let material = new THREE.MeshBasicMaterial( {opacity: 0.5} );
     let mesh = new THREE.Mesh( geometry, material );
     mesh.position.x = x;

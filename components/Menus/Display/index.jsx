@@ -53,7 +53,6 @@ class Display extends React.Component {
         <div className={styles.layout}>
             <Select
                 value={config.display.type}
-                label="Layout"
                 options={[
                     ['classic','Classic'],
                     ['box','Flat'],
@@ -64,7 +63,7 @@ class Display extends React.Component {
 
         </div>
         <div className={styles.label}>
-            Layout
+            View
         </div>
 
             <Slider
