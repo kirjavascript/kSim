@@ -51,7 +51,7 @@ function init(node) {
 
     let R = rFace.map((facelet, i) => {
         let stk = sticker({
-            x: radius, z: ((i%3) * 300) -300, y: 300 - (((i/3)|0) * 300)
+            x: radius, z: 300 - ((i%3) * 300), y: 300 - (((i/3)|0) * 300)
         });
         stk.material.color.setHex( hash2hex(facelet) );
         scene.add( stk.mesh );
