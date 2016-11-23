@@ -61,7 +61,8 @@ module.exports = (env={}) => {
                 __DEV__: env.dev
             }),
             new webpack.ProvidePlugin({
-                React: 'react'
+                React: 'react',
+                THREE: '!!three/build/three.min.js'
             }),
         ]
     }

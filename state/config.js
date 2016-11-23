@@ -16,6 +16,11 @@ class Config {
         solver: 1
     };
 
+    @observable display = {
+        type: '3',
+
+    }
+
     @observable acube = {
         status: 'idle', // idle, solving
         output: [],

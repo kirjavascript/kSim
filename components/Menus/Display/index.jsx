@@ -3,6 +3,7 @@ import { Motion, spring } from 'react-motion';
 import config from '../../../state/config';
 import cube from '../../../state/cube';
 import Slider from '../slider.jsx';
+import Select from '../select.jsx';
 import Checkbox from '../checkbox.jsx';
 import styles from './styles.scss';
 
@@ -39,10 +40,32 @@ class Display extends React.Component {
         this.setColour = (value) => {
             cube.colours[this.state.colourIndex] = value.hex;
         };
+
+        this.onDisplay = (value) => {
+            config.display.type = value;
+        };
     }
 
     render() {
         return <div>
+
+
+        <div className={styles.layout}>
+            <Select
+                value={config.display.type}
+                label="Layout"
+                options={[
+                    ['classic','Classic'],
+                    ['box','Flat'],
+                    ['3','Three'],
+                ]}
+                editable={false}
+                onSelect={this.onDisplay}/>
+
+        </div>
+        <div className={styles.label}>
+            Layout
+        </div>
 
             <Slider
                 name="Opacity"

@@ -72,6 +72,7 @@ class Select extends React.Component {
             numRange,
             onSelect,
             editable,
+            label,
             name,
             ...attrs
 
@@ -99,8 +100,6 @@ class Select extends React.Component {
         return <div 
             ref="wrapper"
             className={styles.wrapper}>
-
-
 
             <input type="hidden" {...attrs} value={value} name={name}/>
 
