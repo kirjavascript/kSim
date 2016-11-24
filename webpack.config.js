@@ -41,12 +41,7 @@ module.exports = (env={}) => {
                 {
                     test: /\.svg$/,
                     use: [
-                        { 
-                            loader:'svg-url-loader',
-                            options: {
-                                noquotes: true
-                            }
-                        },
+                        { loader:'raw-loader', },
                         { loader:'svgo-loader' },
                     ]
                 },

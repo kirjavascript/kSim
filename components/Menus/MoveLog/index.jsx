@@ -43,9 +43,14 @@ class MoveLog extends React.Component {
             simplify(cube.history.join(' ')) : 
             cube.history.join(' ');
 
+        let FTM = alg.cube.countMoves(moves, {metric: 'obtm'});
+        let STM = alg.cube.countMoves(moves, {metric: 'btm'});
+        let QTM = alg.cube.countMoves(moves, {metric: 'obqtm'});
+        let SQTM = alg.cube.countMoves(moves, {metric: 'obtm'});
+
         return <div>
             <Slider
-                name={`Traverse Moves ${cube.historyMove}/${cube.history.length}`}
+                name={`Rewind Moves ${cube.historyMove}/${cube.history.length}`}
                 min="0"
                 step="1"
                 max={cube.history.length}
@@ -55,10 +60,14 @@ class MoveLog extends React.Component {
 
             {moves}
             <div className={styles.condense}>
+                {moves && <div className={styles.counts}>
+                    {`${QTM}q, ${FTM}f, ${STM}s`}
+                </div>}
                 <Checkbox
                     label="Condense moves"
                     checked={this.state.simple}
                     onToggle={this.toggleSimple}/>
+
             </div>
 
 

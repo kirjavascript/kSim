@@ -1,9 +1,10 @@
 import { observer } from 'mobx-react';
+import config from '../../state/config';
 
 import Classic from './classic.jsx';
 import Box from './box.jsx';
 import Isometric from './isometric.jsx';
-import Three from './three.jsx';
+import Three from './three/index.jsx';
 
 @observer
 class CubeUI extends React.Component {

@@ -1,32 +1,28 @@
-import { observer } from 'mobx-react';
 import { autorun } from 'mobx';
-import config from '../../state/config';
-import cube from '../../state/cube';
-import styles from './styles.scss';
-import Face from './face.jsx';
-
+import config from '../../../state/config';
+import cube from '../../../state/cube';
+import { texture } from './texture';
 require('!!three/examples/js/controls/OrbitControls.js');
 
-let width = window.innerWidth, height = window.innerHeight;
+import { hash2hex, sticker, resize } from './util';
 
-function hash2hex(str) {
-    return parseInt(str.slice(1), 16);
-}
+let loop, reactiveStores, camera, renderer, onResize;
 
-let loop, reactiveStore;
-
-function init(node) {
+export function init(node) {
 
     if (!node) {
         // node is unmounting...
         loop = null;
-        reactiveStore(); // dispose
+        reactiveStores.forEach((disposer) => disposer());
+        window.removeEventListener('resize', onResize);
         return;
     }
 
     let { uFace, fFace, rFace, lFace, bFace, dFace } = cube;
 
-    let scene, camera, renderer, controls;
+    let scene, controls;
+
+    let width = window.innerWidth / 2, height = window.innerHeight;
 
     scene = new THREE.Scene();
 
@@ -100,9 +96,6 @@ function init(node) {
         return stk;
     });
 
-
-    let faces = [U.F,R,D,B,L];
-
     
     renderer = new THREE.WebGLRenderer({
         antialias: true,
@@ -122,74 +115,63 @@ function init(node) {
 
     loop();
 
-    reactiveStore = autorun(() => {
+    onResize = resize(camera, renderer);
 
-        // update colours
+    window.addEventListener( 'resize', onResize );
 
-        cube.uFace.forEach((facelet, i) => {
-            U[i].material.color.setHex( hash2hex(facelet) );
-        });
+    reactiveStores = [
+        autorun(() => {
+            // update colours
 
-        cube.fFace.forEach((facelet, i) => {
-            F[i].material.color.setHex( hash2hex(facelet) );
-        });
+            cube.uFace.forEach((facelet, i) => {
+                let material = U[i].material;
+                material.opacity = config.opacity;
+                material.color.setHex( hash2hex(facelet) );
+            });
 
-        cube.rFace.forEach((facelet, i) => {
-            R[i].material.color.setHex( hash2hex(facelet) );
-        });
+            cube.fFace.forEach((facelet, i) => {
+                let material = F[i].material;
+                material.opacity = config.opacity;
+                material.color.setHex( hash2hex(facelet) );
+            });
 
-        cube.lFace.forEach((facelet, i) => {
-            L[i].material.color.setHex( hash2hex(facelet) );
-        });
+            cube.rFace.forEach((facelet, i) => {
+                let material = R[i].material;
+                material.opacity = config.opacity;
+                material.color.setHex( hash2hex(facelet) );
+            });
 
-        cube.dFace.forEach((facelet, i) => {
-            D[i].material.color.setHex( hash2hex(facelet) );
-        });
-        cube.bFace.forEach((facelet, i) => {
-            B[i].material.color.setHex( hash2hex(facelet) );
-        });
+            cube.lFace.forEach((facelet, i) => {
+                let material = L[i].material;
+                material.opacity = config.opacity;
+                material.color.setHex( hash2hex(facelet) );
+            });
 
-        camera.fov = 75/config.scale;
-        camera.updateProjectionMatrix();
-    });
-}
+            cube.dFace.forEach((facelet, i) => {
+                let material = D[i].material;
+                material.opacity = config.opacity;
+                material.color.setHex( hash2hex(facelet) );
+            });
+            cube.bFace.forEach((facelet, i) => {
+                let material = B[i].material;
+                material.opacity = config.opacity;
+                material.color.setHex( hash2hex(facelet) );
+            });
 
-function sticker({ x = 0, y = 0, z = 0 }) {
+            camera.fov = 75/config.scale;
+            camera.updateProjectionMatrix();
+        }),
+        autorun(() => {
+            [U,F,R,D,B,L]
+                .forEach((face) => {
+                    face.forEach((sticker) => {
+                        let { material } = sticker;
 
-    let geometry = new THREE.BoxGeometry( 220, 15, 220 );
-    let material = new THREE.MeshBasicMaterial( {opacity: 0.5} );
-    let mesh = new THREE.Mesh( geometry, material );
-    mesh.position.x = x;
-    mesh.position.y = y;
-    mesh.position.z = z;
+                        material.map = texture();
+                        material.needsUpdate = true;
 
-    return { geometry, material, mesh };
-}
-
-@observer
-export default class extends React.Component {
-
-    constructor(props) {
-        super(props);
-
-        this.click = () => {
-            material.color.setHex( Math.random()*10000000 );
-        };
-    }
-
-
-    shouldComponentUpdate() {
-        return false;
-    }
-
-    render() {
-
-        return <div style={{
-            left: `calc(50% - ${width/2}px)`,
-            top: `calc(50% - ${height/2}px)`,
-            position: 'absolute'
-        }}>
-            <div ref={init}></div>
-        </div>;
-    }
+                    });
+                });
+        })
+    ];
 }

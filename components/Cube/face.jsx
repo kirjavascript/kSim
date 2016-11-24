@@ -1,6 +1,8 @@
 import { observer } from 'mobx-react';
 import SASSVars from '!!sass-variables!../variables.scss';
 
+import config from '../../state/config';
+
 @observer
 class Face extends React.Component {
 
