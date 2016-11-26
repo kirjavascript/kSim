@@ -2,32 +2,26 @@ import { autorun } from 'mobx';
 import config from '../../../state/config';
 import cube from '../../../state/cube';
 import { texture } from './texture';
-require('!!three/examples/js/controls/OrbitControls.js');
-
+import OrbitControls from './controls';
 import { hash2hex, sticker, resize } from './util';
 
-let loop, reactiveStores, camera, renderer, onResize;
+let disposers;
 
 export function init(node) {
 
     if (!node) {
         // node is unmounting...
-        loop = null;
-        reactiveStores.forEach((disposer) => disposer());
-        window.removeEventListener('resize', onResize);
+        disposers.forEach((disposer) => disposer());
         return;
     }
 
     let { uFace, fFace, rFace, lFace, bFace, dFace } = cube;
 
-    let scene, controls;
-
     let width = window.innerWidth / 2, height = window.innerHeight;
 
-    scene = new THREE.Scene();
+    // cause a scene
 
-    camera = new THREE.PerspectiveCamera( 75, width / height, 1, 10000 );
-    camera.position.z = 3000;
+    let scene = new THREE.Scene();
 
     // add stickers to geometry
 
@@ -96,30 +90,45 @@ export function init(node) {
         return stk;
     });
 
+    // setup camera
+
+    let camera = new THREE.PerspectiveCamera(75, width / height, 1, 10000);
+    camera.position.z = 2000;
+
+    // load renderer
     
-    renderer = new THREE.WebGLRenderer({
+    let renderer = new THREE.WebGLRenderer({
         antialias: true,
         alpha: true
     });
     // renderer.setClearColor(0x272b33, 1);
     renderer.setSize( width, height );
+
+    // append renderer to DOM
     
     node && node.appendChild( renderer.domElement );
 
-    controls = new THREE.OrbitControls(camera, renderer.domElement);
+    disposers = [
+        (() => {
 
-    loop = () => {
-        loop && requestAnimationFrame(loop);        
-        renderer.render( scene, camera );
-    };
+            let loop = () => {
+                loop && requestAnimationFrame(loop);        
+                renderer.render(scene, camera);
+            };
 
-    loop();
+            loop();
 
-    onResize = resize(camera, renderer);
+            let onResize = resize(camera, renderer);
+            window.addEventListener('resize', onResize);
 
-    window.addEventListener( 'resize', onResize );
+            let controls = new OrbitControls(camera, renderer.domElement);
 
-    reactiveStores = [
+            return () => {
+                window.removeEventListener('resize', onResize);
+                controls.dispose();
+                loop = null;
+            };
+        })(),
         autorun(() => {
             // update colours
 
@@ -158,20 +167,21 @@ export function init(node) {
                 material.color.setHex( hash2hex(facelet) );
             });
 
-            camera.fov = 75/config.scale;
-            camera.updateProjectionMatrix();
+
         }),
         autorun(() => {
             [U,F,R,D,B,L]
                 .forEach((face) => {
                     face.forEach((sticker) => {
-                        let { material } = sticker;
+                        let { material, geometry } = sticker;
 
                         material.map = texture();
                         material.needsUpdate = true;
-
                     });
                 });
+
+            camera.fov = 85/config.scale;
+            camera.updateProjectionMatrix();
         })
     ];
 }

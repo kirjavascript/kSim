@@ -18,7 +18,12 @@ class Config {
 
     @observable display = {
         type: '3',
-
+        spherical: {
+            radius: 2000,
+            phi: 0.7857963267948965,
+            theta: 0,
+            mutating: false
+        }
     }
 
     @observable acube = {

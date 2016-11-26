@@ -3,7 +3,6 @@ import config from '../../state/config';
 
 import Classic from './classic.jsx';
 import Box from './box.jsx';
-import Isometric from './isometric.jsx';
 import Three from './three/index.jsx';
 
 @observer

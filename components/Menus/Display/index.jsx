@@ -49,22 +49,21 @@ class Display extends React.Component {
     render() {
         return <div>
 
+            <div className={styles.layout}>
+                <Select
+                    value={config.display.type}
+                    options={[
+                        ['classic','Classic'],
+                        ['box','Flat'],
+                        ['3','Three'],
+                    ]}
+                    editable={false}
+                    onSelect={this.onDisplay}/>
 
-        <div className={styles.layout}>
-            <Select
-                value={config.display.type}
-                options={[
-                    ['classic','Classic'],
-                    ['box','Flat'],
-                    ['3','Three'],
-                ]}
-                editable={false}
-                onSelect={this.onDisplay}/>
-
-        </div>
-        <div className={styles.label}>
-            View
-        </div>
+            </div>
+            <div className={styles.label}>
+                View
+            </div>
 
             <Slider
                 name="Opacity"
@@ -80,6 +79,26 @@ class Display extends React.Component {
                 max="2"
                 obj={config}
                 accessor="scale" />
+
+            {config.display.type == 3 && <div>
+
+                <Slider
+                    name="Phi"
+                    min="0"
+                    step="0.01"
+                    max="3.15"
+                    obj={config.display.spherical}
+                    accessor="phi" />
+
+                <Slider
+                    name="Theta"
+                    min="-3.15"
+                    step="0.01"
+                    max="3.15"
+                    obj={config.display.spherical}
+                    accessor="theta" />
+
+            </div>}
 
             <Checkbox
                 label="Facelet Borders"

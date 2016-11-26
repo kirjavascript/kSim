@@ -18,7 +18,7 @@ function getTexture() {
             document.body.appendChild(canvas);
             ctx.fillRect(0,0,64,64);
             ctx.fillStyle = 'white';
-            ctx.fillRect(3,3,58,58);
+            ctx.fillRect(2,2,60,60);
 
             texture = new THREE.Texture(canvas);
             texture.needsUpdate = true;
