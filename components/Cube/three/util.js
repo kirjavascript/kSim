@@ -19,7 +19,7 @@ function resize(camera, renderer) {
 
 function sticker({ x = 0, y = 0, z = 0 }) {
 
-    let geometry = new THREE.BoxGeometry( 220, 0, 220 );
+    let geometry = new THREE.BoxGeometry( 230, 0, 230 );
     let material = new THREE.MeshBasicMaterial({ map: texture() });
     material.transparent = true;
     material.map && (material.map.minFilter = THREE.LinearFilter);

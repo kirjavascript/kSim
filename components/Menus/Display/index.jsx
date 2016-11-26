@@ -70,6 +70,7 @@ class Display extends React.Component {
                 min="0.2"
                 step="0.01"
                 obj={config}
+                reset={1}
                 accessor="opacity" />
 
             <Slider
@@ -77,6 +78,7 @@ class Display extends React.Component {
                 min="0.5"
                 step="0.01"
                 max="2"
+                reset={1}
                 obj={config}
                 accessor="scale" />
 
@@ -87,6 +89,7 @@ class Display extends React.Component {
                     min="0"
                     step="0.01"
                     max="3.15"
+                    reset={0.7857963267948965}
                     obj={config.display.spherical}
                     accessor="phi" />
 
@@ -95,6 +98,7 @@ class Display extends React.Component {
                     min="-3.15"
                     step="0.01"
                     max="3.15"
+                    reset={0}
                     obj={config.display.spherical}
                     accessor="theta" />
 

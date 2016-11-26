@@ -85,6 +85,14 @@ $width: 25%;
 
 .slide {
     margin: 10px 0;
+    position: relative;
+
+    button {
+        position: absolute;
+        top: 0; right: 0;
+        font-size: 12px;
+    }
+
     :global {
         input {
             background: none;

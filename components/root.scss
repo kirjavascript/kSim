@@ -60,6 +60,12 @@ html {
     overflow: hidden;
 }
 
+button {
+    border: none;
+    background-color: $lightgrey;
+    color: $white;
+}
+
 a {
     text-decoration: none;
     font-weight: bold;
