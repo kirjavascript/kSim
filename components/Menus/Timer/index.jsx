@@ -2,6 +2,7 @@ import { observer } from 'mobx-react';
 
 import cube from '../../../state/cube';
 import styles from './styles.scss';
+import Select from '../select.jsx';
 
 @observer
 class Timer extends React.Component {
@@ -13,6 +14,9 @@ class Timer extends React.Component {
     constructor(props) {
         super(props);
 
+        this.setScrambler = (value) => {
+            cube.scrambler = value;
+        };
 
     }
 
@@ -31,6 +35,16 @@ class Timer extends React.Component {
             {cube.timer != 0 && <div className={styles.timer}>
                 {cube.timer}
             </div>}
+
+            <Select
+                value={cube.scrambler}
+                options={[
+                    ['Random','Random'],
+                    ['LL','LL'],
+                    ['LSLL','LSLL'],
+                ]}
+                editable={false}
+                onSelect={this.setScrambler}/>
         </div>;
     }
 }

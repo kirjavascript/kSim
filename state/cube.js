@@ -20,7 +20,8 @@ class Cube {
         SASSVars.red,
         SASSVars.green,
         SASSVars.orange,
-        SASSVars.yellow
+        SASSVars.yellow,
+        SASSVars.lightgrey
     ];
 
     // faces
@@ -77,6 +78,7 @@ class Cube {
 
     @observable state = 'idle'; // idle, ready, running
     @observable scramble = '';
+    @observable scrambler = 'Random';
     @observable timer = 0;
 
     @action startTimer() {
@@ -113,16 +115,19 @@ class Cube {
 
     @action newScramble() {
         this.reset();
-        this.scramble = scramble();
+        this.scramble = scramble(this.scrambler);
         this.doMoves(this.scramble, true);
         this.timer = 0;
         this.state = 'ready';
     }
 
     @computed get solved() {
+        let grey = this.colours[this.colours.length-1];
+
         return [...'urbldf']
             .map((face) => (
                 this[`${face}Face`]
+                    .filter((d) => d != grey)
                     .filter((d,i,a)=>a.indexOf(d)==i)
                     .length
             ))

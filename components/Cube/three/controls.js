@@ -1,15 +1,13 @@
 import { autorun } from 'mobx';
 import config from '../../../state/config';
 
-// modified from three/examples/js/controls/OrbitControls.js
-
-let OrbitControls = function ( object, domElement ) {
+let Controls = function (camera, domElement, faces) {
 
     let scope = this;
 
     let mobXDisposer;
 
-    // "target" sets the location of focus, where the object orbits around
+    // "target" sets the location of focus, where the camera orbits around
     let target = new THREE.Vector3();
 
     let changeEvent = { type: 'change' };
@@ -23,7 +21,6 @@ let OrbitControls = function ( object, domElement ) {
     let sphericalDelta = new THREE.Spherical();
 
     let scale = 1;
-    let panOffset = new THREE.Vector3();
     let zoomChanged = false;
 
     let rotateStart = new THREE.Vector2();
@@ -52,8 +49,8 @@ let OrbitControls = function ( object, domElement ) {
 
     // for reset
     this.target0 = target.clone();
-    this.position0 =object.position.clone();
-    this.zoom0 =object.zoom;
+    this.position0 =camera.position.clone();
+    this.zoom0 =camera.zoom;
 
     //
     // public methods
@@ -74,10 +71,10 @@ let OrbitControls = function ( object, domElement ) {
     this.reset = function () {
 
         target.copy( this.target0 );
-        object.position.copy( scope.position0 );
-        object.zoom = scope.zoom0;
+        camera.position.copy( scope.position0 );
+        camera.zoom = scope.zoom0;
 
-        object.updateProjectionMatrix();
+        camera.updateProjectionMatrix();
         scope.dispatchEvent( changeEvent );
 
     };
@@ -88,7 +85,7 @@ let OrbitControls = function ( object, domElement ) {
         let offset = new THREE.Vector3();
 
         // so camera.up is the orbit axis
-        let quat = new THREE.Quaternion().setFromUnitVectors( object.up, new THREE.Vector3( 0, 1, 0 ) );
+        let quat = new THREE.Quaternion().setFromUnitVectors( camera.up, new THREE.Vector3( 0, 1, 0 ) );
         let quatInverse = quat.clone().inverse();
 
         let lastPosition = new THREE.Vector3();
@@ -96,7 +93,7 @@ let OrbitControls = function ( object, domElement ) {
 
         return function update () {
 
-            let position = object.position;
+            let position = camera.position;
 
             offset.copy( position ).sub( target );
 
@@ -130,8 +127,6 @@ let OrbitControls = function ( object, domElement ) {
             // restrict radius to be between desired limits
             spherical.radius = Math.max( scope.minDistance, Math.min( scope.maxDistance, spherical.radius ) );
 
-            // move target to panned location
-            target.add( panOffset );
 
             offset.setFromSpherical( spherical );
 
@@ -140,7 +135,7 @@ let OrbitControls = function ( object, domElement ) {
 
             position.copy( target ).add( offset );
 
-            object.lookAt( target );
+            camera.lookAt( target );
 
 
             sphericalDelta.set( 0, 0, 0 );
@@ -153,13 +148,13 @@ let OrbitControls = function ( object, domElement ) {
             // using small-angle approximation cos(x/2) = 1 - x^2 / 8
 
             if ( zoomChanged ||
-                lastPosition.distanceToSquared( object.position ) > EPS ||
-                8 * ( 1 - lastQuaternion.dot( object.quaternion ) ) > EPS ) {
+                lastPosition.distanceToSquared( camera.position ) > EPS ||
+                8 * ( 1 - lastQuaternion.dot( camera.quaternion ) ) > EPS ) {
 
                 scope.dispatchEvent( changeEvent );
 
-                lastPosition.copy( object.position );
-                lastQuaternion.copy( object.quaternion );
+                lastPosition.copy( camera.position );
+                lastQuaternion.copy( camera.quaternion );
                 zoomChanged = false;
 
                 return true;
@@ -249,8 +244,6 @@ let OrbitControls = function ( object, domElement ) {
 
     function onMouseUp( event ) {
 
-        // handleMouseUp( event );
-
         document.removeEventListener( 'mousemove', onMouseMove, false );
         document.removeEventListener( 'mouseup', onMouseUp, false );
 
@@ -269,9 +262,48 @@ let OrbitControls = function ( object, domElement ) {
 
     });
 
+    // facelet clicking
+
+    let raycaster = new THREE.Raycaster();
+    let mouse = new THREE.Vector2();
+
+    domElement.addEventListener('mousedown', (e) => {
+
+        e.preventDefault();
+
+        mouse.x = (( e.clientX / domElement.clientWidth ) * 2 - 1);
+        mouse.y = - ( e.clientY / domElement.clientHeight ) * 2 + 1;
+
+        raycaster.setFromCamera( mouse, camera );
+
+        let intersects = raycaster.intersectObjects( [].concat(...faces).map((d) => d.mesh) );
+
+        if ( intersects.length > 0 ) {
+
+            // intersects[ 0 ].object.material.color.setHex( Math.random() * 0xffffff );
+
+            // let particle = new THREE.Sprite( particleMaterial );
+            // particle.position.copy( intersects[ 0 ].point );
+            // particle.scale.x = particle.scale.y = 16;
+            // scene.add( particle );
+
+            console.log(intersects);
+
+        }
+
+        /*
+        // Parse all the faces
+        for ( var i in intersects ) {
+
+            intersects[ i ].face.material[ 0 ].color.setHex( Math.random() * 0xffffff | 0x80000000 );
+
+        }
+        */
+    }, false );
+
 };
 
-OrbitControls.prototype = Object.create( THREE.EventDispatcher.prototype );
+Controls.prototype = Object.create( THREE.EventDispatcher.prototype );
 
 
-export default OrbitControls;
+export default Controls;

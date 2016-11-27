@@ -4,7 +4,7 @@
 export default function (cube) {
     let { centres, edges, corners } = cube;
 
-    let faces = [...'UBRFLD'];
+    let faces = [...'UBRFLD?'];
 
     // kSim to acube position translation
     let pos = {
@@ -42,7 +42,18 @@ export default function (cube) {
     });
 
     return [
-        edgesOut.map((d) => d.join``).join` `,
-        cornersOut.map((d) => d.join``).join` `
+        toString(edgesOut),
+        toString(cornersOut)
     ].join` `;
+}
+
+function toString(obj) {
+    return obj.map((cubie) => {
+        if (~cubie.findIndex((d) => d=='?')) {
+            return '?';
+        }
+        else {
+            return cubie.join``;
+        }
+    }).join` `;
 }

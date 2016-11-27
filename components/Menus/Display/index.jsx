@@ -85,18 +85,18 @@ class Display extends React.Component {
             {config.display.type == 3 && <div>
 
                 <Slider
-                    name="Phi"
+                    name="X"
                     min="0"
-                    step="0.01"
+                    step="0.001"
                     max="3.15"
                     reset={0.7857963267948965}
                     obj={config.display.spherical}
                     accessor="phi" />
 
                 <Slider
-                    name="Theta"
+                    name="Y"
                     min="-3.15"
-                    step="0.01"
+                    step="0.001"
                     max="3.15"
                     reset={0}
                     obj={config.display.spherical}

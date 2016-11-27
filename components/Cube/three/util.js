@@ -7,10 +7,10 @@ function hash2hex(str) {
 function resize(camera, renderer) {
 
     return () => {
-        camera.aspect = (window.innerWidth / 2) / window.innerHeight;
+        camera.aspect = (window.innerWidth) / window.innerHeight;
         camera.updateProjectionMatrix();
 
-        renderer.setSize( window.innerWidth / 2 , window.innerHeight );
+        renderer.setSize( window.innerWidth, window.innerHeight );
     };    
 
 }

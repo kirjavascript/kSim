@@ -7,8 +7,8 @@
 
 let solved = {
     centres: [
-        // U B R F L D
-        0, 1, 2, 3, 4, 5
+        // U B R F L D ?
+        0, 1, 2, 3, 4, 5, 6
     ],
     edges: [ 
         // UB UR UF UL

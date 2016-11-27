@@ -2,7 +2,7 @@ import { autorun } from 'mobx';
 import config from '../../../state/config';
 import cube from '../../../state/cube';
 import { texture } from './texture';
-import OrbitControls from './controls';
+import Controls from './controls';
 import { hash2hex, sticker, resize } from './util';
 
 let disposers;
@@ -17,7 +17,7 @@ export function init(node) {
 
     let { uFace, fFace, rFace, lFace, bFace, dFace } = cube;
 
-    let width = window.innerWidth / 2, height = window.innerHeight;
+    let width = window.innerWidth, height = window.innerHeight;
 
     // cause a scene
 
@@ -33,6 +33,8 @@ export function init(node) {
         });
         stk.material.color.setHex( hash2hex(facelet) );
         scene.add( stk.mesh );
+
+        stk.mesh.__data__ = 'U';
         return stk;
     });
 
@@ -108,6 +110,8 @@ export function init(node) {
     
     node && node.appendChild( renderer.domElement );
 
+    let faces = [U,F,R,D,B,L];
+
     disposers = [
         (() => {
 
@@ -121,7 +125,7 @@ export function init(node) {
             let onResize = resize(camera, renderer);
             window.addEventListener('resize', onResize);
 
-            let controls = new OrbitControls(camera, renderer.domElement);
+            let controls = new Controls(camera, renderer.domElement, faces);
 
             return () => {
                 window.removeEventListener('resize', onResize);
@@ -170,7 +174,7 @@ export function init(node) {
 
         }),
         autorun(() => {
-            [U,F,R,D,B,L]
+            faces
                 .forEach((face) => {
                     face.forEach((sticker) => {
                         let { material, geometry } = sticker;
