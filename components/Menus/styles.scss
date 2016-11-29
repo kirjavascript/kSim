@@ -11,6 +11,7 @@ $width: 25%;
     width: $width;
     height: 100%;
     overflow: auto;
+    background-color: $grey;
 }
 
 .left {
@@ -43,7 +44,6 @@ $width: 25%;
 
 .menu {
 
-    background-color: $grey;
     .title {
 
         background-color: $lightgrey;

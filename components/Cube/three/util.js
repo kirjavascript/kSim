@@ -16,6 +16,25 @@ function resize(camera, renderer) {
 }
 
 
+function face({ input, name, scene, x, y, z, callback }) {
+
+    return input.map((facelet, i) => {
+
+        let stk = sticker({ x: x(i), z: z(i), y: y(i) });
+        stk.material.color.setHex( hash2hex(facelet) );
+        scene.add(stk.mesh);
+        callback && callback(stk);
+
+        // 'object' property on intersects
+        stk.mesh.__data__ = {
+            face: name, index: i
+        };
+        return stk;
+
+    });
+
+}
+
 
 function sticker({ x = 0, y = 0, z = 0 }) {
 
@@ -33,5 +52,5 @@ function sticker({ x = 0, y = 0, z = 0 }) {
 }
 
 
-export { hash2hex, sticker, resize };
+export { hash2hex, sticker, resize, face };
 

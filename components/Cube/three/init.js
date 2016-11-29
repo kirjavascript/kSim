@@ -3,7 +3,7 @@ import config from '../../../state/config';
 import cube from '../../../state/cube';
 import { texture } from './texture';
 import Controls from './controls';
-import { hash2hex, sticker, resize } from './util';
+import { hash2hex, face, sticker, resize } from './util';
 
 let disposers;
 
@@ -25,72 +25,56 @@ export function init(node) {
 
     // add stickers to geometry
 
-    let radius = 440;
-    
-    let U = uFace.map((facelet, i) => {
-        let stk = sticker({
-            x: ((i%3) * 300) -300, z: (((i/3)|0) * 300) -300, y: radius
-        });
-        stk.material.color.setHex( hash2hex(facelet) );
-        scene.add( stk.mesh );
+    let faces, radius = 440;
 
-        stk.mesh.__data__ = 'U';
-        return stk;
-    });
-
-    let F = fFace.map((facelet, i) => {
-        let stk = sticker({
-            x: ((i%3) * 300) -300, z: radius, y: 300 - (((i/3)|0) * 300)
-        });
-        stk.material.color.setHex( hash2hex(facelet) );
-        scene.add( stk.mesh );
-
-        stk.mesh.rotation.x = Math.PI / 2;
-        return stk;
-    });
-
-    let R = rFace.map((facelet, i) => {
-        let stk = sticker({
-            x: radius, z: 300 - ((i%3) * 300), y: 300 - (((i/3)|0) * 300)
-        });
-        stk.material.color.setHex( hash2hex(facelet) );
-        scene.add( stk.mesh );
-
-        stk.mesh.rotation.z = Math.PI /2;
-        return stk;
-    });
-
-    let D = dFace.reverse().map((facelet, i) => {
-        let stk = sticker({
-            x: ((i%3) * 300) -300, z: 300 - (((i/3)|0) * 300), y: -radius
-        });
-        stk.material.color.setHex( hash2hex(facelet) );
-        scene.add( stk.mesh );
-
-        return stk;
-    });
-
-    let B = bFace.map((facelet, i) => {
-        let stk = sticker({
-            x: 300 - ((i%3) * 300), z: -radius, y: 300 - (((i/3)|0) * 300)
-        });
-        stk.material.color.setHex( hash2hex(facelet) );
-        scene.add( stk.mesh );
-
-        stk.mesh.rotation.x = Math.PI / 2;
-        return stk;
-    });
-
-    let L = lFace.map((facelet, i) => {
-        let stk = sticker({
-            x: -radius, z: ((i%3) * 300) -300, y: 300 - (((i/3)|0) * 300)
-        });
-        stk.material.color.setHex( hash2hex(facelet) );
-        scene.add( stk.mesh );
-
-        stk.mesh.rotation.z = Math.PI /2;
-        return stk;
-    });
+    let [U,F,R,D,B,L] = faces = [
+        face({
+            input: uFace, name: 'U',
+            x: (i) => ((i%3) * 300) -300,
+            y: () => radius,
+            z: (i) => (((i/3)|0) * 300) -300,
+            scene
+        }),
+        face({
+            input: fFace, name: 'F',
+            x: (i) => ((i%3) * 300) -300,
+            y: (i) => 300 - (((i/3)|0) * 300),
+            z: (i) => radius,
+            callback: (stk) => { stk.mesh.rotation.x = Math.PI / 2; },
+            scene
+        }),
+        face({
+            input: rFace, name: 'R',
+            x: (i) => radius,
+            y: (i) => 300 - (((i/3)|0) * 300),
+            z: (i) => 300 - ((i%3) * 300),
+            callback: (stk) => { stk.mesh.rotation.z = Math.PI /2; },
+            scene
+        }),
+        face({
+            input: dFace.reverse(), name: 'D',
+            x: (i) => ((i%3) * 300) -300,
+            y: (i) => -radius,
+            z: (i) => 300 - (((i/3)|0) * 300),
+            scene
+        }),
+        face({
+            input: bFace, name: 'B',
+            x: (i) => 300 - ((i%3) * 300),
+            y: (i) => 300 - (((i/3)|0) * 300),
+            z: (i) => -radius,
+            callback: (stk) => { stk.mesh.rotation.x = Math.PI / 2; },
+            scene
+        }),
+        face({
+            input: lFace, name: 'L',
+            x: (i) => -radius,
+            y: (i) => 300 - (((i/3)|0) * 300),
+            z: (i) => ((i%3) * 300) -300,
+            callback: (stk) => { stk.mesh.rotation.z = Math.PI /2; },
+            scene
+        })
+    ];
 
     // setup camera
 
@@ -109,8 +93,6 @@ export function init(node) {
     // append renderer to DOM
     
     node && node.appendChild( renderer.domElement );
-
-    let faces = [U,F,R,D,B,L];
 
     disposers = [
         (() => {

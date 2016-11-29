@@ -10,77 +10,33 @@ let Controls = function (camera, domElement, faces) {
     // "target" sets the location of focus, where the camera orbits around
     let target = new THREE.Vector3();
 
-    let changeEvent = { type: 'change' };
-    let startEvent = { type: 'start' };
-    let endEvent = { type: 'end' };
-
-    let EPS = 0.000001;
-
     // current position in spherical coordinates
     let spherical = new THREE.Spherical();
     let sphericalDelta = new THREE.Spherical();
 
-    let scale = 1;
     let zoomChanged = false;
 
     let rotateStart = new THREE.Vector2();
     let rotateEnd = new THREE.Vector2();
     let rotateDelta = new THREE.Vector2();
 
-    // How far you can dolly in and out ( PerspectiveCamera only )
-    this.minDistance = 0;
-    this.maxDistance = Infinity;
-
-    // How far you can zoom in and out ( OrthographicCamera only )
-    this.minZoom = 0;
-    this.maxZoom = Infinity;
-
-    // How far you can orbit vertically, upper and lower limits.
-    // Range is 0 to Math.PI radians.
-    this.minPolarAngle = 0; // radians
-    this.maxPolarAngle = Math.PI; // radians
-
-    // How far you can orbit horizontally, upper and lower limits.
-    // If set, must be a sub-interval of the interval [ - Math.PI, Math.PI ].
-    this.minAzimuthAngle = - Infinity; // radians
-    this.maxAzimuthAngle = Infinity; // radian
-
-    this.rotateSpeed = 1.0;
-
     // for reset
-    this.target0 = target.clone();
-    this.position0 =camera.position.clone();
-    this.zoom0 =camera.zoom;
+    let target0 = target.clone();
+    let position0 =camera.position.clone();
+    let zoom0 =camera.zoom;
 
-    //
-    // public methods
-    //
+    function reset () {
 
-    this.getPolarAngle = function () {
-
-        return spherical.phi;
-
-    };
-
-    this.getAzimuthalAngle = function () {
-
-        return spherical.theta;
-
-    };
-
-    this.reset = function () {
-
-        target.copy( this.target0 );
-        camera.position.copy( scope.position0 );
-        camera.zoom = scope.zoom0;
+        target.copy( target0 );
+        camera.position.copy( position0 );
+        camera.zoom = zoom0;
 
         camera.updateProjectionMatrix();
-        scope.dispatchEvent( changeEvent );
+        scope.dispatchEvent({ type: 'change' });
 
-    };
+    }
 
-    // this method is exposed, but perhaps it would be better if we can make it private...
-    this.update = function() {
+    let update = (() => {
 
         let offset = new THREE.Vector3();
 
@@ -108,73 +64,30 @@ let Controls = function (camera, domElement, faces) {
                 spherical.phi += sphericalDelta.phi;
             }
             else {
-                scope.reset();
+                reset();
                 spherical.theta = config.display.spherical.theta;
                 spherical.phi = config.display.spherical.phi;
             }
 
-            // restrict theta to be between desired limits
-            spherical.theta = Math.max( scope.minAzimuthAngle, Math.min( scope.maxAzimuthAngle, spherical.theta ) );
-
-            // restrict phi to be between desired limits
-            spherical.phi = Math.max( scope.minPolarAngle, Math.min( scope.maxPolarAngle, spherical.phi ) );
-
             spherical.makeSafe();
 
-
-            spherical.radius *= scale;
-
-            // restrict radius to be between desired limits
-            spherical.radius = Math.max( scope.minDistance, Math.min( scope.maxDistance, spherical.radius ) );
-
-
-            offset.setFromSpherical( spherical );
+            offset.setFromSpherical(spherical);
 
             // rotate offset back to "camera-up-vector-is-up" space
-            offset.applyQuaternion( quatInverse );
+            offset.applyQuaternion(quatInverse);
 
-            position.copy( target ).add( offset );
+            position.copy(target).add(offset);
 
-            camera.lookAt( target );
-
+            camera.lookAt(target);
 
             sphericalDelta.set( 0, 0, 0 );
-
-            scale = 1;
-
-
-            // update condition is:
-            // min(camera displacement, camera rotation in radians)^2 > EPS
-            // using small-angle approximation cos(x/2) = 1 - x^2 / 8
-
-            if ( zoomChanged ||
-                lastPosition.distanceToSquared( camera.position ) > EPS ||
-                8 * ( 1 - lastQuaternion.dot( camera.quaternion ) ) > EPS ) {
-
-                scope.dispatchEvent( changeEvent );
-
-                lastPosition.copy( camera.position );
-                lastQuaternion.copy( camera.quaternion );
-                zoomChanged = false;
-
-                return true;
-
-            }
 
             return false;
 
         };
 
-    }();
+    })();
 
-    this.dispose = function() {
-
-        domElement.removeEventListener( 'mousedown', onMouseDown, false );
-        document.removeEventListener( 'mousemove', onMouseMove, false );
-        document.removeEventListener( 'mouseup', onMouseUp, false );
-        mobXDisposer();
-
-    };
 
     //
     // internals
@@ -208,14 +121,14 @@ let Controls = function (camera, domElement, faces) {
         let element = domElement === document ? domElement.body : domElement;
 
         // rotating across whole screen goes 360 degrees around
-        rotateLeft( 2 * Math.PI * rotateDelta.x / element.clientWidth * scope.rotateSpeed );
+        rotateLeft( 2 * Math.PI * rotateDelta.x / element.clientWidth );
 
         // rotating up and down along whole screen attempts to go 360, but limited to 180
-        rotateUp( 2 * Math.PI * rotateDelta.y / element.clientHeight * scope.rotateSpeed );
+        rotateUp( 2 * Math.PI * rotateDelta.y / element.clientHeight );
 
         rotateStart.copy( rotateEnd );
 
-        scope.update();
+        update();
 
     }
 
@@ -228,7 +141,7 @@ let Controls = function (camera, domElement, faces) {
         document.addEventListener( 'mousemove', onMouseMove, false );
         document.addEventListener( 'mouseup', onMouseUp, false );
 
-        scope.dispatchEvent( startEvent );
+        scope.dispatchEvent({ type: 'start' });
         config.display.spherical.mutating = true;
     }
 
@@ -247,7 +160,7 @@ let Controls = function (camera, domElement, faces) {
         document.removeEventListener( 'mousemove', onMouseMove, false );
         document.removeEventListener( 'mouseup', onMouseUp, false );
 
-        scope.dispatchEvent( endEvent );
+        scope.dispatchEvent({ type: 'end' });
         config.display.spherical.mutating = false;
     }
 
@@ -257,10 +170,19 @@ let Controls = function (camera, domElement, faces) {
     mobXDisposer = autorun(() => {
 
         if (config.display.spherical.mutating == false) {
-            this.update();
+            update();
         }
 
     });
+
+    this.dispose = function() {
+
+        domElement.removeEventListener( 'mousedown', onMouseDown, false );
+        document.removeEventListener( 'mousemove', onMouseMove, false );
+        document.removeEventListener( 'mouseup', onMouseUp, false );
+
+        mobXDisposer();
+    };
 
     // facelet clicking
 
