@@ -36,7 +36,7 @@ class Timer extends React.Component {
                 {cube.timer}
             </div>}
 
-            <Select
+            {false && <Select
                 value={cube.scrambler}
                 options={[
                     ['Random','Random'],
@@ -44,7 +44,7 @@ class Timer extends React.Component {
                     ['LSLL','LSLL'],
                 ]}
                 editable={false}
-                onSelect={this.setScrambler}/>
+                onSelect={this.setScrambler}/>}
         </div>;
     }
 }
