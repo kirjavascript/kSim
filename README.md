@@ -1,6 +1,13 @@
-    88  dP .dP"Y8 88 8b    d8     oP"Yb. 
-    88odP  `Ybo." 88 88b  d88     "' dP' 
-    88"Yb  o.`Y8b 88 88YbdP88       dP'  
-    88  Yb 8bodP' 88 88 YY 88     .d8888 
 
-kSim 2 is a rubik's cube simulator and general toolkit
+
+    888       .d8888b.  d8b                .d8888b.  
+    888      d88P  Y88b Y8P               d88P  Y88b 
+    888      Y88b.                               888 
+    888  888  "Y888b.   888 88888b.d88b.       .d88P 
+    888 .88P     "Y88b. 888 888 "888 "88b  .od888P"  
+    888888K        "888 888 888  888  888 d88P"      
+    888 "88b Y88b  d88P 888 888  888  888 888"       
+    888  888  "Y8888P"  888 888  888  888 888888888  
+
+
+kSim 2 is a rubik's cube simulator and toolkit

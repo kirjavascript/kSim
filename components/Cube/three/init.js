@@ -95,26 +95,6 @@ export function init(node) {
     node && node.appendChild( renderer.domElement );
 
     disposers = [
-        (() => {
-
-            let loop = () => {
-                loop && requestAnimationFrame(loop);        
-                renderer.render(scene, camera);
-            };
-
-            loop();
-
-            let onResize = resize(camera, renderer);
-            window.addEventListener('resize', onResize);
-
-            let controls = new Controls(camera, renderer.domElement, faces);
-
-            return () => {
-                window.removeEventListener('resize', onResize);
-                controls.dispose();
-                loop = null;
-            };
-        })(),
         autorun(() => {
             // update colours
 
@@ -168,6 +148,26 @@ export function init(node) {
 
             camera.fov = 85/config.scale;
             camera.updateProjectionMatrix();
-        })
+        }),
+        (() => {
+
+            let onResize = resize(camera, renderer);
+            window.addEventListener('resize', onResize);
+
+            let controls = new Controls(camera, renderer.domElement, faces);
+
+            let loop = () => {
+                loop && requestAnimationFrame(loop);        
+                renderer.render(scene, camera);
+            };
+
+            loop();
+
+            return () => {
+                window.removeEventListener('resize', onResize);
+                controls.dispose();
+                loop = null;
+            };
+        })(),
     ];
 }

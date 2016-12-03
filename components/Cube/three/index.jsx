@@ -1,3 +1,4 @@
+import { Motion, spring } from 'react-motion';
 import { init } from './init';
 
 export default class extends React.Component {
