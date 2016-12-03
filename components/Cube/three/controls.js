@@ -1,5 +1,6 @@
 import { autorun } from 'mobx';
 import config from '../../../state/config';
+import cube from '../../../state/cube';
 
 let Controls = function (camera, domElement, faces) {
 
@@ -19,22 +20,6 @@ let Controls = function (camera, domElement, faces) {
     let rotateStart = new THREE.Vector2();
     let rotateEnd = new THREE.Vector2();
     let rotateDelta = new THREE.Vector2();
-
-    // for reset
-    let target0 = target.clone();
-    let position0 =camera.position.clone();
-    let zoom0 =camera.zoom;
-
-    function reset () {
-
-        target.copy( target0 );
-        camera.position.copy( position0 );
-        camera.zoom = zoom0;
-
-        camera.updateProjectionMatrix();
-        scope.dispatchEvent({ type: 'change' });
-
-    }
 
     let update = (() => {
 
@@ -64,7 +49,6 @@ let Controls = function (camera, domElement, faces) {
                 spherical.phi += sphericalDelta.phi;
             }
             else {
-                reset();
                 spherical.theta = config.display.spherical.theta;
                 spherical.phi = config.display.spherical.phi;
             }
@@ -87,11 +71,6 @@ let Controls = function (camera, domElement, faces) {
         };
 
     })();
-
-
-    //
-    // internals
-    //
 
     function rotateLeft( angle ) {
 
@@ -201,26 +180,13 @@ let Controls = function (camera, domElement, faces) {
         let intersects = raycaster.intersectObjects( [].concat(...faces).map((d) => d.mesh) );
 
         if ( intersects.length > 0 ) {
+            let { face, index } = intersects[0].object.__data__;
 
-            // intersects[ 0 ].object.material.color.setHex( Math.random() * 0xffffff );
-
-            // let particle = new THREE.Sprite( particleMaterial );
-            // particle.position.copy( intersects[ 0 ].point );
-            // particle.scale.x = particle.scale.y = 16;
-            // scene.add( particle );
-
-            console.log(intersects);
-
+            // cube.setFace({
+            //     face, index, value: 6 
+            // });
         }
 
-        /*
-        // Parse all the faces
-        for ( var i in intersects ) {
-
-            intersects[ i ].face.material[ 0 ].color.setHex( Math.random() * 0xffffff | 0x80000000 );
-
-        }
-        */
     }, false );
 
 };

@@ -5,7 +5,7 @@ import storage from './storage';
 import scramble from '../lib/scramble';
 import acube from './acubeState';
 import { moveToObject, doMove, solved } from './moves';
-import { uFace, rFace, fFace, dFace, lFace, bFace } from './faces';
+import { setFace, getFace } from './faces';
 let { centres, edges, corners } = solved;
 
 class Cube {
@@ -26,12 +26,14 @@ class Cube {
 
     // faces
 
-    @computed get uFace() { return uFace(this); }
-    @computed get rFace() { return rFace(this); }
-    @computed get fFace() { return fFace(this); }
-    @computed get dFace() { return dFace(this); }
-    @computed get lFace() { return lFace(this); }
-    @computed get bFace() { return bFace(this); }
+    @computed get uFace() { return getFace(this, 'U', true); }
+    @computed get rFace() { return getFace(this, 'R', true); }
+    @computed get fFace() { return getFace(this, 'F', true); }
+    @computed get dFace() { return getFace(this, 'D', true); }
+    @computed get lFace() { return getFace(this, 'L', true); }
+    @computed get bFace() { return getFace(this, 'B', true); }
+
+    @action setFace(obj) { return setFace(this, obj); }
 
     // acube.js
 
@@ -182,7 +184,7 @@ if (cube.state == 'running' && !cube.timerLoop) {
 }
 
 // attach keyboard events
-keyboard(cube);
+keyboard(cube); 
 
 if (__DEV__) {
     window.cube = cube;
