@@ -18,6 +18,7 @@ export default function(cube) {
             cube.doMoves(config.keymap[e.key]);
         }
         else if (e.key == ' ') {
+            e.preventDefault();
             cube.spacebar();
         }
         else if (e.key == 'Escape') {

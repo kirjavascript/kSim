@@ -6,9 +6,19 @@ import styles from './styles.scss';
 
 @observer
 export default class extends React.Component {
+
+    constructor(props) {
+        super(props);
+
+        this.resetTimes = () => {
+            cube.rawTimes.replace([]);
+            cube.reset();
+        };
+    }
+
     render() {
         let { times } = cube;
-        let { best5, current5, best12, current12, best100, current100 } = times;
+        let { list, best5, current5, best12, current12, best100, current100 } = times;
 
         return !! cube.rawTimes.length && <div>
 
@@ -28,18 +38,26 @@ export default class extends React.Component {
             </div>}
 
             <div className={styles.times}>
-                {times.list.map((time, i) => {
+                <button
+                    onClick={this.resetTimes}
+                    className={styles.clear}>
+                    reset
+                </button>
+                {list.map((time, i) => {
                     let { best, best5, best5max, best5min, value } = time;
                     return <span key={i} style={{
-                        color: best ? yellow : 
-                            best5min ? green : 
-                            best5max ? red : null,
-                        // fontSize: best5 ? 16 : 14,
                         fontWeight: best5 ? 'bold' : 'normal',
+                        color: do { if (best) yellow;
+                            else if (best5min) green;
+                            else if (best5max) red; },
                     }}> {value} </span>;
                 })}
             </div>
 
+            
+
+            
         </div>;
     }
 }
+

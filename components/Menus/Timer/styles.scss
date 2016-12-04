@@ -18,4 +18,15 @@
 .times {
     padding: 5px;
     border: 1px solid $lightgrey;
+    position: relative;
+}
+
+.clear {
+    float: right;
+    // margin: 5px;
+    transform: translateY(-100%);
+    top: -5px;
+    right: -1px;
+    font-size: 12px;
+    position: absolute;
 }

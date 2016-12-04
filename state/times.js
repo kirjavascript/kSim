@@ -38,10 +38,10 @@ export function parseTimes(rawTimes) {
         }
         if (best5 && i >= best5.index && i < best5.index+5) {
             obj.best5 = true;
-            if (i == best5.index + best5.maxIndex) {
+            if (i == best5.maxIndex) {
                 obj.best5max = true;
             }
-            else if (i == best5.index + best5.minIndex) {
+            else if (i == best5.minIndex) {
                 obj.best5min = true;
             }
         }
@@ -81,7 +81,9 @@ function bestN(n, times) {
 
     return {
         time: timeStamp(min),
-        index, maxIndex, minIndex
+        index, 
+        maxIndex: maxIndex + index, 
+        minIndex: minIndex + index
     };
 
 }

@@ -36,7 +36,7 @@ $width: 25%;
     text-align: center;
     padding: 5px;
     margin-bottom: 10px;
-    cursor: pointer;
+    cursor: default;
 }
 
 
@@ -115,7 +115,6 @@ $width: 25%;
             width: 15px;
             height: 10px;
             border-radius: 5px;
-            cursor: pointer;
         }
 
         input::-moz-range-track {
@@ -130,7 +129,6 @@ $width: 25%;
             width: 15px;
             height: 10px;
             border-radius: 5px;
-            cursor: pointer;
         }
     }
     
