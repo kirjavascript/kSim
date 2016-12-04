@@ -3,6 +3,7 @@ import { observer } from 'mobx-react';
 import cube from '../../../state/cube';
 import styles from './styles.scss';
 import Select from '../select.jsx';
+import Times from './times.jsx';
 
 @observer
 class Timer extends React.Component {
@@ -24,19 +25,19 @@ class Timer extends React.Component {
 
         return <div>
 
-            <div>
+            <div className={styles.info}>
                 <strong>Status:</strong> {cube.state}
             </div>
 
-            {cube.scramble && <div>
+            {cube.scramble && <div className={styles.info}>
                 <strong>Scramble:</strong> {cube.scramble}
             </div>}
 
             {cube.timer != 0 && <div className={styles.timer}>
                 {cube.timer}
             </div>}
-
-            <pre>{JSON.stringify(cube.times,null,4)}</pre>
+            
+            <Times/>
 
             {false && <Select
                 value={cube.scrambler}

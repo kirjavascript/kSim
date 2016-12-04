@@ -18,16 +18,45 @@ export function parseTimes(rawTimes) {
 
     let times = rawTimes.map((d) => d.time ? d.time : Infinity);
 
+    let bestIndex = times.indexOf(Math.min(...times));
+    let worstIndex = times.lastIndexOf(Math.max(...times));
+    let best5 = bestN(5, times);
+    let current5 = currentN(5, times);
+    let best12 = bestN(12, times);
+    let current12 = currentN(12, times);
+    let best100 = bestN(100, times);
+    let current100 = currentN(100, times);
+
+    let list = times.map((time, i) => {
+        let obj = {
+            value: timeStamp(time)
+        };
+
+        // apply time attributes
+        if (i == bestIndex) {
+            obj.best = true;
+        }
+        if (best5 && i >= best5.index && i < best5.index+5) {
+            obj.best5 = true;
+            if (i == best5.index + best5.maxIndex) {
+                obj.best5max = true;
+            }
+            else if (i == best5.index + best5.minIndex) {
+                obj.best5min = true;
+            }
+        }
+
+        return obj;
+    });
+
     return {
-        list: times.map((d) => timeStamp(d)),
-        bestIndex: times.indexOf(Math.min(...times)),
-        worstIndex: times.lastIndexOf(Math.max(...times)),
-        best5: bestN(5, times),
-        current5: currentN(5, times),
-        best12: bestN(12, times),
-        current12: currentN(12, times),
-        best100: bestN(100, times),
-        current100: currentN(100, times),
+        best5,
+        current5,
+        best12,
+        current12,
+        best100,
+        current100,
+        list
     };
 }
 
@@ -44,12 +73,15 @@ function bestN(n, times) {
 
     // calculate averages
     arr = arr.map(getAvg);
+    let averages = arr.map((d)=>d.average);
 
-    let min = Math.min(...arr);
+    let min = Math.min(...averages);
+    let index = averages.indexOf(min);
+    let { maxIndex, minIndex } = arr[index];
 
     return {
         time: timeStamp(min),
-        index: arr.indexOf(min)
+        index, maxIndex, minIndex
     };
 
 }
@@ -59,19 +91,19 @@ function currentN(n, times) {
         return null;
     }
     else {
-        return timeStamp(getAvg([...times].splice(times.length-n, n)));
+        return timeStamp(getAvg([...times].splice(times.length-n, n)).average);
     }
 }
 
 function getAvg(times) {
-    let max = Math.max(...times);
-    let min = Math.min(...times);
+    let maxIndex = times.indexOf(Math.max(...times));
+    let minIndex = times.indexOf(Math.min(...times));
 
-    times.splice(times.indexOf(max), 1);
-    times.splice(times.indexOf(min), 1);
+    times.splice(maxIndex, 1);
+    times.splice(minIndex, 1);
 
-    return times.reduce((a,b) => a+b) / times.length;
+    return {
+        average: times.reduce((a,b) => a+b) / times.length,
+        maxIndex, minIndex
+    };
 }
-
-//yellow, green, red
-// grey background for best 5

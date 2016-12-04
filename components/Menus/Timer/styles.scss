@@ -1,6 +1,21 @@
+@import '../../variables.scss';
+
 .timer {
     text-align: center;
     font-size: 42px;
-    padding: 10px;
+    padding-bottom: 10px;
     font-weight: 900;
+}
+
+.info {
+    padding-bottom: 10px;
+
+    &:last-of-type {
+        padding-bottom: 0;
+    }
+}
+
+.times {
+    padding: 5px;
+    border: 1px solid $lightgrey;
 }
