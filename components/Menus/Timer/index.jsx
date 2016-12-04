@@ -36,6 +36,8 @@ class Timer extends React.Component {
                 {cube.timer}
             </div>}
 
+            <pre>{JSON.stringify(cube.times,null,4)}</pre>
+
             {false && <Select
                 value={cube.scrambler}
                 options={[

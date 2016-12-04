@@ -6,6 +6,7 @@ import scramble from '../lib/scramble';
 import acube from './acubeState';
 import { moveToObject, doMove, solved } from './moves';
 import { setFace, getFace } from './faces';
+import { timeStamp, parseTimes } from './times';
 let { centres, edges, corners } = solved;
 
 class Cube {
@@ -62,7 +63,7 @@ class Cube {
             });
     }
 
-    // history
+    // move history
 
     @observable history = [];
     @observable historyMove = 0;
@@ -81,7 +82,10 @@ class Cube {
     @observable state = 'idle'; // idle, ready, running
     @observable scramble = '';
     @observable scrambler = 'Random';
-    @observable timer = 0;
+    @observable rawTimer = 0;
+    @observable rawTimes = [];
+    @computed get times() { return parseTimes(this.rawTimes); }
+    @computed get timer() { return timeStamp(this.rawTimer); }
 
     @action startTimer() {
         this.state = 'running';
@@ -89,18 +93,7 @@ class Cube {
         this.timerLoop = () => {
             if (this.timerLoop) {
                 requestAnimationFrame(this.timerLoop);
-                let diff = performance.now() - startTime;
-                let seconds = (diff/1000).toFixed(2);
-                let minutes = (seconds/60)|0;
-                if (minutes) {
-                    seconds = (seconds%60).toFixed(2);
-                    seconds = seconds < 10 ? '0' + seconds : seconds;
-                    this.timer = `${minutes}:${seconds}`;
-                }
-                else {
-                    this.timer = seconds;
-                }
-                // return diff
+                this.rawTimer = performance.now() - startTime;
             }
         };
         this.timerLoop();
@@ -109,27 +102,31 @@ class Cube {
     @action stopTimer(solved) {
         this.timerLoop = null;
         this.state = 'idle';
+
         if (!solved) {
-            this.timer = 'DNF';
+            this.rawTimer = null;
         }
-        // add time (get diff)
+
+        let { scramble, history } = this;
+
+        this.rawTimes.push({
+            time: this.rawTimer, scramble, history
+        });
     }
 
     @action newScramble() {
         this.reset();
         this.scramble = scramble(this.scrambler);
         this.doMoves(this.scramble, true);
-        this.timer = 0;
+        this.rawTimer = 0;
         this.state = 'ready';
     }
 
     @computed get solved() {
-        let grey = this.colours[this.colours.length-1];
-
-        return [...'urbldf']
+        return [...'URBLDF']
             .map((face) => (
-                this[`${face}Face`]
-                    .filter((d) => d != grey)
+                getFace(this, face)
+                    .filter((d) => d != 6)
                     .filter((d,i,a)=>a.indexOf(d)==i)
                     .length
             ))
@@ -142,7 +139,7 @@ class Cube {
             this.stopTimer(false);
         }
         else if (this.state == 'idle') {
-            this.timer = 0;
+            this.rawTimer = 0;
         }
     }
 
