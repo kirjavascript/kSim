@@ -193,10 +193,6 @@ function moveToObject(move) {
     };
 }
 
-function cloneArray(arr) {
-    return arr.map((d) => [...d]);
-}
-
 export {
     doMove,
     moveToObject,

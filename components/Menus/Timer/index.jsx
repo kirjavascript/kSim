@@ -14,11 +14,6 @@ class Timer extends React.Component {
 
     constructor(props) {
         super(props);
-
-        this.setScrambler = (value) => {
-            cube.scrambler = value;
-        };
-
     }
 
     render() {
@@ -38,16 +33,7 @@ class Timer extends React.Component {
             </div>}
             
             <Times/>
-
-            {false && <Select
-                value={cube.scrambler}
-                options={[
-                    ['Random','Random'],
-                    ['LL','LL'],
-                    ['LSLL','LSLL'],
-                ]}
-                editable={false}
-                onSelect={this.setScrambler}/>}
+            
         </div>;
     }
 }

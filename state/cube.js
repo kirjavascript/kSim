@@ -1,4 +1,4 @@
-import { action, computed, observable, autorun } from 'mobx';
+import { action, computed, observable, autorun, toJS } from 'mobx';
 import SASSVars from '!!sass-variables!../components/variables.scss';
 import keyboard from './keyboard';
 import storage from './storage';
@@ -14,6 +14,14 @@ class Cube {
     @observable centres = centres;
     @observable edges = edges;
     @observable corners = corners;
+
+    @computed get position() {
+        return {
+            centres: toJS(this.centres),
+            edges: toJS(this.edges),
+            corners: toJS(this.corners),
+        };
+    }
 
     @observable colours = [
         SASSVars.white,

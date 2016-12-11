@@ -12,4 +12,4 @@
 
 kSim 2 is a rubik's cube simulator and toolkit
 
-special thanks; lucas garron, josef jelinek, shuang chen
+special thanks; lucas garron, josef jelinek, shuang chen, justin jaffray, michael gottlieb

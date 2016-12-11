@@ -53,9 +53,6 @@ export default class extends React.Component {
                     }}> {value} </span>;
                 })}
             </div>
-
-            
-
             
         </div>;
     }
