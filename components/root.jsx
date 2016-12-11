@@ -2,7 +2,7 @@ import { render } from 'react-dom';
 import { observer } from 'mobx-react';
 
 import styles from './root.scss';
-import cube from '../state/cube';
+// import '../solver/';
 
 import CubeUI from './Cube/index.jsx';
 import Menus from './Menus/index.jsx';
@@ -24,12 +24,7 @@ class Root extends React.Component {
 
             <Menus />
 
-            <CubeUI />
-
-            {false && __DEV__ && <pre className={styles.debug}>
-                {JSON.stringify(cube.acube,null,4)}
-            </pre>}
-            
+            <CubeUI />            
 
         </div>;
     }

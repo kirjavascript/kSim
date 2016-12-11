@@ -1,5 +1,5 @@
-import { solved, doMove } from './moves';
-import cube from './cube';
+// import { solved, doMove } from '../state/moves';
+// import cube from '../state/cube';
 
 /*
     to remove trivial simplifications;
@@ -31,13 +31,13 @@ Object
         allowed[move] = [].concat(...moves);
     });
 
-function tree(moves=[], depth=0) {
+~function tree(moves=[], depth=0) {
 
-    console.log(formatMoves(moves));
+    postMessage(formatMoves(moves));
 
     // TODO: check solved
 
-    if (depth == 4) {
+    if (depth == 5) {
         return;
     }
 
@@ -48,7 +48,7 @@ function tree(moves=[], depth=0) {
         tree([...moves, allowedMoves[i]], depth + 1);
     }
 
-}
+} ();
 
 function formatMoves(moves) {
     return moves.map((obj) => {
@@ -56,5 +56,3 @@ function formatMoves(moves) {
         return `${move}${order==2?2:order==-1?'\'':''}`;
     }).join` `;
 }
-
-window.tree = tree;
