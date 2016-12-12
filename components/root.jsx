@@ -2,7 +2,7 @@ import { render } from 'react-dom';
 import { observer } from 'mobx-react';
 
 import styles from './root.scss';
-// import '../solver/';
+import '../solver/';
 
 import CubeUI from './Cube/index.jsx';
 import Menus from './Menus/index.jsx';

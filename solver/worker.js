@@ -1,5 +1,5 @@
-// import { solved, doMove } from '../state/moves';
-// import cube from '../state/cube';
+import { solved, doMove } from '../state/moves';
+let { centres, edges, corners } = solved;
 
 /*
     to remove trivial simplifications;
@@ -17,6 +17,8 @@ let allowed = {
     B: 'URDL'
 };
 
+let position = {'centres':[0,1,2,3,4,5,6],'edges':[[0,2],[3,2],[0,3],[0,4],[1,2],[0,1],[3,4],[1,4],[5,1],[5,2],[5,3],[5,4]],'corners':[[4,1,0],[3,2,5],[0,3,4],[0,1,2],[5,2,1],[2,3,0],[5,4,3],[5,1,4]]};
+
 // expand allowed moves
 Object
     .keys(allowed)
@@ -33,11 +35,11 @@ Object
 
 ~function tree(moves=[], depth=0) {
 
-    postMessage(formatMoves(moves));
+    // postMessage(formatMoves(moves));
 
     // TODO: check solved
 
-    if (depth == 5) {
+    if (depth == 4) {
         return;
     }
 

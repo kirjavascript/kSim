@@ -40,10 +40,10 @@
     "svg-url-loader": "^1.1.0",
     "svgo-loader": "^1.1.0",
     "webpack": "2.1.0-beta.25",
-    "webpack-dev-server": "2.1.0-beta.10",
-    "worker-loader": "^0.7.1"
+    "webpack-dev-server": "2.1.0-beta.10"
   },
   "dependencies": {
-    "three": "^0.82.1"
+    "three": "^0.82.1",
+    "worker-loader": "^0.7.1"
   }
 }
