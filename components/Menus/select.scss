@@ -1,70 +1,51 @@
 @import '../variables.scss';
 
-$border: 1px solid $lightgrey;
-
-$height: 26px;
-
 .wrapper {
     position: relative;
-    min-height: $height;
+    min-height: 28px;
 
-    select, input {
-        @extend .cell;
-    }
-
-    .select {
+    select {
         -moz-appearance:none;
         -webkit-appearance: none;
         &:-ms-expand {
             display: none;
-        } 
+        }
+        &:-moz-focusring {
+            color: transparent;
+            text-shadow: 0 0 0 #000;
+        }
+
+        outline: none;
+        height: 28px;
+        border: 1px solid $white;
+        width: 100%;
+        background-color: $white;
+        color: $grey;
+        padding: 2px 5px;
+
+
+
+        option {
+            padding: 8px 10px; 
+            outline: none;
+            border: none;
+            &:hover {
+                background-color: $green;
+            }
+        }
+
     }
 }
 
-.cell {
-    // width: 100%;
-    height: $height;
-    border: $border;
-    background-color: $white;
-    color: $grey;
-    cursor: default;
-    line-height: $height;
-    padding-left: 5px;
-    width: calc(100% - 6px);
-}
-
-.cell-noselect {
-    @extend .cell;
-    @extend .noselect;
-}
-
-.header {
-    @extend .cell;
-    position: absolute;
-    left: 0;
-}
-
-.header-input {
-    @extend .header;
-    cursor: auto;
-}
-.header-div {
-    @extend .header;
-    @extend .noselect;
-}
-
-.placeholder {
-    color: #888;
-}
 
 .arrow {
-    width: $height;
-    height: $height;
+    width: 28px;
+    height: 28px;
     background-color: $lightgrey;
-    border: $border;
+    border: 1px solid $lightgrey;
     position: absolute;
-    right: 0px;
-    top: 0px;
+    right: 0;
+    top: 0;
     cursor: default;
     text-align: center;
     z-index: 14;
@@ -73,28 +54,6 @@ $height: 26px;
         position: absolute;
         top: 5px;
         right: 5px;
-    } 
-}
-
-.item {
-    @extend .cell-noselect;
-    border-top: none;
-    border-bottom: none;
-    border-left: $border;
-    border-right: $border;
-    position: absolute;
-    height: 30px;
-    line-height: 30px;
-    top: 0;
-    left: 0;
-    &:last-of-type {
-        border-bottom: $border;
     }
-    &:hover {
-        background-color: $green;
-    }
-}
-
-.noselect {
-    user-select: none;
+    pointer-events: none;
 }

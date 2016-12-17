@@ -6,7 +6,7 @@ import { checkSolved } from './check-solved';
 // split permutation/orientation
 
 // TypedArrays
-// Symbol.for
+// String()
 
 ~function search(maxDepth) {
 

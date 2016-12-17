@@ -1,4 +1,4 @@
-import { render } from 'react-dom';
+import { render, findDOMNode } from 'react-dom';
 import { observer } from 'mobx-react';
 
 import styles from './root.scss';
@@ -18,15 +18,15 @@ class Root extends React.Component {
 
         let { cube } = this.props;
 
-        return <div>
+        return <main>
 
             <h1>kSim</h1>
 
             <Menus />
 
-            <CubeUI />            
+            <CubeUI />
 
-        </div>;
+        </main>;
     }
 
 }
@@ -34,5 +34,6 @@ class Root extends React.Component {
 document.addEventListener('DOMContentLoaded', () => {
     let node = document.body.appendChild(document.createElement('section'));
     render(<Root cube={cube}/>, node);
+    node.firstChild.removeAttribute('data-reactroot');
+    document.body.replaceChild(node.firstChild, node);
 });
-
