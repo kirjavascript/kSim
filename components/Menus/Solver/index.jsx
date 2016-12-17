@@ -64,7 +64,6 @@ class Solver extends React.Component {
                             ['QTM','QTM'],
                             ['STM','STM'],
                         ]}
-                        editable={false}
                         onSelect={this.onSelect}/>
 
                 </div>

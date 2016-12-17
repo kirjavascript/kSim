@@ -14,15 +14,15 @@ class Select extends React.Component {
 
         let { value, options, ...attrs} = this.props;
 
-        return <div className={styles.wrapper}>
+        return <div className={styles.wrapper} {...attrs}>
             <div className={styles.arrow}>
                 <DownIcon/>
             </div>
 
             <select
                 value={value}
-                ref="input"
-                onChange={this.nativeInput}>
+                onChange={this.nativeInput}
+                onKeyPress={() => console.log('asd')}>
                 {options
                     .map((option) => ({value:option[0],text:option[1]}))
                     .map((option,i) => (

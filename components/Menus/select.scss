@@ -5,32 +5,34 @@
     min-height: 28px;
 
     select {
+        // hide arrow
         -moz-appearance:none;
         -webkit-appearance: none;
         &:-ms-expand {
             display: none;
         }
+        // hide focus bar
         &:-moz-focusring {
             color: transparent;
             text-shadow: 0 0 0 #000;
         }
 
         outline: none;
-        height: 28px;
+        height: 27px;
         border: 1px solid $white;
         width: 100%;
         background-color: $white;
         color: $grey;
-        padding: 2px 5px;
-
-
+        padding: 0px 5px;
 
         option {
             padding: 8px 10px; 
             outline: none;
             border: none;
             &:hover {
-                background-color: $green;
+                // highlight colour
+                box-shadow: 0 0 10px 100px $green inset;
+                transition: box-shadow .1s ease-in-out;
             }
         }
 
@@ -39,8 +41,8 @@
 
 
 .arrow {
-    width: 28px;
-    height: 28px;
+    width: 27px;
+    height: 27px;
     background-color: $lightgrey;
     border: 1px solid $lightgrey;
     position: absolute;

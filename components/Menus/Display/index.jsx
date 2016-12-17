@@ -57,7 +57,6 @@ class Display extends React.Component {
                         ['box','Flat'],
                         ['3','Three'],
                     ]}
-                    editable={false}
                     onSelect={this.onDisplay}/>
 
             </div>

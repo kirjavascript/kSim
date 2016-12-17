@@ -20,6 +20,7 @@ export default function(cube) {
         else if (e.key == ' ') {
             e.preventDefault();
             cube.spacebar();
+            return false;
         }
         else if (e.key == 'Escape') {
             cube.escape();
