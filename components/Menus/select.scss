@@ -4,7 +4,7 @@
     position: relative;
     min-height: 28px;
 
-    select {
+    select{
         // hide arrow
         -moz-appearance:none;
         -webkit-appearance: none;
@@ -36,6 +36,15 @@
             }
         }
 
+    }
+
+    .input {
+        @extend select;
+        padding: 5px 9px;
+        font-weight: 500;
+        max-height: 15px;
+        width: calc(100% - 20px);
+        display: inline-block;
     }
 }
 

@@ -168,7 +168,7 @@ class Cube {
         this.corners.replace(corners);
     }
 
-    @action reset() {
+    @action reset(full = true) {
         this.softReset();
         this.history.replace([]);
         this.historyMove = 0;
