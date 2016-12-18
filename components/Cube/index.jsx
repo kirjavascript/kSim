@@ -14,10 +14,10 @@ class CubeUI extends React.Component {
 
     render() {
         return do {
-            if (config.display.type == '3') {
+            if (config.display.type == 'three') {
                 <Three/>;
             }
-            else if (config.display.type == 'box') {
+            else if (config.display.type == 'flat') {
                 <Box/>;
             }
             else {

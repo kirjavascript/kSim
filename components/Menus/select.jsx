@@ -28,16 +28,18 @@ class Select extends React.Component {
                 <DownIcon/>
             </div>
 
-            {!focus && <div className={styles.input} onMouseEnter={this.onFocus}>
-                {value}
-            </div>}
+            {!focus && <input
+                value={options[value]}
+                className={styles.input}
+                readOnly
+                onMouseEnter={this.onFocus}/>}
 
             {focus && <select
                 value={value}
                 onMouseLeave={this.onBlur}
                 onChange={this.nativeInput}>
-                {options
-                    .map((option) => ({value:option[0],text:option[1]}))
+                {Object.keys(options)
+                    .map((value) => ({value, text: options[value]}))
                     .map((option,i) => (
                     <option key={i} value={option.value}>
                         {option.text}

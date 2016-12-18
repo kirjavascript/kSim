@@ -36,20 +36,20 @@ class Timer extends React.Component {
 
             <Select
                 value={cube.scrambler}
-                options={[
-                    ['Random','Random State'],
-                    ['LL','LL'],
-                    ['CLL','CLL'],
-                    ['ELL','ELL'],
-                    ['OLL','OLL'],
-                    ['PLL','PLL'],
-                    ['CMLL','CMLL'],
-                    ['LSLL','LSLL'],
-                    ['ZBLL','ZBLL'],
-                    ['2GLL','2GLL'],
-                    ['Edge','Edges Only'],
-                    ['Corner','Corners Only'],
-                ]}
+                options={{
+                    'Random': 'Random State',
+                    'LL': 'LL',
+                    'CLL': 'CLL',
+                    'ELL': 'ELL',
+                    'OLL': 'OLL',
+                    'PLL': 'PLL',
+                    'CMLL': 'CMLL',
+                    'LSLL': 'LSLL',
+                    'ZBLL': 'ZBLL',
+                    '2GLL': '2GLL',
+                    'Edge': 'Edges Only',
+                    'Corner': 'Corners Only',
+                }}
                 onSelect={this.onSetScrambler}/>
             
         </div>;

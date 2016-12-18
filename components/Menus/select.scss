@@ -4,18 +4,7 @@
     position: relative;
     min-height: 28px;
 
-    select{
-        // hide arrow
-        -moz-appearance:none;
-        -webkit-appearance: none;
-        &:-ms-expand {
-            display: none;
-        }
-        // hide focus bar
-        &:-moz-focusring {
-            color: transparent;
-            text-shadow: 0 0 0 #000;
-        }
+    select {
 
         outline: none;
         height: 27px;
@@ -24,6 +13,23 @@
         background-color: $white;
         color: $grey;
         padding: 0px 5px;
+
+
+        // hide arrow
+        -moz-appearance:none;
+        -webkit-appearance: none;
+        // webkit only styles
+        @media screen and (-webkit-min-device-pixel-ratio:0) {  
+            padding: 0px 9px;
+        }
+        &:-ms-expand {
+            display: none;
+        }
+        // hide focus bar
+        &:-moz-focusring {
+            color: transparent;
+            text-shadow: 0 0 0 #000;
+        }
 
         option {
             padding: 8px 10px; 
@@ -41,10 +47,8 @@
     .input {
         @extend select;
         padding: 5px 9px;
-        font-weight: 500;
         max-height: 15px;
         width: calc(100% - 20px);
-        display: inline-block;
     }
 }
 

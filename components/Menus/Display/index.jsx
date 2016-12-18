@@ -52,11 +52,11 @@ class Display extends React.Component {
             <div className={styles.layout}>
                 <Select
                     value={config.display.type}
-                    options={[
-                        ['classic','Classic'],
-                        ['box','Flat'],
-                        ['3','Three'],
-                    ]}
+                    options={{
+                        'classic': 'Classic',
+                        'flat': 'Flat',
+                        'three': 'Three',
+                    }}
                     onSelect={this.onDisplay}/>
 
             </div>
@@ -81,7 +81,7 @@ class Display extends React.Component {
                 obj={config}
                 accessor="scale" />
 
-            {config.display.type == 3 && <div>
+            {config.display.type == 'three' && <div>
 
                 <Slider
                     name="X"

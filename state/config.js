@@ -17,7 +17,7 @@ class Config {
     };
 
     @observable display = {
-        type: '3',
+        type: 'three',
         spherical: {
             radius: 2000,
             phi: 0.7857963267948965,

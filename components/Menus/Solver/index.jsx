@@ -59,11 +59,11 @@ class Solver extends React.Component {
                 <div className={styles.metric}>
                     <Select
                         value={metric}
-                        options={[
-                            ['FTM','FTM'],
-                            ['QTM','QTM'],
-                            ['STM','STM'],
-                        ]}
+                        options={{
+                            'FTM': 'FTM',
+                            'QTM': 'QTM',
+                            'STM': 'STM',
+                        }}
                         onSelect={this.onSelect}/>
 
                 </div>
