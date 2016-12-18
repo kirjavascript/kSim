@@ -43,7 +43,7 @@ class MoveLog extends React.Component {
             simplify(cube.history.join(' ')) : 
             cube.history.join(' ');
 
-        let FTM = alg.cube.countMoves(moves, {metric: 'obtm'});
+        let HTM = alg.cube.countMoves(moves, {metric: 'obtm'});
         let STM = alg.cube.countMoves(moves, {metric: 'btm'});
         let QTM = alg.cube.countMoves(moves, {metric: 'obqtm'});
         let SQTM = alg.cube.countMoves(moves, {metric: 'obtm'});
@@ -61,7 +61,7 @@ class MoveLog extends React.Component {
             {moves}
             <div className={styles.condense}>
                 {moves && <div className={styles.counts}>
-                    {`${QTM}q, ${FTM}f, ${STM}s`}
+                    {`${QTM}q, ${HTM}h, ${STM}s`}
                 </div>}
                 <Checkbox
                     label="Condense moves"

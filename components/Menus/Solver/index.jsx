@@ -60,7 +60,7 @@ class Solver extends React.Component {
                     <Select
                         value={metric}
                         options={{
-                            'FTM': 'FTM',
+                            'FTM': 'HTM',
                             'QTM': 'QTM',
                             'STM': 'STM',
                         }}

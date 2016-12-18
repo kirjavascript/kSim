@@ -4,6 +4,7 @@ import keyboard from './keyboard';
 import storage from './storage';
 import scramble from '../lib/scramble';
 import acube from './acubeState';
+import paint from './paint';
 import { moveToObject, doMove, solved } from './moves';
 import { setFace, getFace } from './faces';
 import { timeStamp, parseTimes } from './times';
@@ -131,7 +132,7 @@ class Cube {
     }
 
     @computed get solved() {
-        return [...'URBLDF']
+        return [...'UBRFLD']
             .map((face) => (
                 getFace(this, face)
                     .filter((d) => d != 6)
@@ -166,6 +167,7 @@ class Cube {
         this.centres.replace(centres);
         this.edges.replace(edges);
         this.corners.replace(corners);
+        paint(this);
     }
 
     @action reset(full = true) {

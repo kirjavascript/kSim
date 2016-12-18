@@ -36,11 +36,9 @@ export function setFace(cube, { face, index, value, force }) {
 
     let location = faces[face][index];
 
-    if (index == 4) {
-        // disable setting centres for users
-        if (force) {
-            centres[location[0]] = value;
-        }
+    // disable setting centres for users
+    if (index == 4 && force) {
+        centres[location[0]] = value;
     }
     else if (/[0268]/.test(index)) {
         let [a, b] = location;
