@@ -32,8 +32,21 @@ class Root extends React.Component {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+
     let node = document.body.appendChild(document.createElement('section'));
     render(<Root cube={cube}/>, node);
+    // hide react
     node.firstChild.removeAttribute('data-reactroot');
     document.body.replaceChild(node.firstChild, node);
 });
+
+// favicon
+let link =  document.createElement('link');
+link.rel = 'icon';
+link.type = 'image/png';
+link.href = 'data:image/png;base64,AAABAAEAEBAQAAEABAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAgAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAc2nAADMrJwB4w4YAwLKmAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIiIiIiIiIAAjMyMzIzMiACMzIzMjMyEgIzMjMyMzIRIiIiIiIiIhESMzIzMjMyIRIzMjMyMzISEjMyMzIzMhEiIiIiIiIiERIzMjMyMzIhEjMyMzIzMhISMzIzMjMyESIiIiIiIiIRECREJEQkRCEQAkRCREJEQhAAJEQkRCREIABwAAAAMAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAMAAAADgAAAA';
+document.head.appendChild(link);
+
+// title
+
+document.title = 'kSim 2';

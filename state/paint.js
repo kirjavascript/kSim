@@ -6,6 +6,10 @@ export default function(cube) {
         removeUEdges(cube);
         cube.edges[8] = [6,6];
         cube.edges[10] = [6,6];
+        cube.centres[0] = 6;
+        cube.centres[1] = 6;
+        cube.centres[3] = 6;
+        cube.centres[5] = 6;
     }
     else if (cube.scrambler == 'CLL') {
         removeUEdges(cube);
