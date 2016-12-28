@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react';
 
-import cube from '../../../state/cube';
+import cube from '#state/cube';
 import { yellow, green, red, lightgrey } from '!!sass-variables!../../variables.scss';
 import styles from './styles.scss';
 

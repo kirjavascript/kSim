@@ -59,7 +59,16 @@ module.exports = (env={}) => {
                 React: 'react',
                 THREE: '!!three/build/three.min.js'
             }),
-        ]
+        ],
+        resolve: {
+            alias: {
+                '#lib': __dirname + '/lib',
+                '#state': __dirname + '/state',
+                '#components': __dirname + '/components',
+                '#sass': __dirname + '/components/variables.scss',
+            }
+            
+        }
     }
 
     if (env.devServer) {

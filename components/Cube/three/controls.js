@@ -1,6 +1,6 @@
 import { autorun } from 'mobx';
-import config from '../../../state/config';
-import cube from '../../../state/cube';
+import config from '#state/config';
+import cube from '#state/cube';
 
 let Controls = function (camera, domElement, faces) {
 

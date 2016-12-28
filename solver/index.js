@@ -6,7 +6,7 @@ if (__DEV__) {
         let worker = new solver();
 
         worker.onmessage = function(e) {
-            console.log(e.data);
+            console.info(e.data);
         };
 
     };

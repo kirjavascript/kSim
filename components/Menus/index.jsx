@@ -6,7 +6,7 @@ import Display from './Display/index.jsx';
 import Solver from './Solver/index.jsx';
 import Timer from './Timer/index.jsx';
 import CodeIcon from 'react-icons/lib/go/octoface';
-import { clearStorage } from '../../state/storage';
+import { clearStorage } from '#state/storage';
 
 class Menus extends React.Component {
 

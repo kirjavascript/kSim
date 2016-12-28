@@ -3,7 +3,7 @@ import styles from './styles.scss';
 
 import DeleteIcon from 'react-icons/lib/go/x';
 import AddIcon from 'react-icons/lib/go/plus';
-import config from '../../../state/config';
+import config from '#state/config';
 
 @observer
 class Keymap extends React.Component {

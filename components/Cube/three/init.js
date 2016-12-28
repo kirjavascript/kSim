@@ -1,6 +1,6 @@
 import { autorun } from 'mobx';
-import config from '../../../state/config';
-import cube from '../../../state/cube';
+import config from '#state/config';
+import cube from '#state/cube';
 import { texture } from './texture';
 import Controls from './controls';
 import { hash2hex, face, sticker, resize } from './util';

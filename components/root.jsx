@@ -32,7 +32,6 @@ class Root extends React.Component {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-
     let node = document.body.appendChild(document.createElement('section'));
     render(<Root cube={cube}/>, node);
     // hide react
@@ -47,6 +46,5 @@ link.type = 'image/png';
 link.href = 'data:image/png;base64,AAABAAEAEBAQAAEABAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAgAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAc2nAADMrJwB4w4YAwLKmAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIiIiIiIiIAAjMyMzIzMiACMzIzMjMyEgIzMjMyMzIRIiIiIiIiIhESMzIzMjMyIRIzMjMyMzISEjMyMzIzMhEiIiIiIiIiERIzMjMyMzIhEjMyMzIzMhISMzIzMjMyESIiIiIiIiIRECREJEQkRCEQAkRCREJEQhAAJEQkRCREIABwAAAAMAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAMAAAADgAAAA';
 document.head.appendChild(link);
 
-// title
 
 document.title = 'kSim 2';

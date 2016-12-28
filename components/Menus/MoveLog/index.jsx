@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react';
 
-import cube from '../../../state/cube';
-import alg from '../../../lib/alg';
+import cube from '#state/cube';
+import alg from '#lib/alg';
 import Checkbox from '../checkbox.jsx';
 import Slider from '../slider.jsx';
 import styles from './styles.scss';

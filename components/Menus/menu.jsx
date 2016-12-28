@@ -4,7 +4,7 @@ import styles from './styles.scss';
 
 import DownIcon from 'react-icons/lib/go/chevron-down';
 import RightIcon from 'react-icons/lib/go/chevron-right';
-import config from '../../state/config';
+import config from '#state/config';
 
 @observer
 class Menu extends React.Component {

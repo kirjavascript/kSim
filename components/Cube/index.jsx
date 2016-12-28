@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react';
-import config from '../../state/config';
+import config from '#state/config';
 
 import Classic from './classic.jsx';
 import Box from './box.jsx';

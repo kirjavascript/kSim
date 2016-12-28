@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react';
-import config from '../../state/config';
-import cube from '../../state/cube';
+import config from '#state/config';
+import cube from '#state/cube';
 import styles from './styles.scss';
 import Face from './face.jsx';
 

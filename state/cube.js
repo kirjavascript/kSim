@@ -2,9 +2,8 @@ import { action, computed, observable, autorun, toJS } from 'mobx';
 import SASSVars from '!!sass-variables!../components/variables.scss';
 import keyboard from './keyboard';
 import storage from './storage';
-import scramble from '../lib/scramble';
+import scrambler from './scrambler';
 import acube from './acubeState';
-import paint from './paint';
 import { moveToObject, doMove, solved } from './moves';
 import { setFace, getFace } from './faces';
 import { timeStamp, parseTimes } from './times';
@@ -125,7 +124,7 @@ class Cube {
 
     @action newScramble() {
         this.reset();
-        this.scramble = scramble(this.scrambler);
+        this.scramble = scrambler(this);
         this.doMoves(this.scramble, true);
         this.rawTimer = 0;
         this.state = 'ready';
@@ -167,7 +166,6 @@ class Cube {
         this.centres.replace(centres);
         this.edges.replace(edges);
         this.corners.replace(corners);
-        paint(this);
     }
 
     @action reset(full = true) {

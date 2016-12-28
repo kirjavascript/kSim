@@ -1,15 +1,15 @@
 import { observer } from 'mobx-react';
 
-import alg from '../../../lib/alg';
+import alg from '#lib/alg';
 import Checkbox from '../checkbox.jsx';
 import Slider from '../slider.jsx';
 import Select from '../select.jsx';
 import styles from './styles.scss';
 
-import cube from '../../../state/cube';
-import config from '../../../state/config';
+import cube from '#state/cube';
+import config from '#state/config';
 
-import '!!script-loader!../../../lib/acube';
+import '!!script-loader!#lib/acube';
 let { init, solve } = window.__acube__;
 
 init(config);

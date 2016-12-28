@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react';
 import { Motion, spring } from 'react-motion';
-import config from '../../../state/config';
-import cube from '../../../state/cube';
+import config from '#state/config';
+import cube from '#state/cube';
 import Slider from '../slider.jsx';
 import Select from '../select.jsx';
 import Checkbox from '../checkbox.jsx';

@@ -1,4 +1,4 @@
-import config from '../../../state/config';
+import config from '#state/config';
 
 let texture;
 
