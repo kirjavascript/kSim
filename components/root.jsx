@@ -3,6 +3,7 @@ import { observer } from 'mobx-react';
 
 import styles from './root.scss';
 import '../solver/';
+import cube from '#state/cube';
 
 import CubeUI from './Cube/index.jsx';
 import Menus from './Menus/index.jsx';
