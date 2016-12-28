@@ -1,6 +1,7 @@
 import styles from './styles.scss';
 import Menu from './menu.jsx';
 import Keymap from './Keymap/index.jsx';
+import Cube from './Cube/index.jsx';
 import MoveLog from './MoveLog/index.jsx';
 import Display from './Display/index.jsx';
 import Solver from './Solver/index.jsx';
@@ -14,17 +15,22 @@ class Menus extends React.Component {
         return <div>
             <div className={styles.left}>
 
-                <Menu title="Solver" name="solver">
-                    <Solver />
+                <Menu title="Cube" name="cube">
+                    <Cube />
                 </Menu>
 
                 <Menu title="Display" name="display">
                     <Display />
                 </Menu>
 
+                <Menu title="Solver" name="solver">
+                    <Solver />
+                </Menu>
+
                 <Menu title="Keymap" name="keymap">
                     <Keymap />
                 </Menu>
+
             </div>
 
             <div className={styles.right}>

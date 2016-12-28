@@ -13,7 +13,8 @@ class Config {
         movelog: 1,
         timer: 1,
         about: 1,
-        solver: 1
+        solver: 0,
+        cube: 1,
     };
 
     @observable display = {

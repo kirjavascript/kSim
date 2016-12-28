@@ -1,0 +1,40 @@
+@import '../../variables.scss';
+
+.orient {
+    padding: 5px;
+    margin-top: 10px;
+    width: 100%;
+}
+
+.flex {
+    display: flex;
+    margin: 10px 0 0 0;
+    justify-content: space-around;
+    align-items: center;
+    .colour {
+        cursor: pointer;
+        flex-grow: 1;
+        height: 10px;
+        margin-right: 5px;
+        &:last-of-type {
+            margin-right: 0;
+        }
+    }
+}
+
+.picker {
+    margin: 20px 0;
+    :global {
+        .chrome-picker {
+            margin: 10px auto 0 auto;
+            box-shadow: none !important;
+            border: 5px solid $lightgrey;
+            font-family: 'Inconsolata', sans-serif !important;
+            > div, input, svg { 
+                background-color: $lightgrey !important;
+                color: $white !important;
+                box-shadow: none !important;
+            }
+        }
+    }
+}

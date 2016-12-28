@@ -18,7 +18,7 @@ export default function (cube) {
             .forEach((face) => {
                 setFace(cube, {
                     face,
-                    value: '6',
+                    value: 6,
                     index: 1
                 });
             });
@@ -53,11 +53,10 @@ export default function (cube) {
         removeUEdges(cube);
         cube.edges[8] = [6,6];
         cube.edges[10] = [6,6];
-        cube.centres[0] = 6;
-        cube.centres[1] = 6;
-        cube.centres[3] = 6;
-        cube.centres[5] = 6;
         scramble = scramble333.getCMLLScramble();
+    }
+    else if (type == 'LSE') {
+        scramble = scramble333.getLSEScramble() + auf() + m2();
     }
     else {
         scramble = scramble333[`get${type}Scramble`]();
@@ -78,6 +77,10 @@ let subGroup = {
 
 function auf() {
     return ['','U','U\'','U2'][(Math.random()*3)|0];
+}
+
+function m2() {
+    return ['','M2'][(Math.random()*2)|0];
 }
 
 function setSolved(cube) {
