@@ -76,11 +76,15 @@ let subGroup = {
 };
 
 function auf() {
-    return ['','U','U\'','U2'][(Math.random()*3)|0];
+    return randFromArray(['','U','U\'','U2']);
 }
 
 function m2() {
-    return ['','M2'][(Math.random()*2)|0];
+    return randFromArray(['','M2']);
+}
+
+function randFromArray(options) {
+    return options[(Math.random()*options.length)|0];
 }
 
 function setSolved(cube) {
