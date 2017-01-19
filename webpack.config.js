@@ -61,6 +61,7 @@ module.exports = (env={}) => {
             }),
         ],
         resolve: {
+            extensions: ['.js', '.json', '.jsx'],
             alias: {
                 '#lib': __dirname + '/lib',
                 '#state': __dirname + '/state',

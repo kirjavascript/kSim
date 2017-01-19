@@ -2,7 +2,7 @@ import { observer } from 'mobx-react';
 import config from '#state/config';
 import cube from '#state/cube';
 import styles from './styles.scss';
-import Face from './face.jsx';
+import Face from './face';
 
 @observer
 export default class extends React.Component {

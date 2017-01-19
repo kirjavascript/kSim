@@ -4,7 +4,7 @@ import { Motion, spring } from 'react-motion';
 import { ChromePicker } from 'react-color';
 
 import cube from '#state/cube';
-import Select from '../select.jsx';
+import Select from '#components/UI/Select/';
 
 @observer
 class Timer extends React.Component {

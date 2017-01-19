@@ -1,0 +1,50 @@
+.slide {
+    margin: 10px 0;
+    position: relative;
+
+    button {
+        position: absolute;
+        top: 0; right: 0;
+        font-size: 12px;
+    }
+
+    :global {
+        input {
+            background: none;
+            box-shadow: none;
+            padding: 0 0px;
+            margin: 0;
+            width: 100%;
+            max-width: none;
+            -webkit-appearance: none;
+            border-radius: 8px;
+            height: 10px;
+            border: none;
+            background-color: #444a58;
+        }
+
+        input::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            background: #96a2b0;
+            border: none;
+            width: 15px;
+            height: 10px;
+            border-radius: 5px;
+        }
+
+        input::-moz-range-track {
+            border-radius: 8px;
+            height: 10px;
+            border: none;
+            background-color: #444a58;
+        }
+        input::-moz-range-thumb {
+            background: #96a2b0;
+            border: none;
+            width: 15px;
+            height: 10px;
+            border-radius: 5px;
+        }
+    }
+    
+}

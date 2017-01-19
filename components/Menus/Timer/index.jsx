@@ -2,7 +2,7 @@ import { observer } from 'mobx-react';
 
 import cube from '#state/cube';
 import styles from './styles.scss';
-import Times from './times.jsx';
+import Times from './times';
 
 @observer
 class Timer extends React.Component {

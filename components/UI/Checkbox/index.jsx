@@ -1,6 +1,5 @@
 import { observer } from 'mobx-react';
-import styles from './styles.scss';
-import SASSVars from '!!sass-variables!../variables.scss';
+import SASSVars from '!!sass-variables!../../variables.scss';
 
 @observer
 class Checkbox extends React.Component {

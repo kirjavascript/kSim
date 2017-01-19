@@ -1,11 +1,11 @@
 import styles from './styles.scss';
-import Menu from './menu.jsx';
-import Keymap from './Keymap/index.jsx';
-import Cube from './Cube/index.jsx';
-import MoveLog from './MoveLog/index.jsx';
-import Display from './Display/index.jsx';
-import Solver from './Solver/index.jsx';
-import Timer from './Timer/index.jsx';
+import Menu from '#components/UI/Menu/';
+import Keymap from './Keymap/';
+import Cube from './Cube/';
+import MoveLog from './MoveLog/';
+import Display from './Display/';
+import Solver from './Solver/';
+import Timer from './Timer/';
 import CodeIcon from 'react-icons/lib/go/octoface';
 import { clearStorage } from '#state/storage';
 

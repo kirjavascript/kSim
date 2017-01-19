@@ -1,9 +1,9 @@
 import { observer } from 'mobx-react';
 import config from '#state/config';
 
-import Classic from './classic.jsx';
-import Box from './box.jsx';
-import Three from './three/index.jsx';
+import Classic from './classic';
+import Box from './box';
+import Three from './three/';
 
 @observer
 class CubeUI extends React.Component {

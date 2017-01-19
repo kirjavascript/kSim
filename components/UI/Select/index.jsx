@@ -1,5 +1,5 @@
 import DownIcon from 'react-icons/lib/go/chevron-down';
-import styles from './select.scss';
+import styles from './styles.scss';
 
 class Select extends React.Component {
 

@@ -1,0 +1,41 @@
+@import '../../variables.scss';
+
+.menu {
+
+    .title {
+
+        background-color: $lightgrey;
+        cursor: pointer;
+        z-index: 2;
+        position: relative;
+        min-height: 45px;
+        border-bottom: 1px solid $grey;
+
+        h2 {
+            display: inline-block;
+            color: $red;
+            padding: 10px;
+            margin: 0;
+        }
+
+        svg {
+            width: 25px;
+            height: 25px;
+            position: absolute;
+            right: 10px;
+            top: 10px;
+        }
+    }
+
+    .bodywrap {
+        overflow: hidden;
+    }
+
+    .body {
+        padding: 10px;
+        border-bottom: 1px solid $lightgrey;
+        z-index: 1;
+        position: relative;
+        background-color: $grey;
+    }
+}

@@ -1,9 +1,9 @@
 import { observer } from 'mobx-react';
 
 import alg from '#lib/alg';
-import Checkbox from '../checkbox.jsx';
-import Slider from '../slider.jsx';
-import Select from '../select.jsx';
+import Slider from '#components/UI/Slider/';
+import Select from '#components/UI/Select/';
+import Checkbox from '#components/UI/Checkbox/';
 import styles from './styles.scss';
 
 import cube from '#state/cube';

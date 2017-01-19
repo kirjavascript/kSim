@@ -2,8 +2,8 @@ import { observer } from 'mobx-react';
 
 import cube from '#state/cube';
 import alg from '#lib/alg';
-import Checkbox from '../checkbox.jsx';
-import Slider from '../slider.jsx';
+import Checkbox from '#components/UI/Checkbox/';
+import Slider from '#components/UI/Slider/';
 import styles from './styles.scss';
 
 function simplify(moves) {

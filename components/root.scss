@@ -55,9 +55,10 @@ html {
     font-family: 'Inconsolata', sans-serif;
     margin: 0;
     padding: 10px;
-    background-color: #272b33;
     color: #a6b2c0;
     overflow: hidden;
+    height: 100vh;
+    background: $black;
 }
 
 button {
