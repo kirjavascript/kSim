@@ -3,7 +3,6 @@ import { Motion, spring } from 'react-motion';
 import styles from './styles.scss';
 
 import DownIcon from 'react-icons/lib/go/chevron-down';
-import RightIcon from 'react-icons/lib/go/chevron-right';
 import config from '#state/config';
 
 @observer
@@ -44,7 +43,14 @@ class Menu extends React.Component {
                 onClick={this.toggle}
                 className={styles.title}>
                 <h2>{this.props.title}</h2>
-                {open ? <DownIcon/> : <RightIcon/>}
+                <Motion
+                    defaultStyle={{rotate:open?0:-90}}
+                    style={{rotate: spring(open?0:-90)}}>
+                    {({rotate})=>(
+                        <DownIcon
+                            style={{transform: `rotate(${rotate}deg)`}}/>
+                    )}
+                </Motion>
             </div>
 
             <div className={styles.bodywrap} ref={this.bodyinit}>
