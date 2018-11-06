@@ -61,7 +61,7 @@ class Timer extends React.Component {
                 'LSLL': 'LSLL',
                 '2GLL': '2GLL',
                 'ZBLL': 'ZBLL',
-                
+
                 'ZBLL U': 'ZBLL U',
                 'ZBLL T': 'ZBLL T',
                 'ZBLL AS': 'ZBLL AS',
@@ -90,8 +90,8 @@ class Timer extends React.Component {
                         marginTop: spring(this.state.showPicker?0:-272),
                         opacity: spring(+this.state.showPicker)
                     }}>
-                    {(style) => <div 
-                        className={styles.picker} 
+                    {(style) => <div
+                        className={styles.picker}
                         style={{
                             ...style,
                             display: style.opacity ? 'block' : 'none'
@@ -104,7 +104,7 @@ class Timer extends React.Component {
                 </Motion>
                 <div className={styles.flex}>
                     {cube.colours.map(((colour,i) =>
-                        <Colour 
+                        <Colour
                             onPickFace={this.colourPickFace}
                             colour={colour}
                             id={i}
@@ -119,7 +119,7 @@ class Timer extends React.Component {
 
 
 
-            
+
         </div>;
     }
 }
@@ -133,7 +133,7 @@ class Colour extends React.Component {
 
     render() {
         return (
-            <div 
+            <div
                 onClick={this.onClick}
                 className={styles.colour}
                 style={{backgroundColor: this.props.colour}}>

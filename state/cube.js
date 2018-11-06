@@ -30,7 +30,7 @@ class Cube {
         SASSVars.green,
         SASSVars.orange,
         SASSVars.yellow,
-        SASSVars.lightgrey
+        SASSVars.grey,
     ];
 
     // faces
@@ -189,11 +189,15 @@ if (cube.state == 'running' && !cube.timerLoop) {
 }
 
 // attach keyboard events
-keyboard(cube); 
+keyboard(cube);
 
 if (__DEV__) {
     window.cube = cube;
 }
+
+autorun(() => {
+    document.documentElement.style.backgroundColor = cube.colours[6];
+});
 
 export { Cube };
 export default cube;
