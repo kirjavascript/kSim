@@ -81,8 +81,8 @@ function bestN(n, times) {
 
     return {
         time: timeStamp(min),
-        index, 
-        maxIndex: maxIndex + index, 
+        index,
+        maxIndex: maxIndex + index,
         minIndex: minIndex + index
     };
 
@@ -103,9 +103,10 @@ function getAvg(times) {
 
     times.splice(maxIndex, 1);
     times.splice(minIndex, 1);
+    const filteredTimes = times.filter((_, i) => i !== maxIndex && i !== minIndex);
 
     return {
-        average: times.reduce((a,b) => a+b) / times.length,
+        average: filteredTimes.reduce((a,b) => a+b) / filteredTimes,
         maxIndex, minIndex
     };
 }
