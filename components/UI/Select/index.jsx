@@ -9,6 +9,7 @@ class Select extends React.Component {
 
     nativeInput = (e) => {
         this.props.onSelect(e.target.value);
+        e.target.blur();
     }
 
     onFocus = () => {
@@ -28,13 +29,13 @@ class Select extends React.Component {
                 <DownIcon/>
             </div>
 
-            {!focus && <input
+            {!true && <input
                 value={options[value]}
                 className={styles.input}
                 readOnly
                 onMouseEnter={this.onFocus}/>}
 
-            {focus && <select
+            {true && <select
                 value={value}
                 onMouseLeave={this.onBlur}
                 onChange={this.nativeInput}>
