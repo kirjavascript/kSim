@@ -98,11 +98,9 @@ function currentN(n, times) {
 }
 
 function getAvg(times) {
-    let maxIndex = times.indexOf(Math.max(...times));
-    let minIndex = times.indexOf(Math.min(...times));
+    const maxIndex = times.indexOf(Math.max(...times));
+    const minIndex = times.indexOf(Math.min(...times));
 
-    times.splice(maxIndex, 1);
-    times.splice(minIndex, 1);
     const filteredTimes = times.filter((_, i) => i !== maxIndex && i !== minIndex);
 
     return {
